@@ -116,20 +116,23 @@ class MedicoTest {
     // Cenário: atualizar só a cidade do endereço. A cidade muda, e o logradouro, o bairro e o CEP continuam iguais.
     @Test
     @DisplayName("Cenário: atualizar só a cidade do endereço. A cidade muda, e o logradouro, o bairro e o CEP continuam iguais.")
-    void deveAtualizarApenasACidadeQuandoSoACidadeForInformada() {
-        Endereco endereco = new Endereco(enderecoValido());
+    void deveAtualizarApenasACidadeDoEnderecoDoMedico() {
+        Medico medico = new Medico(cadastroValido());
 
-        // Formulário de atualização: logradouro, bairro, cep, cidade, uf, complement e numero
+        // Formulário de atualização: logradouro, bairro, cep, cidade, uf, complemento e numero
         // null = "não quero mudar este campo"
-        var dados = new DadosEndereco(null, null, null, "Cianorte", null, null, null);
+        var novoEndereco = new DadosEndereco(null, null, null, "Cianorte", null, null, null);
 
-        endereco.atualizarInformacoes(dados);
+        medico.atualizarInformacoes(new DadosAtualizacaoMedico(1L, null, null, novoEndereco));
 
-        assertEquals("Rua das Flores", endereco.getLogradouro());   // NÃO mudou
-        assertEquals("Cianorte", endereco.getCidade());             // mudou
-        assertEquals("Centro", endereco.getBairro());               // NÃO mudou
-        assertEquals("87000000", endereco.getCep());                // NÃO mudou
-        assertEquals("PR", endereco.getUf());                       // NÃO mudou
-        assertEquals("100", endereco.getNumero());                  // NÃO mudou
+        assertAll(
+                () -> assertEquals("Cianorte", medico.getEndereco().getCidade()),           // mudou
+                () -> assertEquals("Rua das Flores", medico.getEndereco().getLogradouro()), //NÃO mudou
+                () -> assertEquals("Centro", medico.getEndereco().getBairro()),             //NÃO mudou
+                () -> assertEquals("87000000", medico.getEndereco().getCep()),              //NÃO mudou
+                () -> assertEquals("PR", medico.getEndereco().getUf()),                     //NÃO mudou
+                () -> assertEquals("100", medico.getEndereco().getNumero()),                //NÃO mudou
+                () -> assertNull(medico.getEndereco().getComplemento())                             //NÃO mudou (continua sem)
+        );
     }
 }
