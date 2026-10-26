@@ -12,34 +12,41 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("medicos")
+@RestController // dizendo que é um controller rest
+@RequestMapping("medicos") // a rota que será chamada nas requisições
 public class MedicoController {
-	@Autowired
+	@Autowired // para chamar o JpaRepository
 	private MedicoRepository repository;
 
-	@PostMapping
+	@PostMapping // rota post
 	@Transactional
 	public void cadastrar(@RequestBody @Valid DadosCadastroMedico dados){
 		repository.save(new Medico(dados));
 	}
 
-	@GetMapping
+	@GetMapping //rota get
 	public Page<DadosListagemMedico> listar(@PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao){
 		return repository.findAllByAtivoTrue(paginacao).map(DadosListagemMedico::new);
 	}
 
-	@PutMapping
+	@PutMapping //rota put
 	@Transactional
 	public void atualizar(@RequestBody @Valid DadosAtualizacaoMedico dados){
 		var medico = repository.getReferenceById(dados.id());
 		medico.atualizarInformacoes(dados); 
 	}
 
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/{id}") // rota delete
 	@Transactional
 	public void excluir(@PathVariable Long id){
 		var medico = repository.getReferenceById(id);
 		medico.excluir();
+	}
+
+	@PatchMapping("/{id}/ativar")
+	@Transactional
+	public void ativar(@PathVariable Long id){
+		var medico = repository.getReferenceById(id);
+		medico.ativar();
 	}
 }
