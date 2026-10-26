@@ -8,15 +8,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import med.voll.api.endereco.Endereco;
 
-@Table(name = "medicos")
-@Entity(name = "Medico")
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "medicos") // Nome da minha tabela no banco "medico"
+@Entity(name = "Medico") // Entidade que vai ficar na gaveta "medicos"
+@Getter // Usando lombok para fazer os getters
+@NoArgsConstructor // Lombok fazendo os construtores
+@AllArgsConstructor // Lombok fazendo os construtores
 @EqualsAndHashCode(of = "id")
 public class Medico {
 
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) // O banco escolhe o número do meu id
 	private Long id;
 	private String nome;
 	private String telefone;
@@ -55,6 +55,10 @@ public class Medico {
     }
 
 	public void excluir() {
-		this.ativo = false;
+		this.ativo = false; // não exclui do banco, só coloca um aviso "inativo"
+	}
+
+	public void ativar(){
+		this.ativo = true; // volta o médido para ativo
 	}
 }
