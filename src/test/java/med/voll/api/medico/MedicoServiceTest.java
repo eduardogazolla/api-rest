@@ -8,6 +8,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -106,5 +111,64 @@ class MedicoServiceTest {
         // ACT + ASSERT
         assertThrows(EntityNotFoundException.class,
                 () -> service.atualizar(dados));
+    }
+
+    @Test
+    void deveAtualizarNomeDoMedico() {
+        // ARRANGE
+        // Este médico ENTRA no Service pelo Optional.of, então aqui o new faz sentido
+        Medico medico = new Medico(cadastroValido());
+        when(repository.findById(1L)).thenReturn(Optional.of(medico));
+
+        var dados = new DadosAtualizacaoMedico(1L, "Ana Lima", null, null);
+
+        // ACT
+        service.atualizar(dados);
+
+        // ASSERT: confiro o MESMO objeto que o mock entregou ao Service
+        assertEquals("Ana Lima", medico.getNome());          // mudou
+        assertEquals("44999990000", medico.getTelefone());   // NÃO mudou
+        verify(repository).findById(1L);
+    }
+
+    @Test
+    void deveConverterMedicosParaDadosDeListagem() {
+        // ARRANGE
+        Medico medico = new Medico(cadastroValido());
+        Pageable paginacao = PageRequest.of(0, 10);   // página 0, 10 por página
+
+        // Ensino o mock: "quando pedirem os ativos dessa página,
+        // devolva uma página com este médico dentro"
+        when(repository.findAllByAtivoTrue(paginacao))
+                .thenReturn(new PageImpl<>(List.of(medico)));
+
+        // ACT
+        Page<DadosListagemMedico> resultado = service.listar(paginacao);
+
+        // ASSERT
+        // 1. Veio exatamente 1 item?
+        assertEquals(1, resultado.getTotalElements());
+
+        // 2. Pego o primeiro item e confiro se o resumo foi montado certo.
+        //    Record não usa getNome(): o "getter" tem o nome do campo, nome()
+        DadosListagemMedico item = resultado.getContent().get(0);
+        assertEquals("Ana Souza", item.nome());
+        assertEquals("ana@voll.med", item.email());
+        assertEquals("123456", item.crm());
+        assertEquals(Especialidade.CARDIOLOGIA, item.especialidade());
+
+        // 3. O Service pediu os ATIVOS (e não um findAll qualquer)?
+        verify(repository).findAllByAtivoTrue(paginacao);
+    }
+
+    // Edge case: nenhum médico ativo, a página deve vir vazia (e não dar erro)
+    @Test
+    void deveRetornarPaginaVaziaQuandoNaoHouverMedicosAtivos() {
+        Pageable paginacao = PageRequest.of(0, 10);
+        when(repository.findAllByAtivoTrue(paginacao)).thenReturn(Page.empty());
+
+        Page<DadosListagemMedico> resultado = service.listar(paginacao);
+
+        assertTrue(resultado.isEmpty());
     }
 }
