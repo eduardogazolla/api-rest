@@ -9,13 +9,13 @@ import med.voll.api.endereco.Endereco;
 
 @Table(name = "medicos")
 @Entity(name = "Medico")
-@Getter // Usando lombok para fazer os getters
-@NoArgsConstructor // Lombok fazendo os construtores
-@AllArgsConstructor // Lombok fazendo os construtores
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class Medico {
 
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) // O banco escolhe o número do meu id
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String nome;
 	private String telefone;
@@ -54,10 +54,10 @@ public class Medico {
     }
 
 	public void excluir() {
-		this.ativo = false; // não exclui do banco, só coloca um aviso "inativo"
+		this.ativo = false; // exclusão lógica: o registro é mantido no banco
 	}
 
 	public void ativar(){
-		this.ativo = true; // volta o médido para ativo
+		this.ativo = true;
 	}
 }
