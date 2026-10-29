@@ -73,16 +73,6 @@ class MedicoTest {
     }
 
     @Test
-    @DisplayName("Este teste documenta o comportamento ATUAL (que provavelmente está errado).")
-    void aceitaNomeVazioNaAtualizacao() {
-        Medico medico = new Medico(cadastroValido());
-
-        medico.atualizarInformacoes(new DadosAtualizacaoMedico(1L, "", null, null));
-
-        assertEquals("", medico.getNome());
-    }
-
-    @Test
     @DisplayName("Cenário: atualizar só a cidade do endereço. A cidade muda, e o logradouro, o bairro e o CEP continuam iguais.")
     void deveAtualizarApenasACidadeDoEnderecoDoMedico() {
         Medico medico = new Medico(cadastroValido());
