@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("medicos")
 public class MedicoController {
 
-	// O controller não conhece mais o repository: só fala com o Service
 	private final MedicoService service;
 
 	public MedicoController(MedicoService service) {
@@ -20,7 +19,7 @@ public class MedicoController {
 
 	@PostMapping
 	public void cadastrar(@RequestBody @Valid DadosCadastroMedico dados) {
-		service.cadastrar(dados);     // "gerente, cadastra isso aqui"
+		service.cadastrar(dados);
 	}
 
 	@GetMapping
