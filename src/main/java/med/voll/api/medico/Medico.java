@@ -54,7 +54,7 @@ public class Medico {
     }
 
 	public void excluir() {
-		this.ativo = false; // não exclui do banco, só coloca um aviso "inativo"
+		this.ativo = false; // exclusão lógica: o registro é mantido no banco
 	}
 
 	public void ativar(){
