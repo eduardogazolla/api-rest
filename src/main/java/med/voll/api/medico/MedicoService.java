@@ -6,23 +6,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// @Service: "Spring, esta classe é um gerente de regras de negócio.
-// Crie um objeto dela e entregue para quem precisar."
 @Service
 public class MedicoService {
 
-    // "final" = depois de recebido, o repository nunca é trocado
     private final MedicoRepository repository;
 
-    // INJEÇÃO PELO CONSTRUTOR (em vez de @Autowired no atributo):
-    // o Spring vê que o construtor pede um MedicoRepository e entrega um.
-    // Vantagem no teste: NÓS podemos entregar um repository FALSO aqui.
     public MedicoService(MedicoRepository repository) {
         this.repository = repository;
     }
 
-    // O @Transactional veio do controller para cá,
-    // porque é o Service quem mexe nos dados agora
     @Transactional
     public void cadastrar(DadosCadastroMedico dados) {
         repository.save(new Medico(dados));
@@ -48,9 +40,6 @@ public class MedicoService {
     }
 
     private Medico buscarMedicoPorId(Long id){
-        // 1. Procuro o médico: findById devolve uma "caixa" (Optional)
-        // 2. orElseThrow: se a caixa estiver vazia, lanço a exceção.
-        //    O "() -> new ..." é uma lambda: só cria a exceção SE precisar.
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Médico não encontrado: " + id));
     }
