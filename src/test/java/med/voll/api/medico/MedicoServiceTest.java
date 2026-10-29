@@ -73,7 +73,6 @@ class MedicoServiceTest {
         var dados = cadastroValido();
 
         // ACT
-        // 1. Crio um médico de verdade (ele nasce ativo)
         service.cadastrar(dados);
 
         // ASSERT
@@ -170,5 +169,28 @@ class MedicoServiceTest {
         Page<DadosListagemMedico> resultado = service.listar(paginacao);
 
         assertTrue(resultado.isEmpty());
+    }
+
+    @Test
+    void deveReativarMedicoInativo() {
+        // ARRANGE: médico inativo, e o mock entrega ele quando pedirem a ficha 1
+        Medico medico = new Medico(cadastroValido());
+        medico.excluir();
+        when(repository.findById(1L)).thenReturn(Optional.of(medico));
+
+        // ACT
+        service.ativar(1L);
+
+        // ASSERT: o MESMO objeto que o mock entregou ficou ativo
+        assertTrue(medico.getAtivo());
+        verify(repository).findById(1L);
+    }
+
+    @Test
+    void deveLancarExcecaoAoAtivarMedicoInexistente() {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class,
+                () -> service.ativar(999L));
     }
 }
