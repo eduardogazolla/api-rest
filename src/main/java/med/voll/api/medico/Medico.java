@@ -1,15 +1,14 @@
 package med.voll.api.medico;
 
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import med.voll.api.endereco.Endereco;
 
-@Table(name = "medicos") // Nome da minha tabela no banco "medico"
-@Entity(name = "Medico") // Entidade que vai ficar na gaveta "medicos"
+@Table(name = "medicos")
+@Entity(name = "Medico")
 @Getter // Usando lombok para fazer os getters
 @NoArgsConstructor // Lombok fazendo os construtores
 @AllArgsConstructor // Lombok fazendo os construtores
@@ -42,7 +41,7 @@ public class Medico {
 		this.endereco = new Endereco(dados.endereco());
 	}
 
-    public void atualizarInformacoes(@Valid DadosAtualizacaoMedico dados) {
+    public void atualizarInformacoes(DadosAtualizacaoMedico dados) {
 		if (dados.nome() != null) {
 			this.nome = dados.nome();
 		}

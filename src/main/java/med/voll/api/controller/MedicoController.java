@@ -33,6 +33,11 @@ public class MedicoController {
 		service.atualizar(dados);
 	}
 
+	@PatchMapping("/{id}/ativar")
+	public void ativar (@PathVariable Long id){
+		service.ativar(id);
+	}
+
 	@DeleteMapping("/{id}")
 	public void excluir(@PathVariable Long id) {
 		service.excluir(id);

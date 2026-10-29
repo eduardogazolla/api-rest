@@ -1,11 +1,8 @@
 package med.voll.api.medico;
 
 import med.voll.api.endereco.DadosEndereco;
-import med.voll.api.endereco.Endereco;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
 
 // "import static" traz os métodos de verificação (assertEquals, assertTrue...)
 // para você usar direto, sem escrever Assertions.assertEquals toda vez
@@ -29,9 +26,6 @@ class MedicoTest {
         return new DadosCadastroMedico("Ana Souza", "ana@voll.med", "44999990000",
                 "123456", Especialidade.CARDIOLOGIA, enderecoValido());
     }
-
-    // os testes vêm aqui embaixo
-    // Cenário: ao cadastrar, o médico nasce ATIVO
     @Test
     @DisplayName("Cenário: ao cadastrar, o médico nasce ATIVO")
     void deveCriarMedicoAtivoAoCadastrar() {
@@ -44,7 +38,6 @@ class MedicoTest {
         assertEquals("Maringá", medico.getEndereco().getCidade()); // montou o endereço?
     }
 
-    // Cenário: excluir NÃO apaga, só marca como inativo (exclusão lógica)
     @Test
     @DisplayName("Cenário: excluir NÃO apaga, só marca como inativo (exclusão lógica)")
     void deveInativarMedicoAoExcluir() {
@@ -58,7 +51,6 @@ class MedicoTest {
         assertFalse(medico.getAtivo());
     }
 
-    // Cenário: atualização PARCIAL, só o nome muda e o resto fica igual
     @Test
     @DisplayName("Cenário: atualização PARCIAL, só o nome muda e o resto fica igual")
     void deveAtualizarApenasONomeQuandoSoONomeForInformado() {
@@ -75,7 +67,6 @@ class MedicoTest {
         assertEquals("Maringá", medico.getEndereco().getCidade()); // NÃO mudou
     }
 
-    // Edge case: tudo nulo, nada deve mudar
     @Test
     @DisplayName("Edge case: tudo nulo, nada deve mudar")
     void naoDeveAlterarNadaQuandoTodosOsCamposForemNulos() {
@@ -87,7 +78,6 @@ class MedicoTest {
         assertEquals("44999990000", medico.getTelefone());
     }
 
-    // Cenário de exceção: passar o formulário inteiro como null
     @Test
     @DisplayName("Cenário de exceção: passar o formulário inteiro como null")
     void deveLancarExcecaoQuandoDadosDeAtualizacaoForemNulos() {
@@ -101,8 +91,6 @@ class MedicoTest {
                 () -> medico.atualizarInformacoes(null));
     }
 
-    // ACHADO: a atualização aceita nome vazio e sobrescreve o nome atual.
-    // Este teste documenta o comportamento ATUAL (que provavelmente está errado).
     @Test
     @DisplayName("Este teste documenta o comportamento ATUAL (que provavelmente está errado).")
     void aceitaNomeVazioNaAtualizacao() {
@@ -113,7 +101,6 @@ class MedicoTest {
         assertEquals("", medico.getNome()); // o médico ficou SEM nome!
     }
 
-    // Cenário: atualizar só a cidade do endereço. A cidade muda, e o logradouro, o bairro e o CEP continuam iguais.
     @Test
     @DisplayName("Cenário: atualizar só a cidade do endereço. A cidade muda, e o logradouro, o bairro e o CEP continuam iguais.")
     void deveAtualizarApenasACidadeDoEnderecoDoMedico() {
@@ -134,5 +121,30 @@ class MedicoTest {
                 () -> assertEquals("100", medico.getEndereco().getNumero()),                //NÃO mudou
                 () -> assertNull(medico.getEndereco().getComplemento())                             //NÃO mudou (continua sem)
         );
+    }
+
+    @Test
+    @DisplayName("Deve reativar um médico que foi excluído logicamente")
+    void deveReativarMedicoInativo() {
+        // ARRANGE: crio um médico e excluo (fica inativo)
+        Medico medico = new Medico(cadastroValido());
+        medico.excluir();
+        assertFalse(medico.getAtivo());   // garanto o ponto de partida: inativo
+
+        // ACT
+        medico.ativar();
+
+        // ASSERT
+        assertTrue(medico.getAtivo());
+    }
+
+    @Test
+    @DisplayName("Ativar um médico que já está ativo mantém ele ativo")
+    void deveManterAtivoAoAtivarMedicoJaAtivo() {
+        Medico medico = new Medico(cadastroValido());   // já nasce ativo
+
+        medico.ativar();
+
+        assertTrue(medico.getAtivo());
     }
 }
