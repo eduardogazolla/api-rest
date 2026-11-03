@@ -3,7 +3,8 @@
   "descricao": "API REST de estudo (PDI) para cadastro de médicos da clínica fictícia Voll.med. Contém apenas dados fictícios.",
   "categoria": "experimento",
   "health_check_path": "/health",
-  "alcance": "pessoal",
+  "alcance": "nomeados",
+  "pessoas": ["cassio.costa@db1.com.br", "tadeu.moreira@db1.com.br"],
   "fatores": {
     "altera_outra_app": false,
     "expoe_api": false,
