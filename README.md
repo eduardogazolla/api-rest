@@ -38,6 +38,7 @@ A Voll.med API implementa um **CRUD completo de médicos** com validações, pag
 | MySQL | Banco de dados da aplicação |
 | Flyway | Controle de versão do schema (migrations) |
 | Lombok | Redução de código boilerplate (`@Getter`, `@NoArgsConstructor`...) |
+| SpringDoc OpenAPI | Documentação e interface Swagger UI |
 | JUnit 5 + Mockito | Testes unitários |
 | H2 | Banco em memória usado **só nos testes** |
 | Spring Boot DevTools | Reinício automático em desenvolvimento |
@@ -55,6 +56,7 @@ A Voll.med API implementa um **CRUD completo de médicos** com validações, pag
 - [x] Validação dos dados de entrada (incluindo nome e telefone em branco na atualização)
 - [x] Retorno `404` para médico inexistente
 - [x] Migrations versionadas com Flyway
+- [x] Interface Swagger UI para testar a API pelo navegador
 
 ---
 
@@ -69,6 +71,8 @@ api
 │   │   │   │   ├── DadosEndereco.java
 │   │   │   │   └── Endereco.java              # @Embeddable
 │   │   │   ├── infra
+│   │   │   │   ├── HealthController.java      # GET /health
+│   │   │   │   ├── HomeController.java        # GET / → Swagger UI
 │   │   │   │   └── TratadorDeErros.java       # @RestControllerAdvice
 │   │   │   ├── medico
 │   │   │   │   ├── DadosAtualizacaoMedico.java
@@ -85,9 +89,14 @@ api
 │   │       │   ├── V1__create-trable-medicos.sql
 │   │       │   ├── V2__alter-table-medicos-add-colum-telefone.sql
 │   │       │   └── V3__alter-table-medicos-add-colum-ativo.sql
-│   │       └── application.properties
+│   │       ├── db/postgresql                # migrations do deploy (PostgreSQL)
+│   │       ├── application.properties
+│   │       └── application-prod.properties  # perfil do deploy
 │   └── test
 │       ├── java/med/voll/api
+│       │   ├── infra
+│       │   │   ├── HealthControllerTest.java
+│       │   │   └── HomeControllerTest.java
 │       │   ├── medico
 │       │   │   ├── DadosAtualizacaoMedicoTest.java
 │       │   │   ├── MedicoServiceTest.java
@@ -95,6 +104,8 @@ api
 │       │   └── ApiApplicationTests.java
 │       └── resources
 │           └── application-test.properties  # H2 em memória
+├── Dockerfile                                 # build para o Portal de Deploy DB1
+├── db1app.json                                # declaração de governança do portal
 ├── Rules.md                                   # padrões de código do projeto
 ├── mvnw / mvnw.cmd
 └── pom.xml
@@ -126,6 +137,8 @@ api
 ## 🔌 Endpoints
 
 Base URL: `http://localhost:8080`
+
+> 💡 A forma mais fácil de testar é pelo **Swagger UI**: abra `http://localhost:8080` (ou `/swagger-ui/index.html`) e use o botão **Try it out** em cada endpoint. A especificação OpenAPI fica em `/v3/api-docs`.
 
 | Método | Rota | Descrição | Respostas |
 |---|---|---|---|
@@ -209,6 +222,60 @@ Não remove o registro: apenas marca `ativo = false`, e o médico deixa de apare
 
 ---
 
+## 📖 Usando o Swagger UI
+
+O Swagger UI é a interface para testar a API pelo navegador, sem Postman.
+
+| Onde | Endereço |
+|---|---|
+| Local | `http://localhost:8080` (redireciona para `/swagger-ui/index.html`) |
+| Portal DB1 | `https://voll-med-eduardo.apps.db1group.com` (exige login DB1) |
+
+**Para chamar qualquer endpoint:** clique nele para abrir → **Try it out** → preencha → **Execute**. A resposta aparece logo abaixo, com o status HTTP e o corpo.
+
+### Listar médicos — `GET /medicos`
+
+Os três campos são opcionais. Deixe tudo em branco para ver a primeira página.
+
+| Campo | O que colocar | Exemplo |
+|---|---|---|
+| `page` | Número da página, **começando em 0** | `0` |
+| `size` | Quantos médicos por página | `10` |
+| `sort` | **Uma propriedade por item**, opcionalmente com a direção depois da vírgula. Use **Add string item** para adicionar outra | `nome` · `crm,desc` · `especialidade,asc` |
+
+> ⚠️ No `sort`, digite só o texto, **sem aspas e sem colchetes**. Escrever `["nome"]` faz a API procurar uma propriedade chamada literalmente `["nome"]`.
+
+Propriedades que dá para ordenar: `nome`, `email`, `crm`, `especialidade`, `telefone`.
+
+### Cadastrar médico — `POST /medicos`
+
+O corpo já vem preenchido com um exemplo válido. Antes de executar, troque o `email` e o `crm`: os dois são **únicos**, então repetir um já cadastrado gera erro.
+
+### Atualizar médico — `PUT /medicos`
+
+Informe o `id` e **só os campos que quer mudar**. Apague do exemplo os campos que não vão mudar, porque campo ausente não é alterado:
+
+```json
+{
+  "id": 1,
+  "telefone": "44988887777"
+}
+```
+
+### Excluir e reativar — `DELETE /medicos/{id}` e `PATCH /medicos/{id}/ativar`
+
+Preencha o `id` no campo do caminho. O médico excluído some do `GET` e volta depois do `PATCH`.
+
+### Respostas mais comuns
+
+| Status | Significa |
+|---|---|
+| `200` | Deu certo |
+| `400` | Algum dado inválido. O corpo da resposta diz qual campo |
+| `404` | Não existe médico com esse `id` |
+
+---
+
 ## ▶️ Como executar
 
 ### Pré-requisitos
@@ -266,7 +333,23 @@ Não remove o registro: apenas marca `ativo = false`, e o médico deixa de apare
 | `MedicoTest` | Regras da entidade (JUnit puro): criação ativa, exclusão lógica, atualização parcial, reativação |
 | `MedicoServiceTest` | Regras do serviço com **Mockito** (repository simulado): cenários positivos e de exceção de cada operação do CRUD |
 | `DadosAtualizacaoMedicoTest` | Validação do formulário de atualização com `Validator`: nome e telefone em branco recusados, `null` aceito |
+| `HealthControllerTest` / `HomeControllerTest` | Health check e redirecionamento da página inicial para o Swagger |
 | `ApiApplicationTests` | A aplicação sobe e as migrations rodam (H2) |
+
+---
+
+## ☁️ Deploy (Portal de Deploy DB1)
+
+A API está preparada para o [Portal de Deploy DB1](https://apps.db1group.com):
+
+| Arquivo | Papel |
+|---|---|
+| `Dockerfile` | Compila com Maven e roda o `.jar` com Java 17, no perfil `prod` |
+| `db1app.json` | Declaração de governança exigida pelo portal |
+| `application-prod.properties` | Perfil de produção: migrations do PostgreSQL e configuração do proxy |
+| `db/postgresql/` | Migrations em sintaxe PostgreSQL (o portal provisiona o banco e injeta as credenciais) |
+
+Health check: `GET /health` → `ok`. No portal, o acesso exige login DB1, e o Swagger UI é a interface para usar a API pelo navegador.
 
 ---
 
@@ -318,7 +401,7 @@ As regras de Clean Code do projeto estão no **[`Rules.md`](Rules.md)**. Elas se
 - [ ] Endpoint de detalhamento de médico (`GET /medicos/{id}`)
 - [ ] Cadastro de pacientes e agendamento de consultas
 - [ ] Autenticação e autorização com Spring Security + JWT
-- [ ] Documentação com Swagger / SpringDoc OpenAPI
+- [x] Documentação com Swagger / SpringDoc OpenAPI
 
 ---
 
