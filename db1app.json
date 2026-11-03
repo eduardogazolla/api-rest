@@ -1,0 +1,17 @@
+{
+  "nome": "voll-med-eduardo",
+  "descricao": "API REST de estudo (PDI) para cadastro de médicos da clínica fictícia Voll.med. Contém apenas dados fictícios.",
+  "categoria": "experimento",
+  "health_check_path": "/health",
+  "alcance": "pessoal",
+  "fatores": {
+    "altera_outra_app": false,
+    "expoe_api": false,
+    "tem_llm": false,
+    "dado_sensivel": false,
+    "credencial_servico": false,
+    "sem_identidade": false
+  },
+  "declarado_por": "eduardo.gazolla@db1.com.br",
+  "declarado_em": "2026-11-03"
+}
