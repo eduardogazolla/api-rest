@@ -35,6 +35,7 @@ public class MedicoController {
 			description = "Lista paginada só com os médicos ativos. Sem parâmetros, devolve a página 0 com 10 médicos, ordenados por nome. "
 					+ "No campo sort, informe uma propriedade por item, por exemplo: nome, crm,desc ou especialidade,asc.")
 	@ApiResponse(responseCode = "200", description = "Página de médicos ativos")
+	@ApiResponse(responseCode = "400", description = "Parâmetro sort inválido: propriedade inexistente ou em formato errado")
 	public Page<DadosListagemMedico> listar(@ParameterObject @PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao) {
 		return service.listar(paginacao);
 	}
