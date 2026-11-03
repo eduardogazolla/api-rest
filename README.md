@@ -99,6 +99,7 @@ api
 │       │   │   └── HomeControllerTest.java
 │       │   ├── medico
 │       │   │   ├── DadosAtualizacaoMedicoTest.java
+│       │   │   ├── MedicoControllerOrdenacaoTest.java
 │       │   │   ├── MedicoServiceTest.java
 │       │   │   └── MedicoTest.java
 │       │   └── ApiApplicationTests.java
@@ -143,7 +144,7 @@ Base URL: `http://localhost:8080`
 | Método | Rota | Descrição | Respostas |
 |---|---|---|---|
 | `POST` | `/medicos` | Cadastra um novo médico | `200` · `400` dados inválidos |
-| `GET` | `/medicos` | Lista médicos ativos (paginado) | `200` |
+| `GET` | `/medicos` | Lista médicos ativos (paginado) | `200` · `400` sort inválido |
 | `PUT` | `/medicos` | Atualiza dados de um médico | `200` · `400` · `404` |
 | `PATCH` | `/medicos/{id}/ativar` | Reativa um médico excluído | `200` · `404` |
 | `DELETE` | `/medicos/{id}` | Inativa um médico (exclusão lógica) | `200` · `404` |
@@ -243,7 +244,7 @@ Os três campos são opcionais. Deixe tudo em branco para ver a primeira página
 | `size` | Quantos médicos por página | `10` |
 | `sort` | **Uma propriedade por item**, opcionalmente com a direção depois da vírgula. Use **Add string item** para adicionar outra | `nome` · `crm,desc` · `especialidade,asc` |
 
-> ⚠️ No `sort`, digite só o texto, **sem aspas e sem colchetes**. Escrever `["nome"]` faz a API procurar uma propriedade chamada literalmente `["nome"]`.
+> ⚠️ No `sort`, digite só o texto, **sem aspas e sem colchetes**. Escrever `["nome"]`, ou usar uma propriedade que não existe, retorna `400` com a mensagem de como usar o parâmetro.
 
 Propriedades que dá para ordenar: `nome`, `email`, `crm`, `especialidade`, `telefone`.
 
@@ -334,6 +335,7 @@ Preencha o `id` no campo do caminho. O médico excluído some do `GET` e volta d
 | `MedicoServiceTest` | Regras do serviço com **Mockito** (repository simulado): cenários positivos e de exceção de cada operação do CRUD |
 | `DadosAtualizacaoMedicoTest` | Validação do formulário de atualização com `Validator`: nome e telefone em branco recusados, `null` aceito |
 | `HealthControllerTest` / `HomeControllerTest` | Health check e redirecionamento da página inicial para o Swagger |
+| `MedicoControllerOrdenacaoTest` | Teste de integração com **MockMvc**: `sort` inválido retorna `400`, `sort` válido retorna `200` |
 | `ApiApplicationTests` | A aplicação sobe e as migrations rodam (H2) |
 
 ---
