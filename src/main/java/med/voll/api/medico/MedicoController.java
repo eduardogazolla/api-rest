@@ -2,9 +2,12 @@ package med.voll.api.medico;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import med.voll.api.infra.TratadorDeErros;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +38,8 @@ public class MedicoController {
 			description = "Lista paginada só com os médicos ativos. Sem parâmetros, devolve a página 0 com 10 médicos, ordenados por nome. "
 					+ "No campo sort, informe uma propriedade por item, por exemplo: nome, crm,desc ou especialidade,asc.")
 	@ApiResponse(responseCode = "200", description = "Página de médicos ativos")
-	@ApiResponse(responseCode = "400", description = "Parâmetro sort inválido: propriedade inexistente ou em formato errado")
+	@ApiResponse(responseCode = "400", description = "Parâmetro sort inválido: propriedade inexistente ou em formato errado",
+			content = @Content(schema = @Schema(implementation = TratadorDeErros.DadosErro.class)))
 	public Page<DadosListagemMedico> listar(@ParameterObject @PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao) {
 		return service.listar(paginacao);
 	}
