@@ -228,25 +228,25 @@ que mudou e validação de endereço no servidor.
 
 ### Tests for User Story 3
 
-- [ ] T037 [P] [US3] Em `MedicoServiceTest.java`, adicionar `deveDetalharMedicoInativoQuandoIdExistir` (garantindo `ativo == false` no DTO) e `deveLancarExcecaoAoDetalharMedicoInexistente`
-- [ ] T038 [P] [US3] Criar `src/test/java/med/voll/api/medico/MedicoControllerDetalhamentoTest.java` (MockMvc e H2) com:
+- [X] T037 [P] [US3] Em `MedicoServiceTest.java`, adicionar `deveDetalharMedicoInativoQuandoIdExistir` (garantindo `ativo == false` no DTO) e `deveLancarExcecaoAoDetalharMedicoInexistente`
+- [X] T038 [P] [US3] Criar `src/test/java/med/voll/api/medico/MedicoControllerDetalhamentoTest.java` (MockMvc e H2) com:
   - `deveRetornar200ComEnderecoQuandoDetalharMedicoExistente`, que verifica `$.telefone`, `$.endereco.cep` e `$.ativo`;
   - `deveRetornar404QuandoDetalharMedicoInexistente`;
   - `deveRetornar400QuandoAtualizarComCepInvalido` (PUT com `endereco.cep = "abc"`, esperando `campo == "endereco.cep"`);
   - `deveApagarComplementoQuandoAtualizarComTextoVazio`.
-- [ ] T039 [P] [US3] Criar `src/test/java/med/voll/api/endereco/DadosAtualizacaoEnderecoTest.java` (Validator) com:
+- [X] T039 [P] [US3] Criar `src/test/java/med/voll/api/endereco/DadosAtualizacaoEnderecoTest.java` (Validator) com:
   - `deveAceitarTodosOsCamposNulos`;
   - `deveRecusarLogradouroEmBranco`;
   - `deveRecusarCepComMenosDeOitoDigitos`;
   - `deveAceitarComplementoVazio`.
-- [ ] T040 [P] [US3] Em `frontend/src/api/medicos.test.ts`, adicionar:
+- [X] T040 [P] [US3] Em `frontend/src/api/medicos.test.ts`, adicionar:
   - `deveBuscarDetalheQuandoDetalharMedico`;
   - `deveEnviarPutComIdQuandoAtualizar`;
   - para a função pura `calcularAlteracoes(original, atual)`:
     - `deveIncluirSoCamposAlterados`;
     - `deveEnviarTextoVazioQuandoNumeroForApagado`;
     - `deveOmitirEnderecoQuandoNadaMudar`.
-- [ ] T041 [US3] Em `FormularioMedico.test.tsx`, adicionar para o modo `edicao`:
+- [X] T041 [US3] Em `FormularioMedico.test.tsx`, adicionar para o modo `edicao`:
   - `devePreencherFormularioComDadosAtuais`;
   - `deveBloquearEmailCrmEEspecialidadeComExplicacao`;
   - `deveEnviarSoCamposAlteradosQuandoSalvar`;
@@ -255,11 +255,11 @@ que mudou e validação de endereço no servidor.
 
 ### Implementation for User Story 3
 
-- [ ] T042 [P] [US3] Criar `src/main/java/med/voll/api/medico/DadosDetalhamentoMedico.java` (data-model.md `DadosDetalhamentoMedico`) e o construtor `DadosEndereco(Endereco endereco)` em `src/main/java/med/voll/api/endereco/DadosEndereco.java`
-- [ ] T043 [US3] Implementar `MedicoService.detalhar(Long id)` e `@GetMapping("/{id}")` em `MedicoController`, com `@Operation` e `@ApiResponse` 200 e 404. O T037 e os testes GET do T038 devem passar
-- [ ] T044 [US3] Criar `src/main/java/med/voll/api/endereco/DadosAtualizacaoEndereco.java` (data-model.md `DadosAtualizacaoEndereco.logradouro`, `.bairro`, `.cidade`, `.uf`, `.cep`, `.numero`, `.complemento`). Trocar a assinatura de `Endereco.atualizarInformacoes` e o tipo de `DadosAtualizacaoMedico.endereco` para `@Valid DadosAtualizacaoEndereco` (data-model.md `DadosAtualizacaoMedico.endereco`). Ajustar `MedicoTest` e `MedicoServiceTest` aos novos tipos, sem mudar o que eles afirmam. O T038, o T039 e o `./mvnw test` completo devem passar
-- [ ] T045 [US3] Implementar `detalharMedico(id)`, `atualizarMedico(dados: MedicoAtualizacao)` e `calcularAlteracoes(original: MedicoDetalhe, atual: MedicoCadastro): MedicoAtualizacao` em `frontend/src/api/medicos.ts`. O T040 deve passar
-- [ ] T046 [US3] Estender `frontend/src/pages/FormularioMedico.tsx` para o modo `edicao`:
+- [X] T042 [P] [US3] Criar `src/main/java/med/voll/api/medico/DadosDetalhamentoMedico.java` (data-model.md `DadosDetalhamentoMedico`) e o construtor `DadosEndereco(Endereco endereco)` em `src/main/java/med/voll/api/endereco/DadosEndereco.java`
+- [X] T043 [US3] Implementar `MedicoService.detalhar(Long id)` e `@GetMapping("/{id}")` em `MedicoController`, com `@Operation` e `@ApiResponse` 200 e 404. O T037 e os testes GET do T038 devem passar
+- [X] T044 [US3] Criar `src/main/java/med/voll/api/endereco/DadosAtualizacaoEndereco.java` (data-model.md `DadosAtualizacaoEndereco.logradouro`, `.bairro`, `.cidade`, `.uf`, `.cep`, `.numero`, `.complemento`). Trocar a assinatura de `Endereco.atualizarInformacoes` e o tipo de `DadosAtualizacaoMedico.endereco` para `@Valid DadosAtualizacaoEndereco` (data-model.md `DadosAtualizacaoMedico.endereco`). Ajustar `MedicoTest` e `MedicoServiceTest` aos novos tipos, sem mudar o que eles afirmam. O T038, o T039 e o `./mvnw test` completo devem passar
+- [X] T045 [US3] Implementar `detalharMedico(id)`, `atualizarMedico(dados: MedicoAtualizacao)` e `calcularAlteracoes(original: MedicoDetalhe, atual: MedicoCadastro): MedicoAtualizacao` em `frontend/src/api/medicos.ts`. O T040 deve passar
+- [X] T046 [US3] Estender `frontend/src/pages/FormularioMedico.tsx` para o modo `edicao`:
   - carrega com `detalharMedico`;
   - e-mail, CRM e especialidade ficam `readOnly`/`disabled`, com a dica "Não pode ser alterado";
   - salva com `calcularAlteracoes`, e no sucesso navega com o aviso "Médico atualizado";

@@ -112,6 +112,29 @@ class MedicoServiceTest {
     }
 
     @Test
+    @DisplayName("Deve detalhar um médico inativo com todos os dados")
+    void deveDetalharMedicoInativoQuandoIdExistir() {
+        Medico medico = new Medico(cadastroValido());
+        medico.excluir();
+        when(repository.findById(1L)).thenReturn(Optional.of(medico));
+
+        DadosDetalhamentoMedico detalhe = service.detalhar(1L);
+
+        assertFalse(detalhe.ativo());
+        assertEquals("44999990000", detalhe.telefone());
+        assertEquals("87000000", detalhe.endereco().cep());
+        assertEquals("100", detalhe.endereco().numero());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao detalhar médico inexistente")
+    void deveLancarExcecaoAoDetalharMedicoInexistente() {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> service.detalhar(999L));
+    }
+
+    @Test
     void deveLancarExcecaoAoExcluirMedicoInexistente(){
         when(repository.findById(999L)).thenReturn(Optional.empty());
 

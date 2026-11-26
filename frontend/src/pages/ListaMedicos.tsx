@@ -124,7 +124,16 @@ export default function ListaMedicos({ modo }: Props) {
 
       {pagina && pagina.content.length > 0 && (
         <>
-          <TabelaMedicos medicos={pagina.content} sort={sort} onOrdenar={ordenar} />
+          <TabelaMedicos
+            medicos={pagina.content}
+            sort={sort}
+            onOrdenar={ordenar}
+            acoes={(medico) => (
+              <Link to={`/editar/${medico.id}`} className="botao botao--texto" aria-label={`Editar ${medico.nome}`}>
+                Editar
+              </Link>
+            )}
+          />
           {pagina.totalPages > 1 && (
             <Paginacao pagina={page} totalPaginas={pagina.totalPages} onMudar={irParaPagina} />
           )}

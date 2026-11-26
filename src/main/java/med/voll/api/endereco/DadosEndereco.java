@@ -24,4 +24,10 @@ public record DadosEndereco(
 		@Schema(example = "Sala 10")
 		String complemento,
 		@Schema(example = "100")
-		String numero) {}
+		String numero) {
+
+	public DadosEndereco(Endereco endereco) {
+		this(endereco.getLogradouro(), endereco.getBairro(), endereco.getCep(), endereco.getCidade(),
+				endereco.getUf(), endereco.getComplemento(), endereco.getNumero());
+	}
+}

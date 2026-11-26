@@ -1,7 +1,23 @@
 import { describe, expect, it } from 'vitest'
 import { json, pagina, simularFetch, vazio } from '../test/fetchFalso'
-import { cadastrarMedico, listarAtivos } from './medicos'
-import type { MedicoCadastro } from './tipos'
+import { formularioVazio, type DadosFormulario } from '../dominio/validacao'
+import { atualizarMedico, cadastrarMedico, calcularAlteracoes, detalharMedico, listarAtivos } from './medicos'
+import type { MedicoCadastro, MedicoDetalhe } from './tipos'
+
+const original: MedicoDetalhe = {
+  id: 7, nome: 'Ana Souza', email: 'ana@voll.med', telefone: '44999990000', crm: '123456',
+  especialidade: 'CARDIOLOGIA', ativo: true,
+  endereco: { logradouro: 'Rua das Flores', bairro: 'Centro', cep: '87000000', cidade: 'Maringá', uf: 'PR', numero: '100', complemento: null },
+}
+
+function formularioDe(medico: MedicoDetalhe): DadosFormulario {
+  const vazio = formularioVazio()
+  return {
+    ...vazio, nome: medico.nome, email: medico.email, telefone: medico.telefone, crm: medico.crm,
+    especialidade: medico.especialidade,
+    endereco: { ...medico.endereco, numero: medico.endereco.numero ?? '', complemento: medico.endereco.complemento ?? '' },
+  }
+}
 
 describe('medicos', () => {
   it('deveMontarQueryDePaginaEOrdenacaoQuandoListarAtivos', async () => {
@@ -25,5 +41,46 @@ describe('medicos', () => {
     expect(url).toBe('/medicos')
     expect(init.method).toBe('POST')
     expect(JSON.parse(String(init.body))).toEqual(dados)
+  })
+
+  it('deveBuscarDetalheQuandoDetalharMedico', async () => {
+    const fetchFalso = simularFetch(() => json(original))
+
+    await expect(detalharMedico(7)).resolves.toEqual(original)
+    expect(fetchFalso.mock.calls[0][0]).toBe('/medicos/7')
+  })
+
+  it('deveEnviarPutComIdQuandoAtualizar', async () => {
+    const fetchFalso = simularFetch(() => vazio())
+
+    await atualizarMedico({ id: 7, telefone: '44911112222' })
+
+    const [url, init] = fetchFalso.mock.calls[0]
+    expect(url).toBe('/medicos')
+    expect(init.method).toBe('PUT')
+    expect(JSON.parse(String(init.body))).toEqual({ id: 7, telefone: '44911112222' })
+  })
+})
+
+describe('calcularAlteracoes', () => {
+  it('deveIncluirSoCamposAlterados', () => {
+    const atual = formularioDe(original)
+    atual.telefone = '44911112222'
+    atual.endereco.cidade = 'Cianorte'
+
+    expect(calcularAlteracoes(original, atual)).toEqual({
+      id: 7, telefone: '44911112222', endereco: { cidade: 'Cianorte' },
+    })
+  })
+
+  it('deveEnviarTextoVazioQuandoNumeroForApagado', () => {
+    const atual = formularioDe(original)
+    atual.endereco.numero = ''
+
+    expect(calcularAlteracoes(original, atual)).toEqual({ id: 7, endereco: { numero: '' } })
+  })
+
+  it('deveOmitirEnderecoQuandoNadaMudar', () => {
+    expect(calcularAlteracoes(original, formularioDe(original))).toEqual({ id: 7 })
   })
 })

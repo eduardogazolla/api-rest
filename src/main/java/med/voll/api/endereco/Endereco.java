@@ -28,7 +28,7 @@ public class Endereco {
 		this.complemento = dados.complemento();
 	}
 
-    public void atualizarInformacoes(DadosEndereco dados) {
+    public void atualizarInformacoes(DadosAtualizacaoEndereco dados) {
 		if (dados.logradouro() != null) {
 			this.logradouro = dados.logradouro();
 		}

@@ -49,12 +49,23 @@ public class MedicoController {
 		return service.listar(paginacao);
 	}
 
+	@GetMapping("/{id}")
+	@Operation(summary = "Detalhar médico",
+			description = "Todos os dados do médico, inclusive telefone, endereço e situação. Também encontra médicos inativos.")
+	@ApiResponse(responseCode = "200", description = "Dados completos do médico")
+	@ApiResponse(responseCode = "404", description = "Médico não encontrado", content = @Content)
+	public DadosDetalhamentoMedico detalhar(@Parameter(description = "ID do médico", example = "1") @PathVariable Long id) {
+		return service.detalhar(id);
+	}
+
 	@PutMapping
 	@Operation(summary = "Atualizar médico",
 			description = "Atualização parcial: só nome, telefone e endereço podem mudar. Campo ausente ou null não é alterado. "
 					+ "Nome ou telefone em branco são recusados.")
 	@ApiResponse(responseCode = "200", description = "Médico atualizado")
-	@ApiResponse(responseCode = "400", description = "Dados inválidos: id ausente, ou nome/telefone em branco")
+	@ApiResponse(responseCode = "400", description = "Dados inválidos: id ausente, nome/telefone em branco, "
+			+ "logradouro/bairro/cidade/UF em branco ou CEP fora do padrão (8 dígitos). Corpo: lista de {campo, mensagem}",
+			content = @Content(array = @ArraySchema(schema = @Schema(implementation = TratadorDeErros.DadosErroCampo.class))))
 	@ApiResponse(responseCode = "404", description = "Médico não encontrado")
 	public void atualizar(@RequestBody @Valid DadosAtualizacaoMedico dados) {
 		service.atualizar(dados);

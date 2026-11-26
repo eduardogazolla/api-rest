@@ -1,5 +1,6 @@
 package med.voll.api.medico;
 
+import med.voll.api.endereco.DadosAtualizacaoEndereco;
 import med.voll.api.endereco.DadosEndereco;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -77,7 +78,7 @@ class MedicoTest {
     void deveAtualizarApenasACidadeDoEnderecoDoMedico() {
         Medico medico = new Medico(cadastroValido());
 
-        var novoEndereco = new DadosEndereco(null, null, null, "Cianorte", null, null, null);
+        var novoEndereco = new DadosAtualizacaoEndereco(null, null, null, "Cianorte", null, null, null);
 
         medico.atualizarInformacoes(new DadosAtualizacaoMedico(1L, null, null, novoEndereco));
 

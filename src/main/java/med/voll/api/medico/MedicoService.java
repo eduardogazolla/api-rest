@@ -35,6 +35,10 @@ public class MedicoService {
         return repository.findAllByAtivoTrue(paginacao).map(DadosListagemMedico::new);
     }
 
+    public DadosDetalhamentoMedico detalhar(Long id) {
+        return new DadosDetalhamentoMedico(buscarMedicoPorId(id));
+    }
+
     @Transactional
     public void atualizar(DadosAtualizacaoMedico dados) {
         buscarMedicoPorId(dados.id()).atualizarInformacoes(dados);

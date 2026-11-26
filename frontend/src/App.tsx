@@ -12,7 +12,7 @@ export default function App() {
           <Route path="/" element={<ListaMedicos modo="ativos" />} />
           <Route path="/inativos" element={<p>Médicos inativos</p>} />
           <Route path="/cadastro" element={<FormularioMedico modo="cadastro" />} />
-          <Route path="/editar/:id" element={<p>Edição</p>} />
+          <Route path="/editar/:id" element={<FormularioMedico modo="edicao" />} />
           <Route path="*" element={<PaginaNaoEncontrada />} />
         </Routes>
       </main>

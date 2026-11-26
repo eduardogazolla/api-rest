@@ -1,8 +1,8 @@
-import { useRef, useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { useEffect, useRef, useState, type FormEvent, type InputHTMLAttributes } from 'react'
+import { Link, useNavigate, useParams } from 'react-router'
 import { ErroApi } from '../api/cliente'
-import { cadastrarMedico } from '../api/medicos'
-import type { Especialidade, MedicoCadastro } from '../api/tipos'
+import { atualizarMedico, cadastrarMedico, calcularAlteracoes, detalharMedico } from '../api/medicos'
+import type { Especialidade, MedicoCadastro, MedicoDetalhe } from '../api/tipos'
 import Campo, { type PropsDoControle } from '../components/Campo'
 import { ESPECIALIDADES, UFS } from '../dominio/constantes'
 import { formularioVazio, validarMedico, type DadosFormulario, type ErrosDoFormulario } from '../dominio/validacao'
@@ -11,15 +11,36 @@ interface Props {
   modo: 'cadastro' | 'edicao'
 }
 
+const BLOQUEADO = 'Não pode ser alterado depois do cadastro'
+
 export default function FormularioMedico({ modo }: Props) {
   const navigate = useNavigate()
+  const { id } = useParams()
+  const edicao = modo === 'edicao'
   const formulario = useRef<HTMLFormElement>(null)
   const enviandoAgora = useRef(false)
 
   const [dados, setDados] = useState<DadosFormulario>(formularioVazio)
+  const [original, setOriginal] = useState<MedicoDetalhe | null>(null)
+  const [erroAoCarregar, setErroAoCarregar] = useState<ErroApi | null>(null)
   const [erros, setErros] = useState<ErrosDoFormulario>({})
   const [erroGeral, setErroGeral] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
+
+  useEffect(() => {
+    if (!edicao) return
+    let ativo = true
+    detalharMedico(Number(id))
+      .then((medico) => {
+        if (!ativo) return
+        setOriginal(medico)
+        setDados(paraFormulario(medico))
+      })
+      .catch((e: unknown) => ativo && setErroAoCarregar(e instanceof ErroApi ? e : new ErroApi('servidor', String(e))))
+    return () => {
+      ativo = false
+    }
+  }, [edicao, id])
 
   function atualizar(campo: string, valor: string) {
     setDados((atual) =>
@@ -58,6 +79,15 @@ export default function FormularioMedico({ modo }: Props) {
     setErroGeral(erro.message)
   }
 
+  async function salvar() {
+    if (edicao && original) {
+      await atualizarMedico(calcularAlteracoes(original, dados))
+      return 'Médico atualizado'
+    }
+    await cadastrarMedico(paraCadastro(dados))
+    return 'Médico cadastrado'
+  }
+
   async function enviar(evento: FormEvent) {
     evento.preventDefault()
     if (enviandoAgora.current) return
@@ -73,8 +103,8 @@ export default function FormularioMedico({ modo }: Props) {
     enviandoAgora.current = true
     setEnviando(true)
     try {
-      await cadastrarMedico(paraCadastro(dados))
-      navigate('/', { state: { aviso: 'Médico cadastrado' } })
+      const aviso = await salvar()
+      navigate('/', { state: { aviso } })
     } catch (erro) {
       mostrarErroDaApi(erro)
     } finally {
@@ -83,7 +113,7 @@ export default function FormularioMedico({ modo }: Props) {
     }
   }
 
-  function texto(campo: string, extras: Partial<React.InputHTMLAttributes<HTMLInputElement>> = {}) {
+  function texto(campo: string, extras: InputHTMLAttributes<HTMLInputElement> = {}) {
     return (props: PropsDoControle) => (
       <input
         {...props}
@@ -95,13 +125,33 @@ export default function FormularioMedico({ modo }: Props) {
     )
   }
 
+  if (erroAoCarregar?.tipo === 'nao-encontrado') {
+    return (
+      <div className="estado">
+        <h1 className="estado__titulo">Médico não encontrado</h1>
+        <p className="estado__texto">O médico pode ter sido removido ou o endereço está incorreto.</p>
+        <Link to="/" className="botao botao--primario">
+          Ver médicos ativos
+        </Link>
+      </div>
+    )
+  }
+  if (erroAoCarregar) {
+    return (
+      <div className="estado estado--erro" role="alert">
+        <p className="estado__titulo">{erroAoCarregar.message}</p>
+      </div>
+    )
+  }
+  if (edicao && !original) return <p className="carregando">Carregando médico…</p>
+
   return (
     <>
       <Link to="/" className="voltar">
         Voltar para a lista
       </Link>
       <div className="pagina__topo">
-        <h1 className="pagina__titulo">Novo médico</h1>
+        <h1 className="pagina__titulo">{edicao ? 'Editar médico' : 'Novo médico'}</h1>
       </div>
 
       <form ref={formulario} className="formulario" noValidate onSubmit={enviar}>
@@ -117,21 +167,27 @@ export default function FormularioMedico({ modo }: Props) {
             <Campo rotulo="Nome" erro={erros.nome}>
               {texto('nome', { autoComplete: 'name' })}
             </Campo>
-            <Campo rotulo="E-mail" erro={erros.email} className="campo--metade">
-              {texto('email', { type: 'email', autoComplete: 'email' })}
+            <Campo rotulo="E-mail" erro={erros.email} dica={edicao ? BLOQUEADO : undefined} className="campo--metade">
+              {texto('email', { type: 'email', autoComplete: 'email', readOnly: edicao })}
             </Campo>
             <Campo rotulo="Telefone" erro={erros.telefone} dica="Com DDD, só números" className="campo--metade">
               {texto('telefone', { type: 'tel', inputMode: 'tel', autoComplete: 'tel' })}
             </Campo>
-            <Campo rotulo="CRM" erro={erros.crm} dica="De 4 a 6 dígitos" className="campo--terco">
-              {texto('crm', { inputMode: 'numeric', maxLength: 6 })}
+            <Campo rotulo="CRM" erro={erros.crm} dica={edicao ? BLOQUEADO : 'De 4 a 6 dígitos'} className="campo--terco">
+              {texto('crm', { inputMode: 'numeric', maxLength: 6, readOnly: edicao })}
             </Campo>
-            <Campo rotulo="Especialidade" erro={erros.especialidade} className="campo--dois-tercos">
+            <Campo
+              rotulo="Especialidade"
+              erro={erros.especialidade}
+              dica={edicao ? BLOQUEADO : undefined}
+              className="campo--dois-tercos"
+            >
               {(props) => (
                 <select
                   {...props}
                   name="especialidade"
                   value={dados.especialidade}
+                  disabled={edicao}
                   onChange={(e) => atualizar('especialidade', e.target.value as Especialidade)}
                 >
                   <option value="">Escolha a especialidade</option>
@@ -188,7 +244,7 @@ export default function FormularioMedico({ modo }: Props) {
 
         <div className="formulario__acoes">
           <button type="submit" className="botao botao--primario" disabled={enviando}>
-            {enviando ? 'Salvando…' : 'Cadastrar médico'}
+            {enviando ? 'Salvando…' : edicao ? 'Salvar alterações' : 'Cadastrar médico'}
           </button>
           <Link to="/" className="botao botao--secundario">
             Cancelar
@@ -197,6 +253,21 @@ export default function FormularioMedico({ modo }: Props) {
       </form>
     </>
   )
+}
+
+function paraFormulario(medico: MedicoDetalhe): DadosFormulario {
+  return {
+    nome: medico.nome,
+    email: medico.email,
+    telefone: medico.telefone,
+    crm: medico.crm,
+    especialidade: medico.especialidade,
+    endereco: {
+      ...medico.endereco,
+      numero: medico.endereco.numero ?? '',
+      complemento: medico.endereco.complemento ?? '',
+    },
+  }
 }
 
 function paraCadastro(dados: DadosFormulario): MedicoCadastro {

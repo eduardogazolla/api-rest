@@ -1,9 +1,10 @@
 package med.voll.api.medico;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import med.voll.api.endereco.DadosEndereco;
+import med.voll.api.endereco.DadosAtualizacaoEndereco;
 
 public record DadosAtualizacaoMedico(
         @Schema(description = "ID do médico a atualizar", example = "1")
@@ -15,7 +16,8 @@ public record DadosAtualizacaoMedico(
         @Schema(description = "Novo telefone. Ausente ou null: não altera. Em branco: recusado", example = "44988887777")
         @Pattern(regexp = ".*\\S.*", message = "não pode ficar em branco")
         String telefone,
-        @Schema(description = "Só os campos informados do endereço são alterados")
-        DadosEndereco endereco) {
+        @Schema(description = "Só os campos informados do endereço são alterados; o formato de cada um é validado")
+        @Valid
+        DadosAtualizacaoEndereco endereco) {
 
 }

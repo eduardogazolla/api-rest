@@ -36,6 +36,84 @@ async function preencherCadastroValido(crm = '123456') {
   return usuario
 }
 
+const detalhe = {
+  id: 7, nome: 'Ana Souza', email: 'ana@voll.med', telefone: '44999990000', crm: '123456',
+  especialidade: 'CARDIOLOGIA', ativo: true,
+  endereco: { logradouro: 'Rua das Flores', bairro: 'Centro', cep: '87000000', cidade: 'Maringá', uf: 'PR', numero: '100', complemento: null },
+}
+
+function renderizarEdicao(id = 7) {
+  return render(
+    <MemoryRouter initialEntries={[`/editar/${id}`]}>
+      <Routes>
+        <Route path="/" element={<ListaFalsa />} />
+        <Route path="/editar/:id" element={<FormularioMedico modo="edicao" />} />
+      </Routes>
+    </MemoryRouter>,
+  )
+}
+
+describe('FormularioMedico (edição)', () => {
+  it('devePreencherFormularioComDadosAtuais', async () => {
+    simularFetch(() => json(detalhe))
+    renderizarEdicao()
+
+    expect(await screen.findByDisplayValue('Ana Souza')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Editar médico' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Telefone')).toHaveValue('44999990000')
+    expect(screen.getByLabelText('CEP')).toHaveValue('87000000')
+    expect(screen.getByLabelText(/Número/)).toHaveValue('100')
+    expect(screen.getByLabelText(/Complemento/)).toHaveValue('')
+  })
+
+  it('deveBloquearEmailCrmEEspecialidadeComExplicacao', async () => {
+    simularFetch(() => json(detalhe))
+    renderizarEdicao()
+    await screen.findByDisplayValue('Ana Souza')
+
+    expect(screen.getByLabelText('E-mail')).toHaveAttribute('readonly')
+    expect(screen.getByLabelText('CRM')).toHaveAttribute('readonly')
+    expect(screen.getByLabelText('Especialidade')).toBeDisabled()
+    expect(screen.getByLabelText('CRM')).toHaveAccessibleDescription(/Não pode ser alterado/)
+  })
+
+  it('deveEnviarSoCamposAlteradosQuandoSalvar', async () => {
+    const fetchFalso = simularFetch((_url, init) => (init.method === 'PUT' ? vazio() : json(detalhe)))
+    renderizarEdicao()
+    const usuario = userEvent.setup()
+    const telefone = await screen.findByDisplayValue('44999990000')
+
+    await usuario.clear(telefone)
+    await usuario.type(telefone, '44911112222')
+    await usuario.clear(screen.getByLabelText(/Número/))
+    await usuario.click(screen.getByRole('button', { name: 'Salvar alterações' }))
+
+    expect(await screen.findByText('Lista: Médico atualizado')).toBeInTheDocument()
+    const put = fetchFalso.mock.calls.find(([, init]) => init.method === 'PUT')!
+    expect(JSON.parse(String(put[1].body))).toEqual({ id: 7, telefone: '44911112222', endereco: { numero: '' } })
+  })
+
+  it('deveMostrarMedicoNaoEncontradoQuando404', async () => {
+    simularFetch(() => vazio(404))
+    renderizarEdicao(99999)
+
+    expect(await screen.findByRole('heading', { name: 'Médico não encontrado' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Ver médicos ativos' })).toHaveAttribute('href', '/')
+  })
+
+  it('deveRecusarNomeEmBrancoNaEdicao', async () => {
+    const fetchFalso = simularFetch(() => json(detalhe))
+    renderizarEdicao()
+    const usuario = userEvent.setup()
+    await usuario.clear(await screen.findByDisplayValue('Ana Souza'))
+
+    await usuario.click(screen.getByRole('button', { name: 'Salvar alterações' }))
+
+    expect(screen.getByLabelText('Nome')).toHaveAccessibleDescription('não pode ficar em branco')
+    expect(fetchFalso).toHaveBeenCalledTimes(1)
+  })
+})
+
 describe('FormularioMedico (cadastro)', () => {
   it('naoDeveEnviarQuandoValidacaoLocalFalhar', async () => {
     const fetchFalso = simularFetch(() => vazio())
