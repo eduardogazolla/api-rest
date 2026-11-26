@@ -34,6 +34,25 @@ class SwaggerDocumentacaoTest {
         mockMvc.perform(get("/v3/api-docs"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paths['/health']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/']").doesNotExist());
+                .andExpect(jsonPath("$.paths['/']").doesNotExist())
+                .andExpect(jsonPath("$.paths['/inativos']").doesNotExist())
+                .andExpect(jsonPath("$.paths['/cadastro']").doesNotExist());
+    }
+
+    @Test
+    @DisplayName("Deve documentar os endpoints de detalhamento e de inativos")
+    void deveDocumentarEndpointsNovosQuandoGerarApiDocs() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.paths['/medicos/{id}'].get").exists())
+                .andExpect(jsonPath("$.paths['/medicos/inativos'].get").exists())
+                .andExpect(jsonPath("$.paths['/medicos'].post.responses['409']").exists());
+    }
+
+    @Test
+    @DisplayName("Deve manter o Swagger UI disponível ao lado do front-end")
+    void deveManterSwaggerUiDisponivel() throws Exception {
+        mockMvc.perform(get("/swagger-ui/index.html"))
+                .andExpect(status().isOk());
     }
 }

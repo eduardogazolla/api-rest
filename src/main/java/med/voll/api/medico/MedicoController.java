@@ -2,6 +2,7 @@ package med.voll.api.medico;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,7 +29,11 @@ public class MedicoController {
 	@PostMapping
 	@Operation(summary = "Cadastrar médico", description = "Cadastra um novo médico. Todo médico cadastrado nasce ativo.")
 	@ApiResponse(responseCode = "200", description = "Médico cadastrado")
-	@ApiResponse(responseCode = "400", description = "Dados inválidos: campo obrigatório vazio, e-mail inválido, CRM fora do padrão (4 a 6 dígitos) ou CEP fora do padrão (8 dígitos)")
+	@ApiResponse(responseCode = "400", description = "Dados inválidos: campo obrigatório vazio, e-mail inválido, CRM fora do padrão (4 a 6 dígitos) ou CEP fora do padrão (8 dígitos). "
+			+ "Corpo: lista de {campo, mensagem}",
+			content = @Content(array = @ArraySchema(schema = @Schema(implementation = TratadorDeErros.DadosErroCampo.class))))
+	@ApiResponse(responseCode = "409", description = "CRM ou e-mail já usado por outro médico, mesmo inativo. Corpo: lista de {campo, mensagem}",
+			content = @Content(array = @ArraySchema(schema = @Schema(implementation = TratadorDeErros.DadosErroCampo.class))))
 	public void cadastrar(@RequestBody @Valid DadosCadastroMedico dados) {
 		service.cadastrar(dados);
 	}
@@ -44,12 +49,34 @@ public class MedicoController {
 		return service.listar(paginacao);
 	}
 
+	@GetMapping("/inativos")
+	@Operation(summary = "Listar médicos inativos",
+			description = "Lista paginada só com os médicos excluídos (inativos), que podem ser reativados. "
+					+ "Mesmos parâmetros de paginação e ordenação de GET /medicos.")
+	@ApiResponse(responseCode = "200", description = "Página de médicos inativos")
+	@ApiResponse(responseCode = "400", description = "Parâmetro sort inválido: propriedade inexistente ou em formato errado",
+			content = @Content(schema = @Schema(implementation = TratadorDeErros.DadosErro.class)))
+	public Page<DadosListagemMedico> listarInativos(@ParameterObject @PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao) {
+		return service.listarInativos(paginacao);
+	}
+
+	@GetMapping("/{id}")
+	@Operation(summary = "Detalhar médico",
+			description = "Todos os dados do médico, inclusive telefone, endereço e situação. Também encontra médicos inativos.")
+	@ApiResponse(responseCode = "200", description = "Dados completos do médico")
+	@ApiResponse(responseCode = "404", description = "Médico não encontrado", content = @Content)
+	public DadosDetalhamentoMedico detalhar(@Parameter(description = "ID do médico", example = "1") @PathVariable Long id) {
+		return service.detalhar(id);
+	}
+
 	@PutMapping
 	@Operation(summary = "Atualizar médico",
 			description = "Atualização parcial: só nome, telefone e endereço podem mudar. Campo ausente ou null não é alterado. "
 					+ "Nome ou telefone em branco são recusados.")
 	@ApiResponse(responseCode = "200", description = "Médico atualizado")
-	@ApiResponse(responseCode = "400", description = "Dados inválidos: id ausente, ou nome/telefone em branco")
+	@ApiResponse(responseCode = "400", description = "Dados inválidos: id ausente, nome/telefone em branco, "
+			+ "logradouro/bairro/cidade/UF em branco ou CEP fora do padrão (8 dígitos). Corpo: lista de {campo, mensagem}",
+			content = @Content(array = @ArraySchema(schema = @Schema(implementation = TratadorDeErros.DadosErroCampo.class))))
 	@ApiResponse(responseCode = "404", description = "Médico não encontrado")
 	public void atualizar(@RequestBody @Valid DadosAtualizacaoMedico dados) {
 		service.atualizar(dados);

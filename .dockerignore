@@ -1,0 +1,10 @@
+target/
+frontend/node_modules/
+frontend/dist/
+.git/
+.idea/
+.claude/
+.specify/
+evidencias/
+*.zip
+src/main/resources/static/

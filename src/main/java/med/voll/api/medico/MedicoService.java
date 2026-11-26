@@ -17,11 +17,30 @@ public class MedicoService {
 
     @Transactional
     public void cadastrar(DadosCadastroMedico dados) {
+        validarDuplicidade(dados);
         repository.save(new Medico(dados));
+    }
+
+    // A checagem inclui inativos: a exclusão é lógica e a constraint unique do banco também os considera
+    private void validarDuplicidade(DadosCadastroMedico dados) {
+        if (repository.existsByCrm(dados.crm())) {
+            throw new CadastroDuplicadoException("crm", "Já existe um médico com este CRM (ele pode estar inativo).");
+        }
+        if (repository.existsByEmail(dados.email())) {
+            throw new CadastroDuplicadoException("email", "Já existe um médico com este e-mail (ele pode estar inativo).");
+        }
     }
 
     public Page<DadosListagemMedico> listar(Pageable paginacao) {
         return repository.findAllByAtivoTrue(paginacao).map(DadosListagemMedico::new);
+    }
+
+    public Page<DadosListagemMedico> listarInativos(Pageable paginacao) {
+        return repository.findAllByAtivoFalse(paginacao).map(DadosListagemMedico::new);
+    }
+
+    public DadosDetalhamentoMedico detalhar(Long id) {
+        return new DadosDetalhamentoMedico(buscarMedicoPorId(id));
     }
 
     @Transactional

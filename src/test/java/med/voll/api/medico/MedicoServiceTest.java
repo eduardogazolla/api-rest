@@ -1,6 +1,7 @@
 package med.voll.api.medico;
 
 import med.voll.api.endereco.DadosEndereco;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -65,6 +66,75 @@ class MedicoServiceTest {
     }
 
     @Test
+    @DisplayName("Deve recusar o cadastro quando o CRM já existir, sem salvar")
+    void deveLancarCadastroDuplicadoQuandoCrmJaExistir() {
+        when(repository.existsByCrm("123456")).thenReturn(true);
+
+        var excecao = assertThrows(CadastroDuplicadoException.class,
+                () -> service.cadastrar(cadastroValido()));
+
+        assertEquals("crm", excecao.getCampo());
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve recusar o cadastro quando o e-mail já existir, sem salvar")
+    void deveLancarCadastroDuplicadoQuandoEmailJaExistir() {
+        when(repository.existsByEmail("ana@voll.med")).thenReturn(true);
+
+        var excecao = assertThrows(CadastroDuplicadoException.class,
+                () -> service.cadastrar(cadastroValido()));
+
+        assertEquals("email", excecao.getCampo());
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve apontar o CRM quando CRM e e-mail já existirem")
+    void deveChecarCrmAntesDoEmailQuandoAmbosExistirem() {
+        when(repository.existsByCrm("123456")).thenReturn(true);
+
+        var excecao = assertThrows(CadastroDuplicadoException.class,
+                () -> service.cadastrar(cadastroValido()));
+
+        assertEquals("crm", excecao.getCampo());
+        verify(repository, never()).existsByEmail(any());
+    }
+
+    @Test
+    @DisplayName("Deve salvar quando CRM e e-mail forem inéditos")
+    void deveSalvarQuandoCrmEEmailForemIneditos() {
+        service.cadastrar(cadastroValido());
+
+        verify(repository).existsByCrm("123456");
+        verify(repository).existsByEmail("ana@voll.med");
+        verify(repository).save(any(Medico.class));
+    }
+
+    @Test
+    @DisplayName("Deve detalhar um médico inativo com todos os dados")
+    void deveDetalharMedicoInativoQuandoIdExistir() {
+        Medico medico = new Medico(cadastroValido());
+        medico.excluir();
+        when(repository.findById(1L)).thenReturn(Optional.of(medico));
+
+        DadosDetalhamentoMedico detalhe = service.detalhar(1L);
+
+        assertFalse(detalhe.ativo());
+        assertEquals("44999990000", detalhe.telefone());
+        assertEquals("87000000", detalhe.endereco().cep());
+        assertEquals("100", detalhe.endereco().numero());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao detalhar médico inexistente")
+    void deveLancarExcecaoAoDetalharMedicoInexistente() {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> service.detalhar(999L));
+    }
+
+    @Test
     void deveLancarExcecaoAoExcluirMedicoInexistente(){
         when(repository.findById(999L)).thenReturn(Optional.empty());
 
@@ -124,6 +194,21 @@ class MedicoServiceTest {
         Page<DadosListagemMedico> resultado = service.listar(paginacao);
 
         assertTrue(resultado.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Deve listar somente os inativos, convertidos para dados de listagem")
+    void deveListarSomenteInativosQuandoListarInativos() {
+        Medico medico = new Medico(cadastroValido());
+        medico.excluir();
+        Pageable paginacao = PageRequest.of(0, 10);
+        when(repository.findAllByAtivoFalse(paginacao)).thenReturn(new PageImpl<>(List.of(medico)));
+
+        Page<DadosListagemMedico> resultado = service.listarInativos(paginacao);
+
+        assertEquals("Ana Souza", resultado.getContent().get(0).nome());
+        verify(repository).findAllByAtivoFalse(paginacao);
+        verify(repository, never()).findAllByAtivoTrue(any());
     }
 
     @Test
