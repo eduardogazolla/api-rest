@@ -318,9 +318,9 @@ novos endpoints.
 **Independent Test**: clicar em "Documentação da API" abre o Swagger, que lista `GET /medicos/{id}`
 e `GET /medicos/inativos`.
 
-- [ ] T056 [P] [US5] Em `src/test/java/med/voll/api/infra/SwaggerDocumentacaoTest.java`, adicionar `deveDocumentarEndpointsNovosQuandoGerarApiDocs`, com `$.paths['/medicos/{id}'].get` e `$.paths['/medicos/inativos'].get` existentes, e `deveManterSwaggerUiDisponivel`, com `GET /swagger-ui/index.html` 200
-- [ ] T057 [P] [US5] Criar `frontend/src/components/Cabecalho.test.tsx` com `deveTerLinkParaDocumentacaoDaApi` (`href="/swagger-ui/index.html"`) e `deveMarcarNavegacaoAtual`
-- [ ] T058 [US5] Adicionar o link "Documentação da API" em `frontend/src/components/Cabecalho.tsx`. O T056 e o T057 devem passar
+- [X] T056 [P] [US5] Em `src/test/java/med/voll/api/infra/SwaggerDocumentacaoTest.java`, adicionar `deveDocumentarEndpointsNovosQuandoGerarApiDocs`, com `$.paths['/medicos/{id}'].get` e `$.paths['/medicos/inativos'].get` existentes, e `deveManterSwaggerUiDisponivel`, com `GET /swagger-ui/index.html` 200
+- [X] T057 [P] [US5] Criar `frontend/src/components/Cabecalho.test.tsx` com `deveTerLinkParaDocumentacaoDaApi` (`href="/swagger-ui/index.html"`) e `deveMarcarNavegacaoAtual`
+- [X] T058 [US5] Adicionar o link "Documentação da API" em `frontend/src/components/Cabecalho.tsx`. O T056 e o T057 devem passar
 
 ---
 

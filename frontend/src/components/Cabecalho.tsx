@@ -17,6 +17,10 @@ export default function Cabecalho() {
           </NavLink>
           <NavLink to="/inativos">Inativos</NavLink>
         </nav>
+        {/* <a> e não <Link>: o Swagger é servido pelo Spring, fora do React Router */}
+        <a className="link-docs" href="/swagger-ui/index.html">
+          Documentação da API
+        </a>
       </div>
     </header>
   )
