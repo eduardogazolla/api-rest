@@ -156,10 +156,15 @@ Front em `frontend/src/...`, com os testes ao lado (`*.test.ts(x)`). Back em `sr
 
 ## Phase 8: Polish
 
-- [ ] T026 Fazer o acabamento visual com a skill `frontend-design`: o seletor Ativos/Inativos nos dois temas, a máscara do CPF, o seletor de data e os cartões em 375px. Só CSS e marcação
+- [X] T026 Fazer o acabamento visual com a skill `frontend-design`: o seletor Ativos/Inativos nos dois temas, a máscara do CPF, o seletor de data e os cartões em 375px. Só CSS e marcação
 - [X] T027 [P] Atualizar o `README.md`: a tabela de telas (rotas `/app`), a seção de clientes na interface, os testes do front e a estrutura (`hooks/`, `Tabela`, `ListaCadastros`)
 - [X] T028 Rodar `./mvnw test`, `npm test` e `npm run build` (bundle < 250 kB gzip) e conferir que não sobraram imports nem arquivos sem uso
-- [ ] T029 Rodar o roteiro de quickstart.md com o Playwright contra o `.jar` no banco `vollmed_e2e` (nunca `vollmed_api`), mais o Lighthouse (acessibilidade) em `/app/clientes` e `/app/clientes/cadastro`
+- [X] T029 Rodar o roteiro de quickstart.md com o Playwright contra o `.jar` no banco `vollmed_e2e` (nunca `vollmed_api`), mais o Lighthouse (acessibilidade) em `/app/clientes` e `/app/clientes/cadastro`
+  - Resultado do T026/T029 (26/11/2026), no `vollmed_e2e`:
+    - os 11 passos do quickstart passaram: lista com CPF formatado, máscara ao colar, CPF inválido e data futura barrados no navegador, 409 de CPF no campo, edição com campos bloqueados, só o telefone no PUT, exclusão, inativos e reativação com aviso;
+    - em 375px não há rolagem horizontal em nenhuma tela;
+    - Lighthouse 100 (acessibilidade, boas práticas e SEO) em `/app/clientes` (desktop) e `/app/clientes/cadastro` (mobile);
+    - o visual não precisou de ajuste.
 - [ ] T030 Fazer a revisão de código da branch (`/code-review high`) e aplicar o que for procedente
 - [ ] T031 Fazer push e abrir o PR para a `main`, **sem atribuição do Claude**
 
