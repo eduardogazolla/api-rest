@@ -189,7 +189,7 @@ Os testes MockMvc compartilham o H2: cada teste usa CPF e e-mail próprios, todo
     - o médico tem a mesma brecha de e-mail com outra caixa, que já existia antes desta branch;
     - um cadastro inativo ainda pode ser editado no `PUT` (regra igual à do médico, decisão de produto);
     - na corrida entre dois cadastros simultâneos, o 409 sai com `campo: null` (research.md R4).
-- [ ] T036 Fazer push da `pdi/clientes-backend` e abrir o PR para a `main`, **sem atribuição do Claude**
+- [X] T036 Fazer push da `pdi/clientes-backend` e abrir o PR para a `main`, **sem atribuição do Claude**
 
 ---
 
