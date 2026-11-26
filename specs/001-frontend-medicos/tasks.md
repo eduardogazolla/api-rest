@@ -33,14 +33,14 @@ e testada de forma independente.
 
 **Purpose**: criar o projeto do front e a configuração de build e testes.
 
-- [ ] T001 Gerar o projeto em `frontend/` com o template Vite `react-ts` (`npm create vite@latest frontend -- --template react-ts`) e remover os arquivos de exemplo: `App.css`, `assets/` e o conteúdo demo de `App.tsx`. Instalar `react-router` e, como dependências de desenvolvimento, `vitest`, `jsdom`, `@testing-library/react`, `@testing-library/user-event` e `@testing-library/jest-dom`. Fixar as versões no `frontend/package-lock.json`. Definir `<html lang="pt-BR">` e o título "Voll.med" em `frontend/index.html`
-- [ ] T002 Configurar `frontend/vite.config.ts`:
+- [X] T001 Gerar o projeto em `frontend/` com o template Vite `react-ts` (`npm create vite@latest frontend -- --template react-ts`) e remover os arquivos de exemplo: `App.css`, `assets/` e o conteúdo demo de `App.tsx`. Instalar `react-router` e, como dependências de desenvolvimento, `vitest`, `jsdom`, `@testing-library/react`, `@testing-library/user-event` e `@testing-library/jest-dom`. Fixar as versões no `frontend/package-lock.json`. Definir `<html lang="pt-BR">` e o título "Voll.med" em `frontend/index.html`
+- [X] T002 Configurar `frontend/vite.config.ts`:
   - proxy de `/medicos`, `/swagger-ui` e `/v3` para `http://localhost:8080` (research.md R9);
   - bloco `test` do Vitest com `environment: "jsdom"` e `setupFiles: "./src/test/setup.ts"`;
   - script `"test": "vitest run"` em `frontend/package.json`.
-- [ ] T003 [P] Criar `frontend/src/test/setup.ts`, que importa `@testing-library/jest-dom/vitest`, simula `HTMLDialogElement.prototype.showModal` e `close` (o jsdom não implementa) e restaura os mocks de `fetch` após cada teste
-- [ ] T004 [P] Adicionar `frontend/node_modules/`, `frontend/dist/` e `src/main/resources/static/` ao `.gitignore`. Criar `.dockerignore` com `target/`, `frontend/node_modules/`, `frontend/dist/` e `.git/`
-- [ ] T005 [P] Criar `frontend/src/styles/tokens.css` e `frontend/src/styles/global.css` com a direção visual de research.md R8:
+- [X] T003 [P] Criar `frontend/src/test/setup.ts`, que importa `@testing-library/jest-dom/vitest`, simula `HTMLDialogElement.prototype.showModal` e `close` (o jsdom não implementa) e restaura os mocks de `fetch` após cada teste
+- [X] T004 [P] Adicionar `frontend/node_modules/`, `frontend/dist/` e `src/main/resources/static/` ao `.gitignore`. Criar `.dockerignore` com `target/`, `frontend/node_modules/`, `frontend/dist/` e `.git/`
+- [X] T005 [P] Criar `frontend/src/styles/tokens.css` e `frontend/src/styles/global.css` com a direção visual de research.md R8:
   - variáveis em `:root`, com o tema escuro em `@media (prefers-color-scheme: dark)`;
   - foco visível;
   - reset mínimo;

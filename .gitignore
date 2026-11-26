@@ -32,3 +32,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Front-end ###
+frontend/node_modules/
+frontend/dist/
+# gerado no build a partir de frontend/dist
+src/main/resources/static/

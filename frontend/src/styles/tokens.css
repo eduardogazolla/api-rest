@@ -1,0 +1,74 @@
+:root {
+  color-scheme: light;
+
+  /* Papel hospitalar frio e tinta petróleo */
+  --cor-fundo: #f6f8f7;
+  --cor-superficie: #ffffff;
+  --cor-texto: #12292e;
+  --cor-texto-suave: #4f6367;
+  --cor-linha: #d3dddb;
+  --cor-linha-forte: #a9b9b7;
+
+  --cor-primaria: #0f5e6b;
+  --cor-primaria-hover: #0b4a54;
+  --cor-sobre-primaria: #ffffff;
+  --cor-carimbo: #2b4c9b;
+  --cor-perigo: #b3261e;
+  --cor-perigo-fundo: #fbeceb;
+  --cor-sucesso: #23704a;
+  --cor-sucesso-fundo: #e7f4ec;
+  --cor-foco: #2b4c9b;
+
+  /* Uma cor por especialidade: codifica informação na lista */
+  --cor-ortopedia: #a8650b;
+  --cor-cardiologia: #c0392b;
+  --cor-ginecologia: #8e3b8a;
+  --cor-dermatologia: #1f7a6d;
+
+  --fonte: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --texto-xs: 0.8125rem;
+  --texto-sm: 0.9375rem;
+  --texto-base: 1.0625rem;
+  --texto-lg: 1.375rem;
+  --texto-xl: 2rem;
+
+  --espaco-1: 0.25rem;
+  --espaco-2: 0.5rem;
+  --espaco-3: 0.75rem;
+  --espaco-4: 1rem;
+  --espaco-6: 1.5rem;
+  --espaco-8: 2rem;
+  --espaco-12: 3rem;
+
+  --raio: 10px;
+  --raio-pequeno: 6px;
+  --largura-pagina: 1080px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --cor-fundo: #0e1a1d;
+    --cor-superficie: #152529;
+    --cor-texto: #e3ecea;
+    --cor-texto-suave: #a3b5b3;
+    --cor-linha: #2a3d41;
+    --cor-linha-forte: #4a6064;
+
+    --cor-primaria: #6cc0cc;
+    --cor-primaria-hover: #8fd2db;
+    --cor-sobre-primaria: #0b2226;
+    --cor-carimbo: #9db4ee;
+    --cor-perigo: #f2867e;
+    --cor-perigo-fundo: #3a1c1a;
+    --cor-sucesso: #7fd1a3;
+    --cor-sucesso-fundo: #17321f;
+    --cor-foco: #9db4ee;
+
+    --cor-ortopedia: #e3a24a;
+    --cor-cardiologia: #f07b6e;
+    --cor-ginecologia: #d68bd2;
+    --cor-dermatologia: #5cc4b4;
+  }
+}
