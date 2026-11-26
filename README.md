@@ -27,16 +27,24 @@ A Voll.med API implementa um **CRUD completo de médicos** com validações, pag
 
 ### 🖥️ Interface web
 
-A raiz do sistema (`/`) abre uma interface para a equipe da clínica cadastrar, consultar, editar, excluir e reativar médicos sem usar o Swagger. O Swagger continua disponível em `/swagger-ui/index.html` e tem um link no topo da interface.
+A interface serve para a equipe da clínica cadastrar, consultar, editar, excluir e reativar **médicos e clientes** sem usar o Swagger. O Swagger continua disponível em `/swagger-ui/index.html`, com um link no topo da interface.
 
-| Tela | Rota | O que faz |
+**A regra das rotas:** tudo que é tela fica sob `/app`. Os caminhos `/medicos` e `/clientes` são da API. A raiz `/` leva a `/app/medicos`.
+
+No topo, **Médicos | Clientes** alternam a área. Dentro de cada área, o seletor **Ativos | Inativos** troca a lista.
+
+| Tela | Rota (médicos · clientes) | O que faz |
 |---|---|---|
-| Médicos ativos | `/` | Lista paginada, ordenável por coluna. Página e ordenação ficam na URL (o F5 mantém) |
-| Inativos | `/inativos` | Médicos excluídos, com o botão **Reativar** |
-| Novo médico | `/cadastro` | Formulário com validação no navegador e erros do servidor embaixo de cada campo |
-| Editar médico | `/editar/{id}` | Formulário já preenchido. E-mail, CRM e especialidade ficam bloqueados |
+| Ativos | `/app/medicos` · `/app/clientes` | Lista paginada e ordenável por coluna. A página e a ordenação ficam na URL, então o F5 mantém |
+| Inativos | `/app/medicos/inativos` · `/app/clientes/inativos` | Registros excluídos, com o botão **Reativar** |
+| Cadastro | `/app/medicos/cadastro` · `/app/clientes/cadastro` | Validação no navegador e erros do servidor embaixo de cada campo |
+| Edição | `/app/medicos/editar/{id}` · `/app/clientes/editar/{id}` | Formulário preenchido. Os campos de identidade ficam bloqueados (médico: e-mail, CRM e especialidade; cliente: e-mail, CPF e data de nascimento) |
 
-O desenho (spec, plano e tarefas) foi feito com o [GitHub Spec Kit](https://github.com/github/spec-kit) e está em `specs/001-frontend-medicos/`. Os princípios do projeto estão em `.specify/memory/constitution.md`.
+No cliente, o **CPF** aparece sempre como `000.000.000-00`. Ele pode ser colado com ou sem pontuação, e a API recebe só os dígitos. Os dígitos verificadores são conferidos antes do envio.
+
+As duas áreas usam as mesmas peças: lista, tabela, formulário e API são genéricas, e cada área só declara os seus textos, colunas e campos.
+
+O desenho (spec, plano e tarefas) foi feito com o [GitHub Spec Kit](https://github.com/github/spec-kit) e está em `specs/001-frontend-medicos/`, `specs/002-clientes-backend/` e `specs/003-clientes-frontend/`. Os princípios do projeto estão em `.specify/memory/constitution.md`.
 
 ---
 
@@ -90,10 +98,11 @@ O desenho (spec, plano e tarefas) foi feito com o [GitHub Spec Kit](https://gith
 api
 ├── frontend                                   # interface web (React + TypeScript + Vite)
 │   ├── src
-│   │   ├── api                                # cliente HTTP, chamadas por endpoint, tipos dos DTOs
-│   │   ├── components                         # Cabecalho, TabelaMedicos, Paginacao, Campo, ModalConfirmacao, Aviso
-│   │   ├── dominio                            # especialidades, UFs e validação do formulário
-│   │   ├── pages                              # ListaMedicos (ativos/inativos) e FormularioMedico (cadastro/edição)
+│   │   ├── api                                # cliente HTTP, API genérica por recurso (médicos, clientes), tipos dos DTOs
+│   │   ├── components                         # Tabela, Campo, CamposEndereco, FormularioCadastro, SeletorSituacao, Paginacao, Modal, Aviso
+│   │   ├── dominio                            # áreas (textos e colunas), CPF, validação e cálculo do PUT
+│   │   ├── hooks                              # useFormularioCadastro: carregar, validar, enviar e mostrar erros
+│   │   ├── pages                              # ListaCadastros (genérica), FormularioMedico e FormularioCliente
 │   │   └── styles                             # tokens de cor/tipografia e estilos globais
 │   ├── package.json
 │   └── vite.config.ts                         # proxy para a API e configuração do Vitest
@@ -303,7 +312,7 @@ O Swagger UI é a interface para testar a API pelo navegador, sem Postman.
 | Local | `http://localhost:8080/swagger-ui/index.html` |
 | Portal DB1 | `https://voll-med-eduardo.apps.db1group.com/swagger-ui/index.html` (exige login DB1) |
 
-A raiz (`/`) agora abre a interface web, que tem o link **Documentação da API** no topo. Se o front-end não foi compilado (por exemplo, rodando só `./mvnw spring-boot:run` num clone novo), a raiz continua redirecionando para o Swagger.
+A raiz (`/`) agora abre a interface web (`/app/medicos`), que tem o link **Documentação da API** no topo. Se o front-end não foi compilado (por exemplo, rodando só `./mvnw spring-boot:run` num clone novo), a raiz continua redirecionando para o Swagger.
 
 **Para chamar qualquer endpoint:** clique nele para abrir → **Try it out** → preencha → **Execute**. A resposta aparece logo abaixo, com o status HTTP e o corpo.
 
@@ -433,7 +442,7 @@ cp -r frontend/dist/. src/main/resources/static/      # pasta no .gitignore
 | `MedicoServiceTest` | Regras do serviço com **Mockito** (repository simulado): cenários positivos e de exceção de cada operação do CRUD |
 | `DadosAtualizacaoMedicoTest` | Validação do formulário de atualização com `Validator`: nome e telefone em branco recusados, `null` aceito |
 | `HealthControllerTest` / `HomeControllerTest` | Health check e encaminhamento das rotas de tela para o `index.html` |
-| `RotasDaTelaTest` | `/`, `/inativos`, `/cadastro` e `/editar/{id}` devolvem a interface (F5 e link direto funcionam) |
+| `RotasDaTelaTest` | `/`, `/app` e qualquer `/app/**` devolvem a interface (F5 e link direto funcionam). Os endereços antigos (`/inativos`) não são mais tela |
 | `MedicoControllerOrdenacaoTest` | Teste de integração com **MockMvc**: `sort` inválido retorna `400`, `sort` válido retorna `200` |
 | `MedicoControllerValidacaoTest` | Erros de validação saem como `[{campo, mensagem}]`, em português |
 | `MedicoControllerDuplicidadeTest` | CRM ou e-mail repetido retorna `409` apontando o campo, inclusive de médico inativo |
@@ -448,7 +457,14 @@ cp -r frontend/dist/. src/main/resources/static/      # pasta no .gitignore
 | `ClienteController*Test` | **MockMvc** com H2: cadastro (200, 400, 409), listagem, detalhe, atualização e inativos/reativação |
 | `ApiApplicationTests` | A aplicação sobe e as migrations rodam (H2) |
 
-**Front-end** (`cd frontend && npm test`): Vitest + Testing Library, com o `fetch` simulado. Cobre o cliente HTTP (cada tipo de erro, incluindo sessão expirada), validação local, componentes (tabela, paginação, campo, modal) e as telas de lista e formulário.
+**Front-end** (`cd frontend && npm test`): Vitest + Testing Library, com o `fetch` simulado. Cobre:
+- o cliente HTTP, com cada tipo de erro, incluindo sessão expirada;
+- a API genérica por recurso;
+- o CPF (máscara e dígitos verificadores);
+- a validação local de médico e de cliente;
+- os componentes (tabela, seletor Ativos/Inativos, cabeçalho, campo, modal, aviso);
+- as rotas `/app`;
+- a lista e os formulários das duas áreas, com os mesmos cenários para médicos e clientes.
 
 ---
 
@@ -514,7 +530,7 @@ As regras de Clean Code do projeto estão no **[`Rules.md`](Rules.md)**. Elas se
 - [ ] GitHub Actions rodando os testes em todo Pull Request
 - [x] Endpoint de detalhamento de médico (`GET /medicos/{id}`)
 - [x] Cadastro de clientes (pacientes), back-end
-- [ ] Tela de clientes no front-end
+- [x] Tela de clientes no front-end
 - [ ] Agendamento de consultas (médico + cliente)
 - [ ] Autenticação e autorização com Spring Security + JWT
 - [x] Documentação com Swagger / SpringDoc OpenAPI

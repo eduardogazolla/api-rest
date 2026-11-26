@@ -157,8 +157,8 @@ Front em `frontend/src/...`, com os testes ao lado (`*.test.ts(x)`). Back em `sr
 ## Phase 8: Polish
 
 - [ ] T026 Fazer o acabamento visual com a skill `frontend-design`: o seletor Ativos/Inativos nos dois temas, a máscara do CPF, o seletor de data e os cartões em 375px. Só CSS e marcação
-- [ ] T027 [P] Atualizar o `README.md`: a tabela de telas (rotas `/app`), a seção de clientes na interface, os testes do front e a estrutura (`hooks/`, `Tabela`, `ListaCadastros`)
-- [ ] T028 Rodar `./mvnw test`, `npm test` e `npm run build` (bundle < 250 kB gzip) e conferir que não sobraram imports nem arquivos sem uso
+- [X] T027 [P] Atualizar o `README.md`: a tabela de telas (rotas `/app`), a seção de clientes na interface, os testes do front e a estrutura (`hooks/`, `Tabela`, `ListaCadastros`)
+- [X] T028 Rodar `./mvnw test`, `npm test` e `npm run build` (bundle < 250 kB gzip) e conferir que não sobraram imports nem arquivos sem uso
 - [ ] T029 Rodar o roteiro de quickstart.md com o Playwright contra o `.jar` no banco `vollmed_e2e` (nunca `vollmed_api`), mais o Lighthouse (acessibilidade) em `/app/clientes` e `/app/clientes/cadastro`
 - [ ] T030 Fazer a revisão de código da branch (`/code-review high`) e aplicar o que for procedente
 - [ ] T031 Fazer push e abrir o PR para a `main`, **sem atribuição do Claude**
