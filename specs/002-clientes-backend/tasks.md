@@ -174,9 +174,9 @@ Os testes MockMvc compartilham o H2: cada teste usa CPF e e-mail próprios, todo
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
-- [ ] T031 Em `src/test/java/med/voll/api/infra/SwaggerDocumentacaoTest.java`, adicionar `deveDocumentarAsSeteOperacoesDeClientes`, que confere os paths `/clientes`, `/clientes/{id}`, `/clientes/inativos` e `/clientes/{id}/ativar` com seus métodos, e a tag "Clientes"
-- [ ] T032 [P] Atualizar o `README.md`: "Funcionalidades", "Estrutura de diretórios" (pacote `cliente/` e a migration V4), "Endpoints" (tabela de clientes), "Respostas" (400 de JSON ilegível), "Testes" (as classes novas) e "Modelo de domínio" (`Cliente`)
-- [ ] T033 Rodar `./mvnw test` (todos verdes) e `cd frontend && npm test` (continua verde). Conferir que não sobrou código morto
+- [X] T031 Em `src/test/java/med/voll/api/infra/SwaggerDocumentacaoTest.java`, adicionar `deveDocumentarAsSeteOperacoesDeClientes`, que confere os paths `/clientes`, `/clientes/{id}`, `/clientes/inativos` e `/clientes/{id}/ativar` com seus métodos, e a tag "Clientes"
+- [X] T032 [P] Atualizar o `README.md`: "Funcionalidades", "Estrutura de diretórios" (pacote `cliente/` e a migration V4), "Endpoints" (tabela de clientes), "Respostas" (400 de JSON ilegível), "Testes" (as classes novas) e "Modelo de domínio" (`Cliente`)
+- [X] T033 Rodar `./mvnw test` (todos verdes) e `cd frontend && npm test` (continua verde). Conferir que não sobrou código morto
 - [ ] T034 Rodar o roteiro de quickstart.md contra `vollmed_e2e` (nunca `vollmed_api`) e registrar o resultado
 - [ ] T035 Fazer a revisão de código da branch (`/code-review high`) e aplicar o que for procedente
 - [ ] T036 Fazer push da `pdi/clientes-backend` e abrir o PR para a `main`, **sem atribuição do Claude**
