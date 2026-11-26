@@ -1,6 +1,7 @@
 package med.voll.api.medico;
 
 import jakarta.persistence.EntityNotFoundException;
+import med.voll.api.infra.CadastroDuplicadoException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

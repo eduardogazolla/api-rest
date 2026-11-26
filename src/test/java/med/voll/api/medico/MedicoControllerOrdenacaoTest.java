@@ -9,6 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -38,5 +39,13 @@ class MedicoControllerOrdenacaoTest {
     void deveRetornar200QuandoSortForValido() throws Exception {
         mockMvc.perform(get("/medicos").param("sort", "crm,desc"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Deve explicar o sort inválido com uma mensagem que serve para médicos e clientes")
+    void deveExplicarOrdenacaoComCampoGenericoQuandoSortForInvalido() throws Exception {
+        mockMvc.perform(get("/medicos").param("sort", "xyz"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensagem").value("Parâmetro sort inválido. Use um campo da listagem, por exemplo: nome ou nome,desc"));
     }
 }

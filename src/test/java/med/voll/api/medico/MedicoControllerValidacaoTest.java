@@ -57,4 +57,13 @@ class MedicoControllerValidacaoTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$[?(@.campo == 'nome')].mensagem").value("é obrigatório"));
     }
+    @Test
+    @DisplayName("Deve retornar 400 apontando o campo quando o JSON tiver um valor que não dá para ler")
+    void deveRetornar400ApontandoCampoQuandoJsonTiverValorIlegivel() throws Exception {
+        var corpo = cadastro("Ana Souza", "123456", "87000000").replace("CARDIOLOGIA", "PEDIATRIA");
+        mockMvc.perform(post("/medicos").contentType(MediaType.APPLICATION_JSON).content(corpo))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].campo").value("especialidade"))
+                .andExpect(jsonPath("$[0].mensagem").value("formato inválido"));
+    }
 }

@@ -42,10 +42,10 @@ Os testes MockMvc compartilham o H2: cada teste usa CPF e e-mail próprios, todo
 
 **Purpose**: deixar a infra de erros servindo aos dois domínios (research.md R3, R4 e R5).
 
-- [ ] T004 Mover `src/main/java/med/voll/api/medico/CadastroDuplicadoException.java` para `src/main/java/med/voll/api/infra/CadastroDuplicadoException.java` e ajustar os imports de `MedicoService`, `TratadorDeErros` e `MedicoServiceTest`. Todos os testes continuam verdes
-- [ ] T005 Em `src/test/java/med/voll/api/infra/TratadorDeErrosTest.java`, mudar o texto esperado para "Já existe um cadastro com estes dados.". Em `src/test/java/med/voll/api/medico/MedicoControllerOrdenacaoTest.java`, adicionar `deveExplicarOrdenacaoComCampoGenericoQuandoSortForInvalido`, com `$.mensagem` igual a "Parâmetro sort inválido. Use um campo da listagem, por exemplo: nome ou nome,desc". Confirmar que FALHA
-- [ ] T006 Criar `deveRetornar400ApontandoCampoQuandoJsonTiverValorIlegivel` em `src/test/java/med/voll/api/medico/MedicoControllerValidacaoTest.java`: POST `/medicos` com `"especialidade":"PEDIATRIA"` deve dar 400 com `$[0].campo == "especialidade"` e `$[0].mensagem == "formato inválido"`. Confirmar que FALHA
-- [ ] T007 Implementar em `src/main/java/med/voll/api/infra/TratadorDeErros.java`:
+- [X] T004 Mover `src/main/java/med/voll/api/medico/CadastroDuplicadoException.java` para `src/main/java/med/voll/api/infra/CadastroDuplicadoException.java` e ajustar os imports de `MedicoService`, `TratadorDeErros` e `MedicoServiceTest`. Todos os testes continuam verdes
+- [X] T005 Em `src/test/java/med/voll/api/infra/TratadorDeErrosTest.java`, mudar o texto esperado para "Já existe um cadastro com estes dados.". Em `src/test/java/med/voll/api/medico/MedicoControllerOrdenacaoTest.java`, adicionar `deveExplicarOrdenacaoComCampoGenericoQuandoSortForInvalido`, com `$.mensagem` igual a "Parâmetro sort inválido. Use um campo da listagem, por exemplo: nome ou nome,desc". Confirmar que FALHA
+- [X] T006 Criar `deveRetornar400ApontandoCampoQuandoJsonTiverValorIlegivel` em `src/test/java/med/voll/api/medico/MedicoControllerValidacaoTest.java`: POST `/medicos` com `"especialidade":"PEDIATRIA"` deve dar 400 com `$[0].campo == "especialidade"` e `$[0].mensagem == "formato inválido"`. Confirmar que FALHA
+- [X] T007 Implementar em `src/main/java/med/voll/api/infra/TratadorDeErros.java`:
   - as mensagens genéricas de research.md R5;
   - o handler de `HttpMessageNotReadableException` de research.md R3, com o campo tirado do caminho da exceção do Jackson e `campo: null` quando não houver caminho.
   - T005 e T006 devem passar, e o `./mvnw test` inteiro também.
