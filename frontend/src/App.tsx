@@ -1,6 +1,6 @@
 import { Link, Navigate, Route, Routes } from 'react-router'
 import Cabecalho from './components/Cabecalho'
-import { MEDICOS } from './dominio/recursos'
+import { CLIENTES, MEDICOS } from './dominio/recursos'
 import FormularioMedico from './pages/FormularioMedico'
 import ListaCadastros from './pages/ListaCadastros'
 
@@ -20,6 +20,11 @@ export default function App() {
           />
           <Route path="/app/medicos/cadastro" element={<FormularioMedico modo="cadastro" />} />
           <Route path="/app/medicos/editar/:id" element={<FormularioMedico modo="edicao" />} />
+          <Route path="/app/clientes" element={<ListaCadastros key="clientes-ativos" area={CLIENTES} modo="ativos" />} />
+          <Route
+            path="/app/clientes/inativos"
+            element={<ListaCadastros key="clientes-inativos" area={CLIENTES} modo="inativos" />}
+          />
           <Route path="*" element={<PaginaNaoEncontrada />} />
         </Routes>
       </main>

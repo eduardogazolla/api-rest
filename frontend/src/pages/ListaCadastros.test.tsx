@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router'
 import { describe, expect, it } from 'vitest'
 import { ErroApi } from '../api/cliente'
-import { ana, bruno, json, pagina, simularFetch, vazio } from '../test/fetchFalso'
-import { MEDICOS } from '../dominio/recursos'
+import { ana, beatriz, bruno, caio, json, pagina, paginaDeClientes, simularFetch, vazio } from '../test/fetchFalso'
+import { CLIENTES, MEDICOS } from '../dominio/recursos'
 import ListaCadastros from './ListaCadastros'
 
 function UrlAtual() {
@@ -195,5 +195,56 @@ describe('ListaCadastros: mensagens da entidade', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Reativar Bruno Lima' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Médico não encontrado.')
+  })
+})
+
+function renderizarClientes(url = '/app/clientes', modo: 'ativos' | 'inativos' = 'ativos') {
+  return render(
+    <MemoryRouter initialEntries={[url]}>
+      <Routes>
+        <Route path="*" element={<><ListaCadastros area={CLIENTES} modo={modo} /><UrlAtual /></>} />
+      </Routes>
+    </MemoryRouter>,
+  )
+}
+
+describe('ListaCadastros: clientes', () => {
+  it('deveListarClientesComCpfFormatado', async () => {
+    const fetchFalso = simularFetch(() => json(paginaDeClientes([beatriz, caio])))
+    renderizarClientes()
+
+    expect(await screen.findByText('529.982.247-25')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Clientes' })).toBeInTheDocument()
+    expect(screen.getByText('2 clientes')).toBeInTheDocument()
+    expect(screen.queryByText('52998224725')).not.toBeInTheDocument()
+    expect(fetchFalso.mock.calls[0][0]).toBe('/clientes?page=0&size=10&sort=nome%2Casc')
+  })
+
+  it('deveMostrarEstadoVazioDeClientesComAtalho', async () => {
+    simularFetch(() => json(paginaDeClientes([])))
+    renderizarClientes()
+
+    expect(await screen.findByText('Nenhum cliente ativo')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Cadastrar o primeiro cliente' })).toHaveAttribute('href', '/app/clientes/cadastro')
+    expect(screen.getByRole('link', { name: 'Novo cliente' })).toHaveAttribute('href', '/app/clientes/cadastro')
+  })
+
+  it('deveOrdenarClientesPorCpf', async () => {
+    const fetchFalso = simularFetch(() => json(paginaDeClientes([beatriz])))
+    renderizarClientes()
+    await screen.findByText('Beatriz Rocha')
+
+    await userEvent.click(screen.getByRole('button', { name: /CPF/ }))
+
+    expect(screen.getByTestId('url')).toHaveTextContent('/app/clientes?sort=cpf%2Casc')
+    await screen.findByText('Beatriz Rocha')
+    expect(fetchFalso.mock.calls.at(-1)?.[0]).toBe('/clientes?page=0&size=10&sort=cpf%2Casc')
+  })
+
+  it('deveApontarEdicaoParaAAreaDeClientes', async () => {
+    simularFetch(() => json(paginaDeClientes([beatriz])))
+    renderizarClientes()
+
+    expect(await screen.findByRole('link', { name: 'Editar Beatriz Rocha' })).toHaveAttribute('href', '/app/clientes/editar/11')
   })
 })

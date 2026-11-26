@@ -1,8 +1,10 @@
+import { apiClientes } from '../api/clientes'
 import { apiMedicos } from '../api/medicos'
 import type { ApiDeCadastro } from '../api/recurso'
-import type { MedicoListagem } from '../api/tipos'
+import type { ClienteListagem, MedicoListagem } from '../api/tipos'
 import type { Coluna } from '../components/Tabela'
 import { rotuloDaEspecialidade } from './constantes'
+import { formatarCpf } from './cpf'
 
 /**
  * Tudo o que muda de uma área (médicos, clientes) para outra na tela de lista.
@@ -38,5 +40,18 @@ export const MEDICOS: AreaDeCadastro<MedicoListagem> = {
         </span>
       ),
     },
+  ],
+}
+
+export const CLIENTES: AreaDeCadastro<ClienteListagem> = {
+  base: '/app/clientes',
+  singular: 'cliente',
+  plural: 'clientes',
+  api: apiClientes,
+  colunas: [
+    { campo: 'nome', rotulo: 'Nome', className: 'coluna-nome tabela__nome', celula: (c) => c.nome },
+    { campo: 'email', rotulo: 'E-mail', className: 'coluna-email tabela__email', celula: (c) => c.email },
+    // A API guarda só dígitos; quem atende lê o CPF com pontuação
+    { campo: 'cpf', rotulo: 'CPF', celula: (c) => <span className="cpf">{formatarCpf(c.cpf)}</span> },
   ],
 }

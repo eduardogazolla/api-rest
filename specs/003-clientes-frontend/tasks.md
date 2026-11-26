@@ -90,16 +90,16 @@ Front em `frontend/src/...`, com os testes ao lado (`*.test.ts(x)`). Back em `sr
 
 **Independent Test**: os cenários US2 da spec.
 
-- [ ] T016 [P] [US2] Criar `frontend/src/dominio/cpf.test.ts`:
+- [X] T016 [P] [US2] Criar `frontend/src/dominio/cpf.test.ts`:
   - `deveFormatarCpfCompleto` (`52998224725` vira `529.982.247-25`);
   - `deveFormatarCpfParcialEnquantoDigita` (`5299` vira `529.9`, `529982247` vira `529.982.247`);
   - `deveGuardarSoDigitosAteOnze`;
   - `deveAceitarCpfComDigitosValidos`;
   - `deveRecusarDigitoVerificadorErrado` (`52998224724`);
   - `deveRecusarOnzeDigitosIguais`.
-- [ ] T017 [US2] Implementar `frontend/src/dominio/cpf.ts` (research.md R4). O T016 deve passar
-- [ ] T018 [US2] Em `frontend/src/api/tipos.ts`, adicionar os tipos de cliente (data-model.md "Tipos da API"). Criar `frontend/src/api/clientes.ts` com `apiClientes = criarApiDeCadastro('/clientes')` e um teste de URL. Criar a área `CLIENTES` em `dominio/recursos.ts`, com as colunas Nome, E-mail e CPF, sendo o CPF formatado
-- [ ] T019 [US2] Em `ListaCadastros.test.tsx`, adicionar um bloco de clientes:
+- [X] T017 [US2] Implementar `frontend/src/dominio/cpf.ts` (research.md R4). O T016 deve passar
+- [X] T018 [US2] Em `frontend/src/api/tipos.ts`, adicionar os tipos de cliente (data-model.md "Tipos da API"). Criar `frontend/src/api/clientes.ts` com `apiClientes = criarApiDeCadastro('/clientes')` e um teste de URL. Criar a área `CLIENTES` em `dominio/recursos.ts`, com as colunas Nome, E-mail e CPF, sendo o CPF formatado
+- [X] T019 [US2] Em `ListaCadastros.test.tsx`, adicionar um bloco de clientes:
   - `deveListarClientesComCpfFormatado`;
   - `deveMostrarEstadoVazioDeClientesComAtalho` ("Nenhum cliente ativo", link para `/app/clientes/cadastro`);
   - `deveOrdenarClientesPorCpf`.

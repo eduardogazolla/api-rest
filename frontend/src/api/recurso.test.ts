@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { json, pagina, simularFetch, vazio } from '../test/fetchFalso'
+import { apiClientes } from './clientes'
 import { criarApiDeCadastro } from './recurso'
 import type { MedicoCadastro, MedicoDetalhe, MedicoListagem } from './tipos'
 
@@ -65,5 +66,13 @@ describe('criarApiDeCadastro', () => {
     await api.reativar(7)
     expect(fetchFalso.mock.calls[0][0]).toBe('/medicos/7/ativar')
     expect(fetchFalso.mock.calls[0][1].method).toBe('PATCH')
+  })
+})
+
+describe('apiClientes', () => {
+  it('deveUsarARotaDeClientesDaApi', async () => {
+    const fetchFalso = simularFetch(() => json(pagina([])))
+    await apiClientes.listarInativos({})
+    expect(fetchFalso.mock.calls[0][0]).toBe('/clientes/inativos?page=0&size=10&sort=nome%2Casc')
   })
 })

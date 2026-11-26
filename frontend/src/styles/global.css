@@ -342,6 +342,11 @@ th[aria-sort] .ordenar {
   transform: rotate(-1.5deg);
 }
 
+.cpf {
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
 .especialidade {
   display: inline-flex;
   align-items: center;
