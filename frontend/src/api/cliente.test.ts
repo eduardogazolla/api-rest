@@ -81,6 +81,30 @@ describe('requisitar', () => {
     expect(erro.message).toBe('Sua sessão expirou. Recarregue a página.')
   })
 
+  it('deveLancarSessaoQuandoSsoRedirecionarParaOutroDominio', async () => {
+    // Com redirect: 'manual', um 302 para o login do SSO chega como resposta opaca, sem corpo
+    const opaca = { type: 'opaqueredirect', status: 0, ok: false, redirected: false, headers: new Headers(), text: async () => '' }
+    const fetchFalso = vi.fn().mockResolvedValue(opaca)
+    vi.stubGlobal('fetch', fetchFalso)
+
+    expect((await erroDe(requisitar('/medicos'))).tipo).toBe('sessao')
+    expect(fetchFalso).toHaveBeenCalledWith('/medicos', expect.objectContaining({ redirect: 'manual' }))
+  })
+
+  it('deveLancarSessaoQuando401Ou403', async () => {
+    responder(401)
+    expect((await erroDe(requisitar('/medicos'))).tipo).toBe('sessao')
+    responder(403)
+    expect((await erroDe(requisitar('/medicos'))).tipo).toBe('sessao')
+  })
+
+  it('deveLancarServidorSemVazarErroDeParseQuandoCorpoNaoForJson', async () => {
+    responder(502, 'Bad Gateway', { tipo: 'text/plain' })
+    const erro = await erroDe(requisitar('/medicos'))
+    expect(erro.tipo).toBe('servidor')
+    expect(erro.message).toBe('O servidor encontrou um erro. Tente novamente em instantes.')
+  })
+
   it('deveLancarServidorQuando500', async () => {
     responder(500)
     expect((await erroDe(requisitar('/medicos'))).tipo).toBe('servidor')

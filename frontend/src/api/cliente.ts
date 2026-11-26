@@ -21,22 +21,36 @@ export async function requisitar<T>(caminho: string, opcoes: RequestInit = {}): 
 
   let resposta: Response
   try {
-    resposta = await fetch(caminho, { ...opcoes, headers: cabecalhos })
+    // redirect: 'manual' porque a API nunca redireciona: um redirecionamento é o SSO mandando
+    // para o login. Seguido automaticamente para outro domínio, ele viraria um erro de rede genérico
+    resposta = await fetch(caminho, { ...opcoes, headers: cabecalhos, redirect: 'manual' })
   } catch {
     throw new ErroApi('rede', MENSAGEM_REDE)
   }
 
-  // O SSO do portal responde com redirecionamento para a página de login (HTML), não com JSON
   const tipoConteudo = resposta.headers.get('Content-Type') ?? ''
-  if (resposta.redirected || tipoConteudo.includes('text/html')) {
-    throw new ErroApi('sessao', MENSAGEM_SESSAO)
-  }
+  const sessaoExpirada =
+    resposta.type === 'opaqueredirect' ||
+    resposta.redirected ||
+    resposta.status === 401 ||
+    resposta.status === 403 ||
+    tipoConteudo.includes('text/html')
+  if (sessaoExpirada) throw new ErroApi('sessao', MENSAGEM_SESSAO)
 
-  const texto = await resposta.text()
-  const corpo: unknown = texto ? JSON.parse(texto) : undefined
+  const corpo = lerJson(await resposta.text())
 
   if (resposta.ok) return corpo as T
   throw criarErro(resposta.status, corpo)
+}
+
+// Um proxy no caminho (ex.: 502 do portal) pode responder em texto puro; nesse caso
+// o erro é decidido só pelo status
+function lerJson(texto: string): unknown {
+  try {
+    return texto ? JSON.parse(texto) : undefined
+  } catch {
+    return undefined
+  }
 }
 
 function criarErro(status: number, corpo: unknown): ErroApi {

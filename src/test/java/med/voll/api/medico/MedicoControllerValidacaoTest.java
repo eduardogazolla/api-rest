@@ -41,6 +41,15 @@ class MedicoControllerValidacaoTest {
     }
 
     @Test
+    @DisplayName("Deve retornar 400 no campo nome, e não 409 do banco, quando o nome passar de 100 caracteres")
+    void deveRetornar400QuandoNomePassarDoTamanhoDaColuna() throws Exception {
+        mockMvc.perform(post("/medicos").contentType(MediaType.APPLICATION_JSON)
+                        .content(cadastro("A".repeat(101), "123456", "87000000")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[?(@.campo == 'nome')].mensagem").value("deve ter no máximo 100 caracteres"));
+    }
+
+    @Test
     @DisplayName("Deve retornar as mensagens em português quando um campo obrigatório faltar")
     void deveRetornarMensagensEmPortuguesQuandoCampoObrigatorioFaltar() throws Exception {
         mockMvc.perform(post("/medicos").contentType(MediaType.APPLICATION_JSON)

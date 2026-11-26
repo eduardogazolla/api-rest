@@ -101,6 +101,31 @@ describe('FormularioMedico (edição)', () => {
     expect(screen.getByRole('link', { name: 'Ver médicos ativos' })).toHaveAttribute('href', '/')
   })
 
+  it('deveMostrarNaoEncontradoSemChamarApiQuandoIdNaoForNumero', async () => {
+    const fetchFalso = simularFetch(() => json(detalhe))
+    render(
+      <MemoryRouter initialEntries={['/editar/abc']}>
+        <Routes>
+          <Route path="/editar/:id" element={<FormularioMedico modo="edicao" />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByRole('heading', { name: 'Médico não encontrado' })).toBeInTheDocument()
+    expect(fetchFalso).not.toHaveBeenCalled()
+  })
+
+  it('deveMostrarErroGeralQuandoServidorApontarCampoSemInput', async () => {
+    simularFetch((_url, init) => (init.method === 'PUT' ? json([{ campo: 'id', mensagem: 'é obrigatório' }], 400) : json(detalhe)))
+    renderizarEdicao()
+    const usuario = userEvent.setup()
+    await screen.findByDisplayValue('Ana Souza')
+
+    await usuario.click(screen.getByRole('button', { name: 'Salvar alterações' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('id: é obrigatório')
+  })
+
   it('deveRecusarNomeEmBrancoNaEdicao', async () => {
     const fetchFalso = simularFetch(() => json(detalhe))
     renderizarEdicao()

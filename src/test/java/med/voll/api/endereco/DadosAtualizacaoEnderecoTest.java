@@ -49,6 +49,25 @@ class DadosAtualizacaoEnderecoTest {
     }
 
     @Test
+    @DisplayName("Deve recusar UF com mais de 2 letras, que não cabe na coluna")
+    void deveRecusarUfComMaisDeDuasLetras() {
+        var dados = new DadosAtualizacaoEndereco(null, null, null, null, "PRX", null, null);
+
+        var erros = validator.validate(dados);
+
+        assertEquals(1, erros.size());
+        assertEquals("deve ter 2 letras", erros.iterator().next().getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve recusar número com mais de 20 caracteres")
+    void deveRecusarNumeroMaiorQueAColuna() {
+        var dados = new DadosAtualizacaoEndereco(null, null, null, null, null, null, "1".repeat(21));
+
+        assertEquals("deve ter no máximo 20 caracteres", validator.validate(dados).iterator().next().getMessage());
+    }
+
+    @Test
     @DisplayName("Deve aceitar complemento vazio, que apaga o valor atual")
     void deveAceitarComplementoVazio() {
         var dados = new DadosAtualizacaoEndereco(null, null, null, null, null, "", "");

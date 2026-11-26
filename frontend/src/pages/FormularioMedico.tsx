@@ -29,6 +29,11 @@ export default function FormularioMedico({ modo }: Props) {
 
   useEffect(() => {
     if (!edicao) return
+    // /editar/abc nem chega à API: só ids numéricos existem
+    if (!/^\d+$/.test(id ?? '')) {
+      setErroAoCarregar(new ErroApi('nao-encontrado', 'Médico não encontrado.'))
+      return
+    }
     let ativo = true
     detalharMedico(Number(id))
       .then((medico) => {
@@ -68,10 +73,16 @@ export default function FormularioMedico({ modo }: Props) {
     }
     if (erro.tipo === 'validacao' || erro.tipo === 'conflito') {
       const porCampo: ErrosDoFormulario = {}
+      const gerais: string[] = []
+      const nomesNaTela = new Set(
+        Array.from(formulario.current?.querySelectorAll('[name]') ?? []).map((c) => c.getAttribute('name')),
+      )
       for (const { campo, mensagem } of erro.campos) {
-        if (campo) porCampo[campo] = mensagem
-        else setErroGeral(mensagem)
+        if (campo && nomesNaTela.has(campo)) porCampo[campo] = mensagem
+        else gerais.push(campo ? `${campo}: ${mensagem}` : mensagem)
       }
+      // Erro de um campo sem input na tela (ex.: id) não pode sumir: vai para o aviso geral
+      if (gerais.length > 0) setErroGeral(gerais.join(' '))
       setErros(porCampo)
       focarPrimeiroErro(porCampo)
       return
@@ -125,7 +136,8 @@ export default function FormularioMedico({ modo }: Props) {
     )
   }
 
-  // Sem maxLength: ele cortaria "87020-000" colado para "87020-00" antes de tirarmos o traço
+  // Os limites de maxLength seguem as colunas do banco (e o @Size dos DTOs).
+  // Sem maxLength aqui: ele cortaria "87020-000" colado para "87020-00" antes de tirarmos o traço
   function numerico(campo: string, limite: number, extras: InputHTMLAttributes<HTMLInputElement> = {}) {
     return (props: PropsDoControle) => (
       <input
@@ -179,13 +191,13 @@ export default function FormularioMedico({ modo }: Props) {
           <legend>Dados do médico</legend>
           <div className="grade">
             <Campo rotulo="Nome" erro={erros.nome}>
-              {texto('nome', { autoComplete: 'name' })}
+              {texto('nome', { autoComplete: 'name', maxLength: 100 })}
             </Campo>
             <Campo rotulo="E-mail" erro={erros.email} dica={edicao ? BLOQUEADO : undefined} className="campo--metade">
-              {texto('email', { type: 'email', autoComplete: 'email', readOnly: edicao })}
+              {texto('email', { type: 'email', autoComplete: 'email', readOnly: edicao, maxLength: 100 })}
             </Campo>
             <Campo rotulo="Telefone" erro={erros.telefone} dica="Com DDD, só números" className="campo--metade">
-              {texto('telefone', { type: 'tel', inputMode: 'tel', autoComplete: 'tel' })}
+              {texto('telefone', { type: 'tel', inputMode: 'tel', autoComplete: 'tel', maxLength: 20 })}
             </Campo>
             <Campo rotulo="CRM" erro={erros.crm} dica={edicao ? BLOQUEADO : 'De 4 a 6 dígitos'} className="campo--terco">
               {numerico('crm', 6, { readOnly: edicao })}
@@ -223,19 +235,19 @@ export default function FormularioMedico({ modo }: Props) {
               {numerico('endereco.cep', 8, { autoComplete: 'postal-code' })}
             </Campo>
             <Campo rotulo="Logradouro" erro={erros['endereco.logradouro']} className="campo--dois-tercos">
-              {texto('endereco.logradouro', { autoComplete: 'address-line1' })}
+              {texto('endereco.logradouro', { autoComplete: 'address-line1', maxLength: 100 })}
             </Campo>
             <Campo rotulo="Número" opcional erro={erros['endereco.numero']} className="campo--terco">
-              {texto('endereco.numero')}
+              {texto('endereco.numero', { maxLength: 20 })}
             </Campo>
             <Campo rotulo="Complemento" opcional erro={erros['endereco.complemento']} className="campo--dois-tercos">
-              {texto('endereco.complemento', { autoComplete: 'address-line2' })}
+              {texto('endereco.complemento', { autoComplete: 'address-line2', maxLength: 100 })}
             </Campo>
             <Campo rotulo="Bairro" erro={erros['endereco.bairro']} className="campo--metade">
-              {texto('endereco.bairro')}
+              {texto('endereco.bairro', { maxLength: 100 })}
             </Campo>
             <Campo rotulo="Cidade" erro={erros['endereco.cidade']} className="campo--terco">
-              {texto('endereco.cidade', { autoComplete: 'address-level2' })}
+              {texto('endereco.cidade', { autoComplete: 'address-level2', maxLength: 100 })}
             </Campo>
             <Campo rotulo="UF" erro={erros['endereco.uf']} className="campo--sexto">
               {(props) => (

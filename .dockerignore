@@ -7,3 +7,4 @@ frontend/dist/
 .specify/
 evidencias/
 *.zip
+src/main/resources/static/

@@ -82,6 +82,15 @@ describe('ListaMedicos (ativos)', () => {
     expect(screen.getByRole('button', { name: 'Tentar de novo' })).toBeInTheDocument()
   })
 
+  it('deveTratarPaginaInvalidaNaUrlComoPrimeiraPagina', async () => {
+    const fetchFalso = simularFetch(() => json(pagina([ana], 0, 2)))
+    renderizar('/?page=abc')
+
+    expect(await screen.findByText('Página 1 de 2')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Anterior' })).toBeDisabled()
+    expect(fetchFalso.mock.calls[0][0]).toContain('page=0')
+  })
+
   it('deveMostrarAvisoRecebidoNaNavegacao', async () => {
     simularFetch(() => json(pagina([ana])))
     renderizar('/', 'ativos', { aviso: 'Médico cadastrado' })

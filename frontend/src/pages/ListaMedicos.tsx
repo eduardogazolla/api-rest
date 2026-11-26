@@ -14,6 +14,12 @@ interface Props {
 
 const SORT_PADRAO = 'nome,asc'
 
+/** ?page=abc ou ?page=-1 viram a primeira página, como o Spring também faz. */
+function paginaDaUrl(valor: string | null): number {
+  const numero = Number(valor)
+  return Number.isInteger(numero) && numero > 0 ? numero : 0
+}
+
 function comoErroApi(erro: unknown): ErroApi {
   return erro instanceof ErroApi ? erro : new ErroApi('servidor', String(erro))
 }
@@ -22,13 +28,17 @@ export default function ListaMedicos({ modo }: Props) {
   const { pathname, search, state } = useLocation()
   const navigate = useNavigate()
   const [parametros, setParametros] = useSearchParams()
-  const page = Number(parametros.get('page') ?? 0)
+  const page = paginaDaUrl(parametros.get('page'))
   const sort = parametros.get('sort') ?? SORT_PADRAO
 
   const [pagina, setPagina] = useState<Pagina<MedicoListagem> | null>(null)
   const [erro, setErro] = useState<ErroApi | null>(null)
   const [tentativa, setTentativa] = useState(0)
-  const [aviso, setAviso] = useState<string | null>((state as { aviso?: string } | null)?.aviso ?? null)
+  // O id faz cada aviso remontar o componente, reiniciando os 5 s mesmo com o mesmo texto
+  const [aviso, setAviso] = useState<{ texto: string; id: number } | null>(() => {
+    const texto = (state as { aviso?: string } | null)?.aviso
+    return texto ? { texto, id: 0 } : null
+  })
   const [paraExcluir, setParaExcluir] = useState<MedicoListagem | null>(null)
   const [erroDaAcao, setErroDaAcao] = useState<string | null>(null)
   const [ocupado, setOcupado] = useState(false)
@@ -69,7 +79,7 @@ export default function ListaMedicos({ modo }: Props) {
     setErroDaAcao(null)
     try {
       await acao()
-      setAviso(mensagem)
+      setAviso({ texto: mensagem, id: Date.now() })
       const eraOUltimoDaPagina = pagina?.content.length === 1 && page > 0
       if (eraOUltimoDaPagina) irParaPagina(page - 1)
       else setTentativa((t) => t + 1)
@@ -203,7 +213,7 @@ export default function ListaMedicos({ modo }: Props) {
         onCancelar={() => setParaExcluir(null)}
       />
 
-      {aviso && <Aviso mensagem={aviso} onFechar={fecharAviso} />}
+      {aviso && <Aviso key={aviso.id} mensagem={aviso.texto} onFechar={fecharAviso} />}
     </>
   )
 }

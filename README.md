@@ -260,7 +260,7 @@ O Swagger UI é a interface para testar a API pelo navegador, sem Postman.
 | Local | `http://localhost:8080/swagger-ui/index.html` |
 | Portal DB1 | `https://voll-med-eduardo.apps.db1group.com/swagger-ui/index.html` (exige login DB1) |
 
-A raiz (`/`) agora abre a interface web, que tem o link **Documentação da API** no topo.
+A raiz (`/`) agora abre a interface web, que tem o link **Documentação da API** no topo. Se o front-end não foi compilado (por exemplo, rodando só `./mvnw spring-boot:run` num clone novo), a raiz continua redirecionando para o Swagger.
 
 **Para chamar qualquer endpoint:** clique nele para abrir → **Try it out** → preencha → **Execute**. A resposta aparece logo abaixo, com o status HTTP e o corpo.
 
