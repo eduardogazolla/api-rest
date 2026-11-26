@@ -28,7 +28,8 @@ describe('ListaCadastros: médicos ativos', () => {
     renderizar()
 
     expect(await screen.findByText('Ana Souza')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Médicos ativos' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Médicos' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Ativos' })).toHaveAttribute('aria-current', 'page')
     expect(screen.getByText('2 médicos')).toBeInTheDocument()
     expect(fetchFalso.mock.calls[0][0]).toBe('/medicos?page=0&size=10&sort=nome%2Casc')
   })
@@ -160,7 +161,8 @@ describe('ListaCadastros: exclusão e reativação de médicos', () => {
     const fetchFalso = simularFetch(() => json(pagina([bruno])))
     renderizar('/app/medicos/inativos', 'inativos')
 
-    expect(await screen.findByRole('heading', { name: 'Médicos inativos' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Médicos' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Inativos' })).toHaveAttribute('aria-current', 'page')
     expect(await screen.findByRole('button', { name: 'Reativar Bruno Lima' })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Novo médico' })).not.toBeInTheDocument()
     expect(fetchFalso.mock.calls[0][0]).toMatch(/^\/medicos\/inativos\?/)

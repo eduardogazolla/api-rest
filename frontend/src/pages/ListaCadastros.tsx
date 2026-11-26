@@ -5,6 +5,7 @@ import type { Pagina } from '../api/tipos'
 import Aviso from '../components/Aviso'
 import ModalConfirmacao from '../components/ModalConfirmacao'
 import Paginacao from '../components/Paginacao'
+import SeletorSituacao from '../components/SeletorSituacao'
 import Tabela from '../components/Tabela'
 import { maiuscula, type AreaDeCadastro } from '../dominio/recursos'
 
@@ -96,18 +97,19 @@ export default function ListaCadastros<L extends { id: number; nome: string }>({
     }
   }
 
-  const titulo = `${maiuscula(plural)} ${modo}`
-
   return (
     <>
       <div className="pagina__topo">
         <div>
-          <h1 className="pagina__titulo">{titulo}</h1>
-          {pagina && (
-            <p className="pagina__resumo">
-              {pagina.totalElements === 1 ? `1 ${singular}` : `${pagina.totalElements} ${plural}`}
-            </p>
-          )}
+          <h1 className="pagina__titulo">{maiuscula(plural)}</h1>
+          <div className="pagina__situacao">
+            <SeletorSituacao base={base} />
+            {pagina && (
+              <p className="pagina__resumo">
+                {pagina.totalElements === 1 ? `1 ${singular}` : `${pagina.totalElements} ${plural}`}
+              </p>
+            )}
+          </div>
         </div>
         {modo === 'ativos' && (
           <Link to={`${base}/cadastro`} className="botao botao--primario">

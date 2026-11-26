@@ -12,10 +12,9 @@ export default function Cabecalho() {
           Voll.med
         </Link>
         <nav className="navegacao" aria-label="Principal">
-          <NavLink to="/app/medicos" end>
-            Médicos ativos
-          </NavLink>
-          <NavLink to="/app/medicos/inativos">Inativos</NavLink>
+          {/* Sem "end": a área fica marcada também no cadastro, na edição e nos inativos */}
+          <NavLink to="/app/medicos">Médicos</NavLink>
+          <NavLink to="/app/clientes">Clientes</NavLink>
         </nav>
         {/* <a> e não <Link>: o Swagger é servido pelo Spring, fora do React Router */}
         <a className="link-docs" href="/swagger-ui/index.html">

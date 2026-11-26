@@ -67,17 +67,17 @@ Front em `frontend/src/...`, com os testes ao lado (`*.test.ts(x)`). Back em `sr
 
 **Independent Test**: os cenários US1 da spec.
 
-- [ ] T012 [P] [US1] Atualizar `frontend/src/components/Cabecalho.test.tsx`:
+- [X] T012 [P] [US1] Atualizar `frontend/src/components/Cabecalho.test.tsx`:
   - `deveMostrarAreasMedicosEClientes`;
   - `deveMarcarMedicosComoAtualTambemNoCadastro`, em `/app/medicos/cadastro` com `aria-current`;
   - `deveMarcarClientesQuandoEstiverNaAreaDeClientes`;
   - manter o link da documentação.
-- [ ] T013 [P] [US1] Criar `frontend/src/components/SeletorSituacao.test.tsx`:
+- [X] T013 [P] [US1] Criar `frontend/src/components/SeletorSituacao.test.tsx`:
   - `deveMarcarAtivosNaListaPrincipal`;
   - `deveMarcarInativosNaRotaDeInativos`;
   - `deveApontarParaAsRotasDaArea`, com `/app/clientes` e `/app/clientes/inativos`.
-- [ ] T014 [P] [US1] Criar `frontend/src/App.test.tsx` com `deveRedirecionarRaizParaMedicos` e `deveMostrarPaginaNaoEncontradaEmRotaAntiga` (`/inativos`)
-- [ ] T015 [US1] Implementar:
+- [X] T014 [P] [US1] Criar `frontend/src/App.test.tsx` com `deveRedirecionarRaizParaMedicos` e `deveMostrarPaginaNaoEncontradaEmRotaAntiga` (`/inativos`)
+- [X] T015 [US1] Implementar:
   - `Cabecalho.tsx`, com Médicos e Clientes sem o link Inativos;
   - `SeletorSituacao.tsx`, um `nav` com `aria-label="Situação"` e `NavLink end`;
   - o seletor dentro da `ListaCadastros`, abaixo do título, que passa a ser "Médicos"/"Clientes" com o resumo.
