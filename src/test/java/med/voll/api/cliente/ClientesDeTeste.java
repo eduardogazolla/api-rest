@@ -37,6 +37,11 @@ final class ClientesDeTeste {
         return cadastro(novoCpf(), novoEmail());
     }
 
+    static DadosCadastroCliente cadastroComNome(String nome) {
+        return new DadosCadastroCliente(nome, novoEmail(), "44999998888", novoCpf(),
+                LocalDate.of(1990, 5, 20), endereco());
+    }
+
     static String json(String cpf, String email, String dataNascimento) {
         return """
                 {"nome":"Beatriz Rocha","email":"%s","telefone":"44999998888","cpf":"%s","dataNascimento":"%s",

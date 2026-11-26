@@ -8,6 +8,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -61,6 +67,30 @@ class ClienteServiceTest {
 
         assertEquals("cpf", excecao.getCampo());
         verify(repository, never()).existsByEmail(any());
+    }
+
+    @Test
+    @DisplayName("Deve converter os clientes ativos para dados de listagem")
+    void deveConverterClientesAtivosParaDadosDeListagem() {
+        var cliente = new Cliente(ClientesDeTeste.cadastroValido());
+        Pageable paginacao = PageRequest.of(0, 10);
+        when(repository.findAllByAtivoTrue(paginacao)).thenReturn(new PageImpl<>(List.of(cliente)));
+
+        Page<DadosListagemCliente> resultado = service.listar(paginacao);
+
+        var item = resultado.getContent().get(0);
+        assertEquals("Beatriz Rocha", item.nome());
+        assertEquals(cliente.getCpf(), item.cpf());
+        assertEquals(cliente.getEmail(), item.email());
+    }
+
+    @Test
+    @DisplayName("Deve retornar página vazia quando não houver clientes ativos")
+    void deveRetornarPaginaVaziaQuandoNaoHouverClientesAtivos() {
+        Pageable paginacao = PageRequest.of(0, 10);
+        when(repository.findAllByAtivoTrue(paginacao)).thenReturn(Page.empty());
+
+        assertTrue(service.listar(paginacao).isEmpty());
     }
 
     @Test

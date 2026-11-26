@@ -1,6 +1,8 @@
 package med.voll.api.cliente;
 
 import med.voll.api.infra.CadastroDuplicadoException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,10 @@ public class ClienteService {
     public void cadastrar(DadosCadastroCliente dados) {
         validarDuplicidade(dados);
         repository.save(new Cliente(dados));
+    }
+
+    public Page<DadosListagemCliente> listar(Pageable paginacao) {
+        return repository.findAllByAtivoTrue(paginacao).map(DadosListagemCliente::new);
     }
 
     // A checagem inclui inativos: a exclusão é lógica e a constraint unique do banco também os considera

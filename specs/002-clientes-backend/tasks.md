@@ -101,12 +101,12 @@ Os testes MockMvc compartilham o H2: cada teste usa CPF e e-mail próprios, todo
 
 **Independent Test**: o cenário 4 do quickstart.md.
 
-- [ ] T017 [P] [US2] Em `ClienteServiceTest.java`, adicionar `deveConverterClientesAtivosParaDadosDeListagem` e `deveRetornarPaginaVaziaQuandoNaoHouverClientesAtivos`
-- [ ] T018 [P] [US2] Criar `src/test/java/med/voll/api/cliente/ClienteControllerListagemTest.java`:
+- [X] T017 [P] [US2] Em `ClienteServiceTest.java`, adicionar `deveConverterClientesAtivosParaDadosDeListagem` e `deveRetornarPaginaVaziaQuandoNaoHouverClientesAtivos`
+- [X] T018 [P] [US2] Criar `src/test/java/med/voll/api/cliente/ClienteControllerListagemTest.java`:
   - `deveListarSomenteAtivosOrdenadosPorNome`;
   - `deveRetornar400QuandoSortForInvalido`;
   - `deveRetornar200QuandoSortForValido` (`cpf,desc`).
-- [ ] T019 [US2] Criar `src/main/java/med/voll/api/cliente/DadosListagemCliente.java` (data-model.md "Saída") e `findAllByAtivoTrue`. Implementar `ClienteService.listar` e o `GET` com `@PageableDefault(size = 10, sort = {"nome"})` e `@ParameterObject`. T017 e T018 devem passar
+- [X] T019 [US2] Criar `src/main/java/med/voll/api/cliente/DadosListagemCliente.java` (data-model.md "Saída") e `findAllByAtivoTrue`. Implementar `ClienteService.listar` e o `GET` com `@PageableDefault(size = 10, sort = {"nome"})` e `@ParameterObject`. T017 e T018 devem passar
 
 ---
 
