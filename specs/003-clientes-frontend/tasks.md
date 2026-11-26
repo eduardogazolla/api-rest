@@ -23,16 +23,16 @@ Front em `frontend/src/...`, com os testes ao lado (`*.test.ts(x)`). Back em `sr
 
 ## Phase 1: Setup
 
-- [ ] T001 Emendar `.specify/memory/constitution.md` para a 1.0.1:
+- [X] T001 Emendar `.specify/memory/constitution.md` para a 1.0.1:
   - no princípio V, "As rotas de tela MUST NOT começar com `/medicos`, prefixo reservado à API" passa a ser
     "As rotas de tela MUST ficar sob `/app`; `/medicos` e `/clientes` são reservados à API";
   - atualizar a linha de versão e a data da emenda.
-- [ ] T002 [P] Adicionar `'/clientes': api` ao proxy de `frontend/vite.config.ts`
-- [ ] T003 Em `src/test/java/med/voll/api/infra/RotasDaTelaTest.java`:
+- [X] T002 [P] Adicionar `'/clientes': api` ao proxy de `frontend/vite.config.ts`
+- [X] T003 Em `src/test/java/med/voll/api/infra/RotasDaTelaTest.java`:
   - trocar as rotas parametrizadas por `/`, `/app`, `/app/medicos`, `/app/medicos/inativos`, `/app/clientes/cadastro` e `/app/clientes/editar/7`;
   - adicionar `naoDeveEncaminharRotasAntigasDeTela`, que espera 404 em `/inativos`.
   - Confirmar que FALHA.
-- [ ] T004 Mapear `{"/", "/app", "/app/**"}` em `src/main/java/med/voll/api/infra/HomeController.java` (research.md R6). O T003 e o `./mvnw test` completo devem passar
+- [X] T004 Mapear `{"/", "/app", "/app/**"}` em `src/main/java/med/voll/api/infra/HomeController.java` (research.md R6). O T003 e o `./mvnw test` completo devem passar
 
 ---
 
