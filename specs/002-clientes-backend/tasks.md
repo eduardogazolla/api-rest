@@ -116,12 +116,12 @@ Os testes MockMvc compartilham o H2: cada teste usa CPF e e-mail próprios, todo
 
 **Independent Test**: o cenário 5 do quickstart.md.
 
-- [ ] T020 [P] [US3] Em `ClienteServiceTest.java`, adicionar `deveDetalharClienteInativoComTodosOsDados` e `deveLancarExcecaoAoDetalharClienteInexistente`
-- [ ] T021 [P] [US3] Criar `src/test/java/med/voll/api/cliente/ClienteControllerDetalhamentoTest.java`:
+- [X] T020 [P] [US3] Em `ClienteServiceTest.java`, adicionar `deveDetalharClienteInativoComTodosOsDados` e `deveLancarExcecaoAoDetalharClienteInexistente`
+- [X] T021 [P] [US3] Criar `src/test/java/med/voll/api/cliente/ClienteControllerDetalhamentoTest.java`:
   - `deveRetornar200ComDataDeNascimentoEEnderecoQuandoDetalhar` (`$.dataNascimento == "1990-05-20"`, `$.endereco.cep`, `$.ativo`);
   - `deveRetornar404QuandoClienteNaoExistir`;
   - `deveRetornar400QuandoIdNaoForNumero`.
-- [ ] T022 [US3] Criar `src/main/java/med/voll/api/cliente/DadosDetalhamentoCliente.java` (data-model.md "Saída"), `ClienteService.detalhar` com `buscarClientePorId` e `@GetMapping("/{id}")`. T020 e T021 devem passar
+- [X] T022 [US3] Criar `src/main/java/med/voll/api/cliente/DadosDetalhamentoCliente.java` (data-model.md "Saída"), `ClienteService.detalhar` com `buscarClientePorId` e `@GetMapping("/{id}")`. T020 e T021 devem passar
 
 ---
 

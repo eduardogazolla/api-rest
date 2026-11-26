@@ -13,9 +13,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import jakarta.persistence.EntityNotFoundException;
+
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -91,6 +96,31 @@ class ClienteServiceTest {
         when(repository.findAllByAtivoTrue(paginacao)).thenReturn(Page.empty());
 
         assertTrue(service.listar(paginacao).isEmpty());
+    }
+
+    @Test
+    @DisplayName("Deve detalhar um cliente inativo com todos os dados")
+    void deveDetalharClienteInativoComTodosOsDados() {
+        var cliente = new Cliente(ClientesDeTeste.cadastroValido());
+        cliente.excluir();
+        when(repository.findById(1L)).thenReturn(Optional.of(cliente));
+
+        DadosDetalhamentoCliente detalhe = service.detalhar(1L);
+
+        assertFalse(detalhe.ativo());
+        assertEquals(LocalDate.of(1990, 5, 20), detalhe.dataNascimento());
+        assertEquals("44999998888", detalhe.telefone());
+        assertEquals("87013000", detalhe.endereco().cep());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao detalhar cliente inexistente")
+    void deveLancarExcecaoAoDetalharClienteInexistente() {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        var excecao = assertThrows(EntityNotFoundException.class, () -> service.detalhar(999L));
+
+        assertEquals("Cliente não encontrado: 999", excecao.getMessage());
     }
 
     @Test

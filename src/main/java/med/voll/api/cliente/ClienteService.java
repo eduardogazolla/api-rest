@@ -1,5 +1,6 @@
 package med.voll.api.cliente;
 
+import jakarta.persistence.EntityNotFoundException;
 import med.voll.api.infra.CadastroDuplicadoException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,15 @@ public class ClienteService {
 
     public Page<DadosListagemCliente> listar(Pageable paginacao) {
         return repository.findAllByAtivoTrue(paginacao).map(DadosListagemCliente::new);
+    }
+
+    public DadosDetalhamentoCliente detalhar(Long id) {
+        return new DadosDetalhamentoCliente(buscarClientePorId(id));
+    }
+
+    private Cliente buscarClientePorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado: " + id));
     }
 
     // A checagem inclui inativos: a exclusão é lógica e a constraint unique do banco também os considera
