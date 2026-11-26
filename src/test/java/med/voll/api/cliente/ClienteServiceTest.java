@@ -124,6 +124,27 @@ class ClienteServiceTest {
     }
 
     @Test
+    @DisplayName("Deve atualizar o nome do cliente e manter o resto")
+    void deveAtualizarNomeDoCliente() {
+        var cliente = new Cliente(ClientesDeTeste.cadastroValido());
+        when(repository.findById(1L)).thenReturn(Optional.of(cliente));
+
+        service.atualizar(new DadosAtualizacaoCliente(1L, "Beatriz Lima", null, null));
+
+        assertEquals("Beatriz Lima", cliente.getNome());
+        assertEquals("44999998888", cliente.getTelefone());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao atualizar cliente inexistente")
+    void deveLancarExcecaoAoAtualizarClienteInexistente() {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+        var dados = new DadosAtualizacaoCliente(999L, "Beatriz", null, null);
+
+        assertThrows(EntityNotFoundException.class, () -> service.atualizar(dados));
+    }
+
+    @Test
     @DisplayName("Deve salvar um cliente ativo quando CPF e e-mail forem inéditos")
     void deveSalvarClienteAtivoQuandoCpfEEmailForemIneditos() {
         var dados = ClientesDeTeste.cadastroValido();

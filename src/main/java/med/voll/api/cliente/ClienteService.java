@@ -30,6 +30,11 @@ public class ClienteService {
         return new DadosDetalhamentoCliente(buscarClientePorId(id));
     }
 
+    @Transactional
+    public void atualizar(DadosAtualizacaoCliente dados) {
+        buscarClientePorId(dados.id()).atualizarInformacoes(dados);
+    }
+
     private Cliente buscarClientePorId(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado: " + id));

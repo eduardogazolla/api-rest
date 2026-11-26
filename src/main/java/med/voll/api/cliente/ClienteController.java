@@ -16,6 +16,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -62,5 +63,18 @@ public class ClienteController {
 	@ApiResponse(responseCode = "404", description = "Cliente não encontrado", content = @Content)
 	public DadosDetalhamentoCliente detalhar(@Parameter(description = "ID do cliente", example = "1") @PathVariable Long id) {
 		return service.detalhar(id);
+	}
+
+	@PutMapping
+	@Operation(summary = "Atualizar cliente",
+			description = "Atualização parcial: só nome, telefone e endereço podem mudar. Campo ausente ou null não é alterado. "
+					+ "Nome ou telefone em branco são recusados. E-mail, CPF e data de nascimento não mudam.")
+	@ApiResponse(responseCode = "200", description = "Cliente atualizado")
+	@ApiResponse(responseCode = "400", description = "Dados inválidos: id ausente, nome/telefone em branco, "
+			+ "logradouro/bairro/cidade/UF em branco ou CEP fora do padrão (8 dígitos). Corpo: lista de {campo, mensagem}",
+			content = @Content(array = @ArraySchema(schema = @Schema(implementation = TratadorDeErros.DadosErroCampo.class))))
+	@ApiResponse(responseCode = "404", description = "Cliente não encontrado", content = @Content)
+	public void atualizar(@RequestBody @Valid DadosAtualizacaoCliente dados) {
+		service.atualizar(dados);
 	}
 }

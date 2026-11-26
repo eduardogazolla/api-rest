@@ -131,20 +131,20 @@ Os testes MockMvc compartilham o H2: cada teste usa CPF e e-mail próprios, todo
 
 **Independent Test**: o cenário 6 do quickstart.md.
 
-- [ ] T023 [P] [US4] Criar `src/test/java/med/voll/api/cliente/DadosAtualizacaoClienteTest.java`:
+- [X] T023 [P] [US4] Criar `src/test/java/med/voll/api/cliente/DadosAtualizacaoClienteTest.java`:
   - `deveAceitarCamposNulos`;
   - `deveRecusarNomeEmBranco`;
   - `deveRecusarTelefoneEmBranco`;
   - `deveRecusarIdAusente`.
-- [ ] T024 [P] [US4] Em `ClienteTest.java`, adicionar `deveAtualizarApenasOTelefoneQuandoSoOTelefoneForInformado` e `naoDeveAlterarNadaQuandoTodosOsCamposForemNulos`
-- [ ] T025 [P] [US4] Em `ClienteServiceTest.java`, adicionar `deveAtualizarNomeDoCliente` e `deveLancarExcecaoAoAtualizarClienteInexistente`
-- [ ] T026 [P] [US4] Criar `src/test/java/med/voll/api/cliente/ClienteControllerAtualizacaoTest.java`:
+- [X] T024 [P] [US4] Em `ClienteTest.java`, adicionar `deveAtualizarApenasOTelefoneQuandoSoOTelefoneForInformado` e `naoDeveAlterarNadaQuandoTodosOsCamposForemNulos`
+- [X] T025 [P] [US4] Em `ClienteServiceTest.java`, adicionar `deveAtualizarNomeDoCliente` e `deveLancarExcecaoAoAtualizarClienteInexistente`
+- [X] T026 [P] [US4] Criar `src/test/java/med/voll/api/cliente/ClienteControllerAtualizacaoTest.java`:
   - `deveAlterarSoOTelefone`;
   - `deveRetornar400QuandoNomeEmBranco`;
   - `deveRetornar400ApontandoEnderecoCepQuandoCepInvalido`;
   - `deveApagarComplementoQuandoAtualizarComTextoVazio`;
   - `deveRetornar404QuandoAtualizarClienteInexistente`.
-- [ ] T027 [US4] Criar `src/main/java/med/voll/api/cliente/DadosAtualizacaoCliente.java` (data-model.md `DadosAtualizacaoCliente.id`, `.nome`, `.telefone` e `.endereco`). Implementar `Cliente.atualizarInformacoes`, `ClienteService.atualizar` e o `@PutMapping`, documentando 400 e 404. T023 a T026 devem passar
+- [X] T027 [US4] Criar `src/main/java/med/voll/api/cliente/DadosAtualizacaoCliente.java` (data-model.md `DadosAtualizacaoCliente.id`, `.nome`, `.telefone` e `.endereco`). Implementar `Cliente.atualizarInformacoes`, `ClienteService.atualizar` e o `@PutMapping`, documentando 400 e 404. T023 a T026 devem passar
 
 ---
 
