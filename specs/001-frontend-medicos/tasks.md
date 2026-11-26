@@ -328,15 +328,16 @@ e `GET /medicos/inativos`.
 
 **Purpose**: deploy, documentação, acabamento visual e verificação de ponta a ponta.
 
-- [ ] T059 Atualizar o `Dockerfile` com a etapa `FROM node:24-alpine AS front`. Ela copia `frontend/package*.json`, roda `npm ci`, copia `frontend/` e roda `npm test && npm run build`. Na etapa Maven, copiar `--from=front /front/dist` para `src/main/resources/static` antes do `mvn package`. Validar com `docker build .` se o Docker estiver disponível; se não estiver, registrar como pendente
-- [ ] T060 [P] Em `README.md`, adicionar a seção "Front-end" (stack, como rodar em dev, testes e build), atualizar a estrutura de diretórios, a tabela de endpoints (os dois novos e os erros 400/409) e "Funcionalidades". A rota `/` agora abre a tela, e o Swagger fica em `/swagger-ui/index.html`
-- [ ] T061 Fazer o acabamento visual com a skill `frontend-design`:
+- [X] T059 Atualizar o `Dockerfile` com a etapa `FROM node:24-alpine AS front`. Ela copia `frontend/package*.json`, roda `npm ci`, copia `frontend/` e roda `npm test && npm run build`. Na etapa Maven, copiar `--from=front /front/dist` para `src/main/resources/static` antes do `mvn package`. Validar com `docker build .` se o Docker estiver disponível; se não estiver, registrar como pendente
+  - ⚠️ Resultado: Dockerfile atualizado, mas o `docker build` não foi validado porque não há Docker nesta máquina. Os passos foram reproduzidos à mão: build do front, cópia para `static/` e `spring-boot:run`.
+- [X] T060 [P] Em `README.md`, adicionar a seção "Front-end" (stack, como rodar em dev, testes e build), atualizar a estrutura de diretórios, a tabela de endpoints (os dois novos e os erros 400/409) e "Funcionalidades". A rota `/` agora abre a tela, e o Swagger fica em `/swagger-ui/index.html`
+- [X] T061 Fazer o acabamento visual com a skill `frontend-design`:
   - revisar a hierarquia, os estados (carregando, vazio, erro) e o contraste nos dois temas;
   - revisar os cartões em 375px.
   - Ajustar só CSS e marcação, sem mudar o comportamento testado.
-- [ ] T062 Rodar o roteiro de `quickstart.md` ("Roteiro de verificação manual", itens 1 a 10) com o Playwright MCP, contra o `.jar` com o front em `static/` e a API com H2. Salvar os screenshots em `evidencias/frontend/`
-- [ ] T063 Rodar o Lighthouse (acessibilidade) em `/` e `/cadastro` com o Chrome DevTools MCP. Corrigir violações graves (SC-006) e registrar a nota
-- [ ] T064 Conferir que o bundle tem < 250 kB gzip (saída do `npm run build`), que `./mvnw test`, `npm test` e `npm run build` estão verdes e que não sobrou código morto (imports e arquivos do template Vite)
+- [X] T062 Rodar o roteiro de `quickstart.md` ("Roteiro de verificação manual", itens 1 a 10) com o Playwright MCP, contra o `.jar` com o front em `static/` e a API com H2. Salvar os screenshots em `evidencias/frontend/`
+- [X] T063 Rodar o Lighthouse (acessibilidade) em `/` e `/cadastro` com o Chrome DevTools MCP. Corrigir violações graves (SC-006) e registrar a nota
+- [X] T064 Conferir que o bundle tem < 250 kB gzip (saída do `npm run build`), que `./mvnw test`, `npm test` e `npm run build` estão verdes e que não sobrou código morto (imports e arquivos do template Vite)
 - [ ] T065 Fazer a revisão de código da branch inteira (skill `code-review`, back-end e front-end) contra a constituição, e aplicar as correções procedentes
 - [ ] T066 Pendência manual (Eduardo): confirmar com o time do Portal DB1 se a nova tela em `/` exige atualizar o `db1app.json`. Não alterar o arquivo nesta entrega
 

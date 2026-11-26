@@ -2,13 +2,15 @@
 
 ## Pré-requisitos
 
-Java 17, Node 24 e npm. MySQL é opcional, porque dá para rodar com H2.
+Java 17, Node 24, npm e MySQL local. O H2 só é usado nos testes, porque ele não está no classpath
+de execução. Atenção: `-Dspring-boot.run.useTestClasspath=true` **não** troca o banco, e a app
+continua usando o MySQL.
 
 ## Desenvolvimento (dois terminais)
 
 ```bash
-# 1) API com H2 em memória (sem MySQL)
-./mvnw spring-boot:run -Dspring-boot.run.profiles=test -Dspring-boot.run.useTestClasspath=true
+# 1) API num banco separado, para não misturar dados de teste com o vollmed_api
+DB_URL='jdbc:mysql://localhost/vollmed_e2e?createDatabaseIfNotExist=true' ./mvnw spring-boot:run
 
 # 2) Front com recarga automática
 cd frontend
@@ -30,7 +32,7 @@ cd frontend && npm run build # checagem de tipos e bundle de produção
 cd frontend && npm ci && npm run build && cd ..
 rm -rf src/main/resources/static && mkdir -p src/main/resources/static
 cp -r frontend/dist/. src/main/resources/static/
-./mvnw spring-boot:run -Dspring-boot.run.profiles=test -Dspring-boot.run.useTestClasspath=true
+DB_URL='jdbc:mysql://localhost/vollmed_e2e?createDatabaseIfNotExist=true' ./mvnw spring-boot:run
 # http://localhost:8080 serve a tela e a API juntas, como no portal
 ```
 

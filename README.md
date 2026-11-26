@@ -22,7 +22,21 @@ A Voll.med API implementa um **CRUD completo de médicos** com validações, pag
 - **Tratamento de erros centralizado**: recurso inexistente retorna `404`, e não `500`;
 - Versionamento do banco com **migrations Flyway**;
 - Persistência com **Spring Data JPA** (Hibernate) em **MySQL**;
-- **Testes unitários** com JUnit 5 e Mockito, rodando sem depender do MySQL.
+- **Testes unitários** com JUnit 5 e Mockito, rodando sem depender do MySQL;
+- **Front-end em React + TypeScript** (pasta `frontend/`), servido pelo mesmo `.jar` da API.
+
+### 🖥️ Interface web
+
+A raiz do sistema (`/`) abre uma interface para a equipe da clínica cadastrar, consultar, editar, excluir e reativar médicos sem usar o Swagger. O Swagger continua disponível em `/swagger-ui/index.html` e tem um link no topo da interface.
+
+| Tela | Rota | O que faz |
+|---|---|---|
+| Médicos ativos | `/` | Lista paginada, ordenável por coluna. Página e ordenação ficam na URL (o F5 mantém) |
+| Inativos | `/inativos` | Médicos excluídos, com o botão **Reativar** |
+| Novo médico | `/cadastro` | Formulário com validação no navegador e erros do servidor embaixo de cada campo |
+| Editar médico | `/editar/{id}` | Formulário já preenchido. E-mail, CRM e especialidade ficam bloqueados |
+
+O desenho (spec, plano e tarefas) foi feito com o [GitHub Spec Kit](https://github.com/github/spec-kit) e está em `specs/001-frontend-medicos/`. Os princípios do projeto estão em `.specify/memory/constitution.md`.
 
 ---
 
@@ -43,6 +57,10 @@ A Voll.med API implementa um **CRUD completo de médicos** com validações, pag
 | H2 | Banco em memória usado **só nos testes** |
 | Spring Boot DevTools | Reinício automático em desenvolvimento |
 | Maven | Gerenciador de dependências e build |
+| React 19 + TypeScript | Interface web (`frontend/`) |
+| Vite | Servidor de desenvolvimento e build do front-end |
+| React Router | Rotas das telas |
+| Vitest + Testing Library | Testes do front-end |
 
 ---
 
@@ -57,6 +75,11 @@ A Voll.med API implementa um **CRUD completo de médicos** com validações, pag
 - [x] Retorno `404` para médico inexistente
 - [x] Migrations versionadas com Flyway
 - [x] Interface Swagger UI para testar a API pelo navegador
+- [x] Detalhar médico com todos os dados (`GET /medicos/{id}`)
+- [x] Listar médicos inativos (`GET /medicos/inativos`)
+- [x] Erros de validação por campo, em português (`[{campo, mensagem}]`)
+- [x] `409` para CRM ou e-mail já cadastrados, mesmo de médico inativo
+- [x] Interface web (React) servida pelo próprio `.jar`
 
 ---
 
@@ -64,19 +87,31 @@ A Voll.med API implementa um **CRUD completo de médicos** com validações, pag
 
 ```
 api
+├── frontend                                   # interface web (React + TypeScript + Vite)
+│   ├── src
+│   │   ├── api                                # cliente HTTP, chamadas por endpoint, tipos dos DTOs
+│   │   ├── components                         # Cabecalho, TabelaMedicos, Paginacao, Campo, ModalConfirmacao, Aviso
+│   │   ├── dominio                            # especialidades, UFs e validação do formulário
+│   │   ├── pages                              # ListaMedicos (ativos/inativos) e FormularioMedico (cadastro/edição)
+│   │   └── styles                             # tokens de cor/tipografia e estilos globais
+│   ├── package.json
+│   └── vite.config.ts                         # proxy para a API e configuração do Vitest
 ├── src
 │   ├── main
 │   │   ├── java/med/voll/api
 │   │   │   ├── endereco
+│   │   │   │   ├── DadosAtualizacaoEndereco.java  # endereço parcial do PUT (só formato)
 │   │   │   │   ├── DadosEndereco.java
 │   │   │   │   └── Endereco.java              # @Embeddable
 │   │   │   ├── infra
 │   │   │   │   ├── HealthController.java      # GET /health
-│   │   │   │   ├── HomeController.java        # GET / → Swagger UI
-│   │   │   │   └── TratadorDeErros.java       # @RestControllerAdvice
+│   │   │   │   ├── HomeController.java        # rotas de tela → index.html do front
+│   │   │   │   └── TratadorDeErros.java       # @RestControllerAdvice (400, 404, 409)
 │   │   │   ├── medico
+│   │   │   │   ├── CadastroDuplicadoException.java
 │   │   │   │   ├── DadosAtualizacaoMedico.java
 │   │   │   │   ├── DadosCadastroMedico.java
+│   │   │   │   ├── DadosDetalhamentoMedico.java
 │   │   │   │   ├── DadosListagemMedico.java
 │   │   │   │   ├── Especialidade.java         # enum
 │   │   │   │   ├── Medico.java                # @Entity
@@ -90,22 +125,13 @@ api
 │   │       │   ├── V2__alter-table-medicos-add-colum-telefone.sql
 │   │       │   └── V3__alter-table-medicos-add-colum-ativo.sql
 │   │       ├── db/postgresql                # migrations do deploy (PostgreSQL)
+│   │       ├── static/                      # front compilado (gerado no build, fora do Git)
 │   │       ├── application.properties
 │   │       └── application-prod.properties  # perfil do deploy
-│   └── test
-│       ├── java/med/voll/api
-│       │   ├── infra
-│       │   │   ├── HealthControllerTest.java
-│       │   │   └── HomeControllerTest.java
-│       │   ├── medico
-│       │   │   ├── DadosAtualizacaoMedicoTest.java
-│       │   │   ├── MedicoControllerOrdenacaoTest.java
-│       │   │   ├── MedicoServiceTest.java
-│       │   │   └── MedicoTest.java
-│       │   └── ApiApplicationTests.java
-│       └── resources
-│           └── application-test.properties  # H2 em memória
-├── Dockerfile                                 # build para o Portal de Deploy DB1
+│   └── test                                 # JUnit, Mockito e MockMvc (ver seção Testes)
+├── specs/001-frontend-medicos                 # spec, plano e tarefas do front (Spec Kit)
+├── .specify                                   # constituição e templates do Spec Kit
+├── Dockerfile                                 # build para o Portal de Deploy DB1 (front + API)
 ├── db1app.json                                # declaração de governança do portal
 ├── Rules.md                                   # padrões de código do projeto
 ├── mvnw / mvnw.cmd
@@ -143,8 +169,10 @@ Base URL: `http://localhost:8080`
 
 | Método | Rota | Descrição | Respostas |
 |---|---|---|---|
-| `POST` | `/medicos` | Cadastra um novo médico | `200` · `400` dados inválidos |
+| `POST` | `/medicos` | Cadastra um novo médico | `200` · `400` dados inválidos · `409` CRM ou e-mail já cadastrado |
 | `GET` | `/medicos` | Lista médicos ativos (paginado) | `200` · `400` sort inválido |
+| `GET` | `/medicos/inativos` | Lista médicos inativos (paginado) | `200` · `400` sort inválido |
+| `GET` | `/medicos/{id}` | Detalha um médico (ativo ou inativo), com telefone e endereço | `200` · `404` |
 | `PUT` | `/medicos` | Atualiza dados de um médico | `200` · `400` · `404` |
 | `PATCH` | `/medicos/{id}/ativar` | Reativa um médico excluído | `200` · `404` |
 | `DELETE` | `/medicos/{id}` | Inativa um médico (exclusão lógica) | `200` · `404` |
@@ -229,8 +257,10 @@ O Swagger UI é a interface para testar a API pelo navegador, sem Postman.
 
 | Onde | Endereço |
 |---|---|
-| Local | `http://localhost:8080` (redireciona para `/swagger-ui/index.html`) |
-| Portal DB1 | `https://voll-med-eduardo.apps.db1group.com` (exige login DB1) |
+| Local | `http://localhost:8080/swagger-ui/index.html` |
+| Portal DB1 | `https://voll-med-eduardo.apps.db1group.com/swagger-ui/index.html` (exige login DB1) |
+
+A raiz (`/`) agora abre a interface web, que tem o link **Documentação da API** no topo.
 
 **Para chamar qualquer endpoint:** clique nele para abrir → **Try it out** → preencha → **Execute**. A resposta aparece logo abaixo, com o status HTTP e o corpo.
 
@@ -272,8 +302,9 @@ Preencha o `id` no campo do caminho. O médico excluído some do `GET` e volta d
 | Status | Significa |
 |---|---|
 | `200` | Deu certo |
-| `400` | Algum dado inválido. O corpo da resposta diz qual campo |
+| `400` | Algum dado inválido. O corpo é uma lista `[{"campo": "endereco.cep", "mensagem": "deve ter 8 dígitos, sem traço"}]` |
 | `404` | Não existe médico com esse `id` |
+| `409` | CRM ou e-mail já usado por outro médico (mesmo inativo). Mesmo formato de lista do `400` |
 
 ---
 
@@ -318,6 +349,30 @@ Preencha o `id` no campo do caminho. O médico excluído some do `GET` e volta d
    curl http://localhost:8080/medicos
    ```
 
+### Front-end
+
+Pré-requisito: **Node 24** e npm.
+
+```bash
+cd frontend
+npm install
+npm run dev       # http://localhost:5173 — com a API rodando no :8080
+```
+
+O Vite repassa `/medicos`, `/swagger-ui` e `/v3` para o `localhost:8080`, então tela e API ficam na mesma origem e não é preciso CORS.
+
+Para testar tela e API juntas como no portal (um só `.jar`):
+
+```bash
+cd frontend && npm run build && cd ..
+rm -rf src/main/resources/static && mkdir -p src/main/resources/static
+cp -r frontend/dist/. src/main/resources/static/      # pasta no .gitignore
+./mvnw spring-boot:run                                 # http://localhost:8080
+```
+
+> Para não misturar dados de teste com o seu banco, rode com um banco separado:
+> `DB_URL='jdbc:mysql://localhost/vollmed_e2e?createDatabaseIfNotExist=true' ./mvnw spring-boot:run`
+
 ---
 
 ## 🧪 Testes
@@ -334,9 +389,19 @@ Preencha o `id` no campo do caminho. O médico excluído some do `GET` e volta d
 | `MedicoTest` | Regras da entidade (JUnit puro): criação ativa, exclusão lógica, atualização parcial, reativação |
 | `MedicoServiceTest` | Regras do serviço com **Mockito** (repository simulado): cenários positivos e de exceção de cada operação do CRUD |
 | `DadosAtualizacaoMedicoTest` | Validação do formulário de atualização com `Validator`: nome e telefone em branco recusados, `null` aceito |
-| `HealthControllerTest` / `HomeControllerTest` | Health check e redirecionamento da página inicial para o Swagger |
+| `HealthControllerTest` / `HomeControllerTest` | Health check e encaminhamento das rotas de tela para o `index.html` |
+| `RotasDaTelaTest` | `/`, `/inativos`, `/cadastro` e `/editar/{id}` devolvem a interface (F5 e link direto funcionam) |
 | `MedicoControllerOrdenacaoTest` | Teste de integração com **MockMvc**: `sort` inválido retorna `400`, `sort` válido retorna `200` |
+| `MedicoControllerValidacaoTest` | Erros de validação saem como `[{campo, mensagem}]`, em português |
+| `MedicoControllerDuplicidadeTest` | CRM ou e-mail repetido retorna `409` apontando o campo, inclusive de médico inativo |
+| `MedicoControllerDetalhamentoTest` | `GET /medicos/{id}` (200 e 404) e validação do endereço no `PUT` |
+| `MedicoControllerInativosTest` | `GET /medicos/inativos` só traz inativos e não se confunde com `/{id}` |
+| `DadosAtualizacaoEnderecoTest` | Endereço na atualização: campos nulos aceitos, CEP fora do padrão e texto em branco recusados |
+| `TratadorDeErrosTest` | Violação de integridade do banco vira `409`, e não `500` |
+| `SwaggerDocumentacaoTest` | Swagger documenta os endpoints novos e continua disponível |
 | `ApiApplicationTests` | A aplicação sobe e as migrations rodam (H2) |
+
+**Front-end** (`cd frontend && npm test`): Vitest + Testing Library, com o `fetch` simulado. Cobre o cliente HTTP (cada tipo de erro, incluindo sessão expirada), validação local, componentes (tabela, paginação, campo, modal) e as telas de lista e formulário.
 
 ---
 
@@ -346,7 +411,7 @@ A API está preparada para o [Portal de Deploy DB1](https://apps.db1group.com):
 
 | Arquivo | Papel |
 |---|---|
-| `Dockerfile` | Compila com Maven e roda o `.jar` com Java 17, no perfil `prod` |
+| `Dockerfile` | Testa e compila o front-end (Node 24), copia para `static/`, compila com Maven e roda o `.jar` com Java 17, no perfil `prod` |
 | `db1app.json` | Declaração de governança exigida pelo portal |
 | `application-prod.properties` | Perfil de produção: migrations do PostgreSQL e configuração do proxy |
 | `db/postgresql/` | Migrations em sintaxe PostgreSQL (o portal provisiona o banco e injeta as credenciais) |

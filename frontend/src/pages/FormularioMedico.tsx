@@ -11,7 +11,7 @@ interface Props {
   modo: 'cadastro' | 'edicao'
 }
 
-const BLOQUEADO = 'Não pode ser alterado depois do cadastro'
+const BLOQUEADO = 'Não pode ser alterado'
 
 export default function FormularioMedico({ modo }: Props) {
   const navigate = useNavigate()
@@ -125,6 +125,20 @@ export default function FormularioMedico({ modo }: Props) {
     )
   }
 
+  // Sem maxLength: ele cortaria "87020-000" colado para "87020-00" antes de tirarmos o traço
+  function numerico(campo: string, limite: number, extras: InputHTMLAttributes<HTMLInputElement> = {}) {
+    return (props: PropsDoControle) => (
+      <input
+        {...props}
+        {...extras}
+        name={campo}
+        inputMode="numeric"
+        value={valorDe(campo)}
+        onChange={(e) => atualizar(campo, e.target.value.replace(/\D/g, '').slice(0, limite))}
+      />
+    )
+  }
+
   if (erroAoCarregar?.tipo === 'nao-encontrado') {
     return (
       <div className="estado">
@@ -174,7 +188,7 @@ export default function FormularioMedico({ modo }: Props) {
               {texto('telefone', { type: 'tel', inputMode: 'tel', autoComplete: 'tel' })}
             </Campo>
             <Campo rotulo="CRM" erro={erros.crm} dica={edicao ? BLOQUEADO : 'De 4 a 6 dígitos'} className="campo--terco">
-              {texto('crm', { inputMode: 'numeric', maxLength: 6, readOnly: edicao })}
+              {numerico('crm', 6, { readOnly: edicao })}
             </Campo>
             <Campo
               rotulo="Especialidade"
@@ -206,7 +220,7 @@ export default function FormularioMedico({ modo }: Props) {
           <legend>Endereço</legend>
           <div className="grade">
             <Campo rotulo="CEP" erro={erros['endereco.cep']} dica="8 dígitos, sem traço" className="campo--terco">
-              {texto('endereco.cep', { inputMode: 'numeric', maxLength: 8, autoComplete: 'postal-code' })}
+              {numerico('endereco.cep', 8, { autoComplete: 'postal-code' })}
             </Campo>
             <Campo rotulo="Logradouro" erro={erros['endereco.logradouro']} className="campo--dois-tercos">
               {texto('endereco.logradouro', { autoComplete: 'address-line1' })}

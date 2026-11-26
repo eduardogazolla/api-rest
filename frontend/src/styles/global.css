@@ -95,6 +95,18 @@ a {
   text-decoration: none;
   font-weight: 600;
   font-size: var(--texto-sm);
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .cabecalho__interno {
+    column-gap: var(--espaco-3);
+  }
+
+  .navegacao a,
+  .link-docs {
+    padding-inline: var(--espaco-2);
+  }
 }
 
 .navegacao a:hover,

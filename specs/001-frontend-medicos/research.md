@@ -123,9 +123,11 @@ Cada item segue o formato Decisão / Motivo / Alternativas.
 
 - **Decisão**:
   - o `vite.config.ts` faz proxy de `/medicos`, `/swagger-ui` e `/v3` para `http://localhost:8080`;
-  - para rodar a API sem MySQL:
-    `./mvnw spring-boot:run -Dspring-boot.run.profiles=test -Dspring-boot.run.useTestClasspath=true`,
-    que usa H2 em memória com as mesmas migrations;
+  - para a verificação manual, a API roda no MySQL local, mas num banco separado
+    (`DB_URL='jdbc:mysql://localhost/vollmed_e2e?createDatabaseIfNotExist=true'`). Correção feita
+    durante a implementação: a ideia original de usar `useTestClasspath` com o perfil `test` não
+    trocou o banco, e a app gravou no `vollmed_api`. Os 12 registros fictícios gravados lá foram
+    apagados;
   - a verificação final é feita com Playwright e Lighthouse (acessibilidade) sobre o `.jar`
     empacotado com o front.
 - **Motivo**: reproduz o ambiente de produção (mesma origem) sem depender de banco instalado.

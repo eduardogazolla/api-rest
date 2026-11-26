@@ -168,6 +168,19 @@ describe('FormularioMedico (cadastro)', () => {
     expect(fetchFalso).toHaveBeenCalledTimes(1)
   })
 
+  it('deveGuardarSoDigitosQuandoDigitarCepOuCrmComPontuacao', async () => {
+    simularFetch(() => vazio())
+    renderizarCadastro()
+    const usuario = userEvent.setup()
+
+    await usuario.click(screen.getByLabelText('CEP'))
+    await usuario.paste('87020-000')
+    await usuario.type(screen.getByLabelText('CRM'), '12.345')
+
+    expect(screen.getByLabelText('CEP')).toHaveValue('87020000')
+    expect(screen.getByLabelText('CRM')).toHaveValue('12345')
+  })
+
   it('deveMostrarErroGeralQuandoConflitoNaoTiverCampo', async () => {
     simularFetch(() => json([{ campo: null, mensagem: 'Já existe um médico com estes dados.' }], 409))
     renderizarCadastro()
