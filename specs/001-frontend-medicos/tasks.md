@@ -339,7 +339,8 @@ e `GET /medicos/inativos`.
 - [X] T063 Rodar o Lighthouse (acessibilidade) em `/` e `/cadastro` com o Chrome DevTools MCP. Corrigir violações graves (SC-006) e registrar a nota
 - [X] T064 Conferir que o bundle tem < 250 kB gzip (saída do `npm run build`), que `./mvnw test`, `npm test` e `npm run build` estão verdes e que não sobrou código morto (imports e arquivos do template Vite)
 - [ ] T065 Fazer a revisão de código da branch inteira (skill `code-review`, back-end e front-end) contra a constituição, e aplicar as correções procedentes
-- [ ] T066 Pendência manual (Eduardo): confirmar com o time do Portal DB1 se a nova tela em `/` exige atualizar o `db1app.json`. Não alterar o arquivo nesta entrega
+- [X] T066 Pendência manual (Eduardo): confirmar com o time do Portal DB1 se a nova tela em `/` exige atualizar o `db1app.json`. Não alterar o arquivo nesta entrega
+  - Decisão do Eduardo (26/11/2026): os fatores de risco não mudam, porque não há dado exposto e a API continua atrás do SSO. Só a `descricao` do `db1app.json` foi atualizada, para mencionar a interface web.
 
 ---
 
