@@ -248,3 +248,53 @@ describe('ListaCadastros: clientes', () => {
     expect(await screen.findByRole('link', { name: 'Editar Beatriz Rocha' })).toHaveAttribute('href', '/app/clientes/editar/11')
   })
 })
+
+describe('ListaCadastros: exclusão e reativação de clientes', () => {
+  it('deveExcluirClienteAposConfirmacaoComAviso', async () => {
+    let excluido = false
+    const fetchFalso = simularFetch((_url, init) => {
+      if (init.method === 'DELETE') {
+        excluido = true
+        return vazio()
+      }
+      return json(paginaDeClientes(excluido ? [caio] : [beatriz, caio]))
+    })
+    renderizarClientes()
+    const usuario = userEvent.setup()
+
+    await usuario.click(await screen.findByRole('button', { name: 'Excluir Beatriz Rocha' }))
+    expect(screen.getByRole('dialog', { name: 'Excluir cliente?' })).toHaveTextContent('Beatriz Rocha')
+    await usuario.click(screen.getByRole('button', { name: 'Excluir' }))
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Cliente excluído')
+    expect(screen.queryByText('Beatriz Rocha')).not.toBeInTheDocument()
+    expect(fetchFalso.mock.calls.find(([, init]) => init.method === 'DELETE')?.[0]).toBe('/clientes/11')
+  })
+
+  it('deveReativarClienteNosInativos', async () => {
+    let reativado = false
+    const fetchFalso = simularFetch((_url, init) => {
+      if (init.method === 'PATCH') {
+        reativado = true
+        return vazio()
+      }
+      return json(paginaDeClientes(reativado ? [] : [caio]))
+    })
+    renderizarClientes('/app/clientes/inativos', 'inativos')
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Reativar Caio Nunes' }))
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Cliente reativado')
+    expect(await screen.findByText('Nenhum cliente inativo')).toBeInTheDocument()
+    expect(fetchFalso.mock.calls.find(([, init]) => init.method === 'PATCH')?.[0]).toBe('/clientes/12/ativar')
+  })
+
+  it('deveMostrarClienteNaoEncontradoQuandoAcaoDer404', async () => {
+    simularFetch((_url, init) => (init.method === 'PATCH' ? vazio(404) : json(paginaDeClientes([caio]))))
+    renderizarClientes('/app/clientes/inativos', 'inativos')
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Reativar Caio Nunes' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Cliente não encontrado.')
+  })
+})

@@ -144,7 +144,7 @@ Front em `frontend/src/...`, com os testes ao lado (`*.test.ts(x)`). Back em `sr
 
 ## Phase 7: User Story 5 - Excluir e reativar cliente (P2)
 
-- [ ] T025 [US5] Em `ListaCadastros.test.tsx` (bloco de clientes), adicionar:
+- [X] T025 [US5] Em `ListaCadastros.test.tsx` (bloco de clientes), adicionar:
   - `deveExcluirClienteAposConfirmacaoComAviso` ("Excluir cliente?", depois "Cliente excluído");
   - `deveReativarClienteNosInativos` ("Cliente reativado");
   - `deveMostrarClienteNaoEncontradoQuandoAcaoDer404`.
