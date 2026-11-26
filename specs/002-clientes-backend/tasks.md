@@ -177,7 +177,8 @@ Os testes MockMvc compartilham o H2: cada teste usa CPF e e-mail próprios, todo
 - [X] T031 Em `src/test/java/med/voll/api/infra/SwaggerDocumentacaoTest.java`, adicionar `deveDocumentarAsSeteOperacoesDeClientes`, que confere os paths `/clientes`, `/clientes/{id}`, `/clientes/inativos` e `/clientes/{id}/ativar` com seus métodos, e a tag "Clientes"
 - [X] T032 [P] Atualizar o `README.md`: "Funcionalidades", "Estrutura de diretórios" (pacote `cliente/` e a migration V4), "Endpoints" (tabela de clientes), "Respostas" (400 de JSON ilegível), "Testes" (as classes novas) e "Modelo de domínio" (`Cliente`)
 - [X] T033 Rodar `./mvnw test` (todos verdes) e `cd frontend && npm test` (continua verde). Conferir que não sobrou código morto
-- [ ] T034 Rodar o roteiro de quickstart.md contra `vollmed_e2e` (nunca `vollmed_api`) e registrar o resultado
+- [X] T034 Rodar o roteiro de quickstart.md contra `vollmed_e2e` (nunca `vollmed_api`) e registrar o resultado
+  - Resultado (26/11/2026): a V4 foi aplicada no MySQL real (`vollmed_e2e`) e os 14 de 14 passos do roteiro passaram, inclusive `/medicos` intacto e a tag "Clientes" no Swagger.
 - [ ] T035 Fazer a revisão de código da branch (`/code-review high`) e aplicar o que for procedente
 - [ ] T036 Fazer push da `pdi/clientes-backend` e abrir o PR para a `main`, **sem atribuição do Claude**
 
