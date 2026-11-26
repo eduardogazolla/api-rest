@@ -50,6 +50,22 @@ class SwaggerDocumentacaoTest {
     }
 
     @Test
+    @DisplayName("Deve documentar as sete operações de clientes no grupo Clientes")
+    void deveDocumentarAsSeteOperacoesDeClientes() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.paths['/clientes'].post").exists())
+                .andExpect(jsonPath("$.paths['/clientes'].get").exists())
+                .andExpect(jsonPath("$.paths['/clientes'].put").exists())
+                .andExpect(jsonPath("$.paths['/clientes/inativos'].get").exists())
+                .andExpect(jsonPath("$.paths['/clientes/{id}'].get").exists())
+                .andExpect(jsonPath("$.paths['/clientes/{id}'].delete").exists())
+                .andExpect(jsonPath("$.paths['/clientes/{id}/ativar'].patch").exists())
+                .andExpect(jsonPath("$.paths['/clientes'].post.responses['409']").exists())
+                .andExpect(jsonPath("$.paths['/clientes'].post.tags[0]").value("Clientes"));
+    }
+
+    @Test
     @DisplayName("Deve manter o Swagger UI disponível ao lado do front-end")
     void deveManterSwaggerUiDisponivel() throws Exception {
         mockMvc.perform(get("/swagger-ui/index.html"))

@@ -26,7 +26,7 @@ class TratadorDeErrosTest {
         assertEquals(HttpStatus.CONFLICT, resposta.getStatusCode());
         var erro = resposta.getBody().get(0);
         assertNull(erro.campo());
-        assertEquals("Já existe um médico com estes dados.", erro.mensagem());
+        assertEquals("Já existe um cadastro com estes dados.", erro.mensagem());
     }
 
     @Test

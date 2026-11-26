@@ -21,5 +21,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 ENV SPRING_PROFILES_ACTIVE=prod
+# "Hoje" da clínica é o do Brasil: sem isto o @Past da data de nascimento usaria o UTC do container
+# e, depois das 21h, aceitaria como "passado" uma data que no Brasil ainda é hoje
+ENV TZ=America/Sao_Paulo
+ENV JAVA_TOOL_OPTIONS=-Duser.timezone=America/Sao_Paulo
 EXPOSE 8080
 CMD ["java", "-jar", "app.jar"]

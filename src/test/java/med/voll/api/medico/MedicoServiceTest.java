@@ -1,6 +1,7 @@
 package med.voll.api.medico;
 
 import med.voll.api.endereco.DadosEndereco;
+import med.voll.api.infra.CadastroDuplicadoException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

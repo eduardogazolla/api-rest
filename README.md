@@ -16,7 +16,7 @@ API REST em **Java 17 + Spring Boot 4** para o cadastro e gerenciamento de médi
 A Voll.med API implementa um **CRUD completo de médicos** com validações, paginação, ordenação, exclusão lógica e reativação, seguindo boas práticas de uma API REST:
 
 - Arquitetura em camadas: **Controller → Service → Repository**;
-- Pacotes **organizados por domínio** (`medico/`, `endereco/`), com o que é transversal em `infra/`;
+- Pacotes **organizados por domínio** (`medico/`, `cliente/`, `endereco/`), com o que é transversal em `infra/`;
 - Uso de **DTOs (records)** para entrada e saída de dados;
 - Validação de dados de entrada com **Bean Validation**;
 - **Tratamento de erros centralizado**: recurso inexistente retorna `404`, e não `500`;
@@ -80,6 +80,7 @@ O desenho (spec, plano e tarefas) foi feito com o [GitHub Spec Kit](https://gith
 - [x] Erros de validação por campo, em português (`[{campo, mensagem}]`)
 - [x] `409` para CRM ou e-mail já cadastrados, mesmo de médico inativo
 - [x] Interface web (React) servida pelo próprio `.jar`
+- [x] **Clientes (pacientes)**: as mesmas 7 operações dos médicos em `/clientes`, com CPF (dígitos verificadores validados) e data de nascimento. Só back-end por enquanto
 
 ---
 
@@ -99,16 +100,22 @@ api
 ├── src
 │   ├── main
 │   │   ├── java/med/voll/api
+│   │   │   ├── cliente                        # mesmo desenho de medico/
+│   │   │   │   ├── Cliente.java               # @Entity
+│   │   │   │   ├── ClienteController.java     # @RestController /clientes
+│   │   │   │   ├── ClienteRepository.java
+│   │   │   │   ├── ClienteService.java
+│   │   │   │   └── Dados*Cliente.java         # cadastro, atualização, listagem e detalhamento
 │   │   │   ├── endereco
 │   │   │   │   ├── DadosAtualizacaoEndereco.java  # endereço parcial do PUT (só formato)
 │   │   │   │   ├── DadosEndereco.java
 │   │   │   │   └── Endereco.java              # @Embeddable
 │   │   │   ├── infra
+│   │   │   │   ├── CadastroDuplicadoException.java  # 409, usada por médicos e clientes
 │   │   │   │   ├── HealthController.java      # GET /health
 │   │   │   │   ├── HomeController.java        # rotas de tela → index.html do front
 │   │   │   │   └── TratadorDeErros.java       # @RestControllerAdvice (400, 404, 409)
 │   │   │   ├── medico
-│   │   │   │   ├── CadastroDuplicadoException.java
 │   │   │   │   ├── DadosAtualizacaoMedico.java
 │   │   │   │   ├── DadosCadastroMedico.java
 │   │   │   │   ├── DadosDetalhamentoMedico.java
@@ -123,7 +130,8 @@ api
 │   │       ├── db/migration
 │   │       │   ├── V1__create-trable-medicos.sql
 │   │       │   ├── V2__alter-table-medicos-add-colum-telefone.sql
-│   │       │   └── V3__alter-table-medicos-add-colum-ativo.sql
+│   │       │   ├── V3__alter-table-medicos-add-colum-ativo.sql
+│   │       │   └── V4__create-table-clientes.sql
 │   │       ├── db/postgresql                # migrations do deploy (PostgreSQL)
 │   │       ├── static/                      # front compilado (gerado no build, fora do Git)
 │   │       ├── application.properties
@@ -157,6 +165,21 @@ api
 | `endereco` | `Endereco` | Objeto embutido (`@Embedded`) na mesma tabela |
 | `ativo` | `Boolean` | Controla a exclusão lógica |
 
+**Cliente** (paciente)
+
+| Campo | Tipo | Observação |
+|---|---|---|
+| `id` | `Long` | Gerado automaticamente (`IDENTITY`) |
+| `nome` | `String` | Obrigatório, até 100 caracteres |
+| `email` | `String` | Obrigatório, formato de e-mail, único |
+| `telefone` | `String` | Obrigatório, até 20 caracteres |
+| `cpf` | `String` | Obrigatório, 11 dígitos sem pontuação, dígitos verificadores válidos (`@CPF`), único |
+| `dataNascimento` | `LocalDate` | Obrigatória, no passado, formato `AAAA-MM-DD` |
+| `endereco` | `Endereco` | O mesmo objeto embutido do médico |
+| `ativo` | `Boolean` | Controla a exclusão lógica |
+
+Depois do cadastro, só nome, telefone e endereço podem mudar. E-mail, CPF e data de nascimento identificam o cliente.
+
 **Endereço** (`@Embeddable`): `logradouro`, `bairro`, `cep`, `cidade`, `uf`, `complemento`, `numero`.
 
 ---
@@ -176,6 +199,26 @@ Base URL: `http://localhost:8080`
 | `PUT` | `/medicos` | Atualiza dados de um médico | `200` · `400` · `404` |
 | `PATCH` | `/medicos/{id}/ativar` | Reativa um médico excluído | `200` · `404` |
 | `DELETE` | `/medicos/{id}` | Inativa um médico (exclusão lógica) | `200` · `404` |
+
+**Clientes**: mesmo contrato, em `/clientes` (grupo "Clientes" no Swagger).
+
+| Método | Rota | Descrição | Respostas |
+|---|---|---|---|
+| `POST` | `/clientes` | Cadastra um novo cliente | `200` · `400` dados inválidos · `409` CPF ou e-mail já cadastrado |
+| `GET` | `/clientes` | Lista clientes ativos (paginado, por nome) | `200` · `400` sort inválido |
+| `GET` | `/clientes/inativos` | Lista clientes inativos (paginado) | `200` · `400` sort inválido |
+| `GET` | `/clientes/{id}` | Detalha um cliente (ativo ou inativo) | `200` · `404` |
+| `PUT` | `/clientes` | Atualiza nome, telefone e endereço | `200` · `400` · `404` |
+| `PATCH` | `/clientes/{id}/ativar` | Reativa um cliente excluído | `200` · `404` |
+| `DELETE` | `/clientes/{id}` | Inativa um cliente (exclusão lógica) | `200` · `404` |
+
+Exemplo de cadastro (o CPF é um número de teste com dígitos válidos):
+
+```json
+{"nome":"Beatriz Rocha","email":"beatriz.rocha@exemplo.com","telefone":"44999998888",
+ "cpf":"52998224725","dataNascimento":"1990-05-20",
+ "endereco":{"logradouro":"Av. Brasil","bairro":"Centro","cep":"87013000","cidade":"Maringá","uf":"PR","numero":"100"}}
+```
 
 ### Cadastrar médico — `POST /medicos`
 
@@ -302,9 +345,9 @@ Preencha o `id` no campo do caminho. O médico excluído some do `GET` e volta d
 | Status | Significa |
 |---|---|
 | `200` | Deu certo |
-| `400` | Algum dado inválido. O corpo é uma lista `[{"campo": "endereco.cep", "mensagem": "deve ter 8 dígitos, sem traço"}]` |
-| `404` | Não existe médico com esse `id` |
-| `409` | CRM ou e-mail já usado por outro médico (mesmo inativo). Mesmo formato de lista do `400` |
+| `400` | Algum dado inválido. O corpo é uma lista `[{"campo": "endereco.cep", "mensagem": "deve ter 8 dígitos, sem traço"}]`. Valor que nem dá para ler (ex.: data `31/02/1990`) também vem assim: `[{"campo": "dataNascimento", "mensagem": "formato inválido"}]` |
+| `404` | Não existe médico ou cliente com esse `id` |
+| `409` | CRM (médico), CPF (cliente) ou e-mail já usado, mesmo por um registro inativo. Mesmo formato de lista do `400` |
 
 ---
 
@@ -397,8 +440,12 @@ cp -r frontend/dist/. src/main/resources/static/      # pasta no .gitignore
 | `MedicoControllerDetalhamentoTest` | `GET /medicos/{id}` (200 e 404) e validação do endereço no `PUT` |
 | `MedicoControllerInativosTest` | `GET /medicos/inativos` só traz inativos e não se confunde com `/{id}` |
 | `DadosAtualizacaoEnderecoTest` | Endereço na atualização: campos nulos aceitos, CEP fora do padrão e texto em branco recusados |
-| `TratadorDeErrosTest` | Violação de integridade do banco vira `409`, e não `500` |
-| `SwaggerDocumentacaoTest` | Swagger documenta os endpoints novos e continua disponível |
+| `TratadorDeErrosTest` | Violação de unicidade do banco vira `409`, e as demais violações viram `400`, nunca `500` |
+| `SwaggerDocumentacaoTest` | Swagger documenta os endpoints de médicos e as 7 operações de clientes, e continua disponível |
+| `ClienteTest` | Regras da entidade Cliente: nasce ativo, exclusão lógica, reativação e atualização parcial |
+| `ClienteServiceTest` | Serviço com **Mockito**: duplicidade de CPF/e-mail (o CPF é checado primeiro), listagens, detalhe, atualização, exclusão e reativação |
+| `DadosCadastroClienteTest` / `DadosAtualizacaoClienteTest` | Validação: CPF com 10 dígitos, com pontuação ou com dígito errado; data de nascimento hoje ou no futuro; tamanhos; nome/telefone em branco |
+| `ClienteController*Test` | **MockMvc** com H2: cadastro (200, 400, 409), listagem, detalhe, atualização e inativos/reativação |
 | `ApiApplicationTests` | A aplicação sobe e as migrations rodam (H2) |
 
 **Front-end** (`cd frontend && npm test`): Vitest + Testing Library, com o `fetch` simulado. Cobre o cliente HTTP (cada tipo de erro, incluindo sessão expirada), validação local, componentes (tabela, paginação, campo, modal) e as telas de lista e formulário.
@@ -465,8 +512,10 @@ As regras de Clean Code do projeto estão no **[`Rules.md`](Rules.md)**. Elas se
 - [ ] Teste de repository com `@DataJpaTest`, para validar o filtro de médicos ativos
 - [ ] Cobertura de testes com JaCoCo
 - [ ] GitHub Actions rodando os testes em todo Pull Request
-- [ ] Endpoint de detalhamento de médico (`GET /medicos/{id}`)
-- [ ] Cadastro de pacientes e agendamento de consultas
+- [x] Endpoint de detalhamento de médico (`GET /medicos/{id}`)
+- [x] Cadastro de clientes (pacientes), back-end
+- [ ] Tela de clientes no front-end
+- [ ] Agendamento de consultas (médico + cliente)
 - [ ] Autenticação e autorização com Spring Security + JWT
 - [x] Documentação com Swagger / SpringDoc OpenAPI
 
