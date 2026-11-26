@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { json, pagina, simularFetch, vazio } from '../test/fetchFalso'
 import { formularioVazio, type DadosFormulario } from '../dominio/validacao'
-import { atualizarMedico, cadastrarMedico, calcularAlteracoes, detalharMedico, listarAtivos } from './medicos'
+import {
+  atualizarMedico, cadastrarMedico, calcularAlteracoes, detalharMedico, excluirMedico, listarAtivos, listarInativos,
+  reativarMedico,
+} from './medicos'
 import type { MedicoCadastro, MedicoDetalhe } from './tipos'
 
 const original: MedicoDetalhe = {
@@ -59,6 +62,28 @@ describe('medicos', () => {
     expect(url).toBe('/medicos')
     expect(init.method).toBe('PUT')
     expect(JSON.parse(String(init.body))).toEqual({ id: 7, telefone: '44911112222' })
+  })
+})
+
+describe('medicos (inativos, exclusão e reativação)', () => {
+  it('deveChamarRotaDeInativosQuandoListarInativos', async () => {
+    const fetchFalso = simularFetch(() => json(pagina([])))
+    await listarInativos({ sort: 'crm,desc' })
+    expect(fetchFalso.mock.calls[0][0]).toBe('/medicos/inativos?page=0&size=10&sort=crm%2Cdesc')
+  })
+
+  it('deveEnviarDeleteQuandoExcluir', async () => {
+    const fetchFalso = simularFetch(() => vazio())
+    await excluirMedico(7)
+    expect(fetchFalso.mock.calls[0][0]).toBe('/medicos/7')
+    expect(fetchFalso.mock.calls[0][1].method).toBe('DELETE')
+  })
+
+  it('deveEnviarPatchQuandoReativar', async () => {
+    const fetchFalso = simularFetch(() => vazio())
+    await reativarMedico(7)
+    expect(fetchFalso.mock.calls[0][0]).toBe('/medicos/7/ativar')
+    expect(fetchFalso.mock.calls[0][1].method).toBe('PATCH')
   })
 })
 

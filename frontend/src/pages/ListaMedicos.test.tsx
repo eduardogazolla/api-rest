@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router'
 import { describe, expect, it } from 'vitest'
 import { ErroApi } from '../api/cliente'
-import { ana, bruno, json, pagina, simularFetch } from '../test/fetchFalso'
+import { ana, bruno, json, pagina, simularFetch, vazio } from '../test/fetchFalso'
 import ListaMedicos from './ListaMedicos'
 
 function UrlAtual() {
@@ -94,5 +94,83 @@ describe('ListaMedicos (ativos)', () => {
     renderizar()
 
     expect(await screen.findByText(new ErroApi('sessao', 'Sua sessão expirou. Recarregue a página.').message)).toBeInTheDocument()
+  })
+})
+
+describe('ListaMedicos (exclusão e reativação)', () => {
+  it('deveExcluirSomenteAposConfirmacao', async () => {
+    const fetchFalso = simularFetch(() => json(pagina([ana, bruno])))
+    renderizar()
+    const usuario = userEvent.setup()
+
+    await usuario.click(await screen.findByRole('button', { name: 'Excluir Ana Souza' }))
+    expect(screen.getByRole('dialog', { name: 'Excluir médico?' })).toHaveTextContent('Ana Souza')
+    await usuario.click(screen.getByRole('button', { name: 'Cancelar' }))
+
+    expect(fetchFalso.mock.calls.some(([, init]) => init.method === 'DELETE')).toBe(false)
+  })
+
+  it('deveRemoverDaListaEMostrarAvisoQuandoExcluir', async () => {
+    let excluida = false
+    const fetchFalso = simularFetch((_url, init) => {
+      if (init.method === 'DELETE') {
+        excluida = true
+        return vazio()
+      }
+      return json(pagina(excluida ? [bruno] : [ana, bruno]))
+    })
+    renderizar()
+    const usuario = userEvent.setup()
+
+    await usuario.click(await screen.findByRole('button', { name: 'Excluir Ana Souza' }))
+    await usuario.click(screen.getByRole('button', { name: 'Excluir' }))
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Médico excluído')
+    expect(screen.queryByText('Ana Souza')).not.toBeInTheDocument()
+    expect(fetchFalso.mock.calls.find(([, init]) => init.method === 'DELETE')?.[0]).toBe('/medicos/1')
+  })
+
+  it('deveIrParaPaginaAnteriorQuandoExcluirUltimoDaUltimaPagina', async () => {
+    const fetchFalso = simularFetch((url, init) => {
+      if (init.method === 'DELETE') return vazio()
+      return url.includes('page=1') ? json(pagina([bruno], 1, 2)) : json(pagina([ana], 0, 1))
+    })
+    renderizar('/?page=1')
+    const usuario = userEvent.setup()
+
+    await usuario.click(await screen.findByRole('button', { name: 'Excluir Bruno Lima' }))
+    await usuario.click(screen.getByRole('button', { name: 'Excluir' }))
+
+    expect(await screen.findByText('Ana Souza')).toBeInTheDocument()
+    expect(screen.getByTestId('url')).toHaveTextContent(/^\/$/)
+    expect(fetchFalso.mock.calls.at(-1)?.[0]).toContain('page=0')
+  })
+
+  it('deveListarInativosComBotaoReativar', async () => {
+    const fetchFalso = simularFetch(() => json(pagina([bruno])))
+    renderizar('/inativos', 'inativos')
+
+    expect(await screen.findByRole('heading', { name: 'Médicos inativos' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Reativar Bruno Lima' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Novo médico' })).not.toBeInTheDocument()
+    expect(fetchFalso.mock.calls[0][0]).toMatch(/^\/medicos\/inativos\?/)
+  })
+
+  it('deveRemoverDaListaQuandoReativar', async () => {
+    let reativado = false
+    const fetchFalso = simularFetch((_url, init) => {
+      if (init.method === 'PATCH') {
+        reativado = true
+        return vazio()
+      }
+      return json(pagina(reativado ? [] : [bruno]))
+    })
+    renderizar('/inativos', 'inativos')
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Reativar Bruno Lima' }))
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Médico reativado')
+    expect(await screen.findByText('Nenhum médico inativo')).toBeInTheDocument()
+    expect(fetchFalso.mock.calls.find(([, init]) => init.method === 'PATCH')?.[0]).toBe('/medicos/2/ativar')
   })
 })

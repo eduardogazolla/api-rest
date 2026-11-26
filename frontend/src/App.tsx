@@ -9,8 +9,8 @@ export default function App() {
       <Cabecalho />
       <main className="pagina">
         <Routes>
-          <Route path="/" element={<ListaMedicos modo="ativos" />} />
-          <Route path="/inativos" element={<p>Médicos inativos</p>} />
+          <Route path="/" element={<ListaMedicos key="ativos" modo="ativos" />} />
+          <Route path="/inativos" element={<ListaMedicos key="inativos" modo="inativos" />} />
           <Route path="/cadastro" element={<FormularioMedico modo="cadastro" />} />
           <Route path="/editar/:id" element={<FormularioMedico modo="edicao" />} />
           <Route path="*" element={<PaginaNaoEncontrada />} />

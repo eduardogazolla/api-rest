@@ -17,6 +17,10 @@ export function listarAtivos(parametros: ParametrosDeLista): Promise<Pagina<Medi
   return requisitar(`/medicos?${consulta(parametros)}`)
 }
 
+export function listarInativos(parametros: ParametrosDeLista): Promise<Pagina<MedicoListagem>> {
+  return requisitar(`/medicos/inativos?${consulta(parametros)}`)
+}
+
 export function detalharMedico(id: number): Promise<MedicoDetalhe> {
   return requisitar(`/medicos/${id}`)
 }
@@ -27,6 +31,14 @@ export function cadastrarMedico(dados: MedicoCadastro): Promise<void> {
 
 export function atualizarMedico(dados: MedicoAtualizacao): Promise<void> {
   return requisitar('/medicos', { method: 'PUT', body: JSON.stringify(dados) })
+}
+
+export function excluirMedico(id: number): Promise<void> {
+  return requisitar(`/medicos/${id}`, { method: 'DELETE' })
+}
+
+export function reativarMedico(id: number): Promise<void> {
+  return requisitar(`/medicos/${id}/ativar`, { method: 'PATCH' })
 }
 
 const CAMPOS_DO_ENDERECO: (keyof Endereco)[] = ['logradouro', 'bairro', 'cep', 'cidade', 'uf', 'numero', 'complemento']

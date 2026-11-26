@@ -279,28 +279,28 @@ que mudou e validação de endereço no servidor.
 
 ### Tests for User Story 4
 
-- [ ] T047 [P] [US4] Em `MedicoServiceTest.java`, adicionar `deveListarSomenteInativosQuandoListarInativos` (`verify(repository).findAllByAtivoFalse(paginacao)`)
-- [ ] T048 [P] [US4] Criar `src/test/java/med/voll/api/medico/MedicoControllerInativosTest.java` (MockMvc e H2) com:
+- [X] T047 [P] [US4] Em `MedicoServiceTest.java`, adicionar `deveListarSomenteInativosQuandoListarInativos` (`verify(repository).findAllByAtivoFalse(paginacao)`)
+- [X] T048 [P] [US4] Criar `src/test/java/med/voll/api/medico/MedicoControllerInativosTest.java` (MockMvc e H2) com:
   - `deveListarApenasInativosQuandoChamarInativos`: cadastra 2, exclui 1, e espera `totalElements == 1` com o nome do excluído;
   - `deveRetornar400QuandoSortDeInativosForInvalido`;
   - `naoDeveConfundirInativosComIdQuandoChamarRotaLiteral`.
-- [ ] T049 [P] [US4] Criar `frontend/src/components/ModalConfirmacao.test.tsx` com:
+- [X] T049 [P] [US4] Criar `frontend/src/components/ModalConfirmacao.test.tsx` com:
   - `deveMostrarMensagemComNomeDoMedico`;
   - `deveChamarOnConfirmarQuandoConfirmar`;
   - `deveChamarOnCancelarQuandoCancelarOuEsc`.
-- [ ] T050 [US4] Em `ListaMedicos.test.tsx`, adicionar:
+- [X] T050 [US4] Em `ListaMedicos.test.tsx`, adicionar:
   - `deveExcluirSomenteAposConfirmacao`, em que cancelar não chama `DELETE`;
   - `deveRemoverDaListaEMostrarAvisoQuandoExcluir`;
   - `deveIrParaPaginaAnteriorQuandoExcluirUltimoDaUltimaPagina` (research.md R7);
   - para o modo inativos: `deveListarInativosComBotaoReativar` e `deveRemoverDaListaQuandoReativar`, com o aviso "Médico reativado".
-- [ ] T051 [P] [US4] Em `frontend/src/api/medicos.test.ts`, adicionar testes de URL e método para `listarInativos`, `excluirMedico` (DELETE `/medicos/{id}`) e `reativarMedico` (PATCH `/medicos/{id}/ativar`)
+- [X] T051 [P] [US4] Em `frontend/src/api/medicos.test.ts`, adicionar testes de URL e método para `listarInativos`, `excluirMedico` (DELETE `/medicos/{id}`) e `reativarMedico` (PATCH `/medicos/{id}/ativar`)
 
 ### Implementation for User Story 4
 
-- [ ] T052 [US4] Adicionar `findAllByAtivoFalse` em `MedicoRepository` (data-model.md `MedicoRepository`), `MedicoService.listarInativos` e `@GetMapping("/inativos")` em `MedicoController`. Usar `@PageableDefault(size = 10, sort = {"nome"})` e `@ParameterObject`, e documentar 200 e 400 como no `listar`. O T047 e o T048 devem passar
-- [ ] T053 [P] [US4] Implementar `listarInativos`, `excluirMedico` e `reativarMedico` em `frontend/src/api/medicos.ts`. O T051 deve passar
-- [ ] T054 [P] [US4] Implementar `frontend/src/components/ModalConfirmacao.tsx` com `<dialog>` nativo (`showModal`), título, mensagem, os botões "Cancelar" e "Excluir" (este com estilo de perigo) e o foco inicial em "Cancelar". O T049 deve passar
-- [ ] T055 [US4] Em `frontend/src/pages/ListaMedicos.tsx`:
+- [X] T052 [US4] Adicionar `findAllByAtivoFalse` em `MedicoRepository` (data-model.md `MedicoRepository`), `MedicoService.listarInativos` e `@GetMapping("/inativos")` em `MedicoController`. Usar `@PageableDefault(size = 10, sort = {"nome"})` e `@ParameterObject`, e documentar 200 e 400 como no `listar`. O T047 e o T048 devem passar
+- [X] T053 [P] [US4] Implementar `listarInativos`, `excluirMedico` e `reativarMedico` em `frontend/src/api/medicos.ts`. O T051 deve passar
+- [X] T054 [P] [US4] Implementar `frontend/src/components/ModalConfirmacao.tsx` com `<dialog>` nativo (`showModal`), título, mensagem, os botões "Cancelar" e "Excluir" (este com estilo de perigo) e o foco inicial em "Cancelar". O T049 deve passar
+- [X] T055 [US4] Em `frontend/src/pages/ListaMedicos.tsx`:
   - ligar o botão "Excluir", com modal e aviso "Médico excluído";
   - ligar o modo `inativos` (título "Médicos inativos", ação "Reativar" com o aviso "Médico reativado", sem o botão "Novo médico");
   - aplicar a regra de voltar uma página.

@@ -197,6 +197,21 @@ class MedicoServiceTest {
     }
 
     @Test
+    @DisplayName("Deve listar somente os inativos, convertidos para dados de listagem")
+    void deveListarSomenteInativosQuandoListarInativos() {
+        Medico medico = new Medico(cadastroValido());
+        medico.excluir();
+        Pageable paginacao = PageRequest.of(0, 10);
+        when(repository.findAllByAtivoFalse(paginacao)).thenReturn(new PageImpl<>(List.of(medico)));
+
+        Page<DadosListagemMedico> resultado = service.listarInativos(paginacao);
+
+        assertEquals("Ana Souza", resultado.getContent().get(0).nome());
+        verify(repository).findAllByAtivoFalse(paginacao);
+        verify(repository, never()).findAllByAtivoTrue(any());
+    }
+
+    @Test
     void deveReativarMedicoInativo() {
         Medico medico = new Medico(cadastroValido());
         medico.excluir();

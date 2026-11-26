@@ -35,6 +35,10 @@ public class MedicoService {
         return repository.findAllByAtivoTrue(paginacao).map(DadosListagemMedico::new);
     }
 
+    public Page<DadosListagemMedico> listarInativos(Pageable paginacao) {
+        return repository.findAllByAtivoFalse(paginacao).map(DadosListagemMedico::new);
+    }
+
     public DadosDetalhamentoMedico detalhar(Long id) {
         return new DadosDetalhamentoMedico(buscarMedicoPorId(id));
     }

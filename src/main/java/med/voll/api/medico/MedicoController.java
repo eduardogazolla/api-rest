@@ -49,6 +49,17 @@ public class MedicoController {
 		return service.listar(paginacao);
 	}
 
+	@GetMapping("/inativos")
+	@Operation(summary = "Listar médicos inativos",
+			description = "Lista paginada só com os médicos excluídos (inativos), que podem ser reativados. "
+					+ "Mesmos parâmetros de paginação e ordenação de GET /medicos.")
+	@ApiResponse(responseCode = "200", description = "Página de médicos inativos")
+	@ApiResponse(responseCode = "400", description = "Parâmetro sort inválido: propriedade inexistente ou em formato errado",
+			content = @Content(schema = @Schema(implementation = TratadorDeErros.DadosErro.class)))
+	public Page<DadosListagemMedico> listarInativos(@ParameterObject @PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao) {
+		return service.listarInativos(paginacao);
+	}
+
 	@GetMapping("/{id}")
 	@Operation(summary = "Detalhar médico",
 			description = "Todos os dados do médico, inclusive telefone, endereço e situação. Também encontra médicos inativos.")
