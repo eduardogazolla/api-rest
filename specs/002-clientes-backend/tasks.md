@@ -30,9 +30,9 @@ Os testes MockMvc compartilham o H2: cada teste usa CPF e e-mail próprios, todo
 
 **Purpose**: criar a tabela `clientes` nos dois dialetos.
 
-- [ ] T001 Criar `src/main/resources/db/migration/V4__create-table-clientes.sql` com as colunas MySQL de data-model.md "Tabela `clientes`"
-- [ ] T002 [P] Criar `src/main/resources/db/postgresql/V4__create-table-clientes.sql` com as colunas PostgreSQL da mesma tabela de data-model.md
-- [ ] T003 Rodar `./mvnw test -Dtest=ApiApplicationTests` e confirmar que a V4 aplica no H2 (modo MySQL)
+- [X] T001 Criar `src/main/resources/db/migration/V4__create-table-clientes.sql` com as colunas MySQL de data-model.md "Tabela `clientes`"
+- [X] T002 [P] Criar `src/main/resources/db/postgresql/V4__create-table-clientes.sql` com as colunas PostgreSQL da mesma tabela de data-model.md
+- [X] T003 Rodar `./mvnw test -Dtest=ApiApplicationTests` e confirmar que a V4 aplica no H2 (modo MySQL)
 
 **Checkpoint**: `./mvnw test` continua verde, com 69 testes.
 
