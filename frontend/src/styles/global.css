@@ -228,7 +228,7 @@ a {
 
 /* ---------- Lista de médicos ---------- */
 
-.tabela-medicos {
+.tabela {
   width: 100%;
   border-collapse: collapse;
   background: var(--cor-superficie);
@@ -237,25 +237,25 @@ a {
   overflow: hidden;
 }
 
-.tabela-medicos th,
-.tabela-medicos td {
+.tabela th,
+.tabela td {
   padding: var(--espaco-3) var(--espaco-4);
   text-align: left;
   vertical-align: middle;
 }
 
-.tabela-medicos thead th {
+.tabela thead th {
   font-size: var(--texto-xs);
   font-weight: 700;
   color: var(--cor-texto-suave);
   border-bottom: 1px solid var(--cor-linha);
 }
 
-.tabela-medicos tbody tr + tr td {
+.tabela tbody tr + tr td {
   border-top: 1px solid var(--cor-linha);
 }
 
-.tabela-medicos tbody tr:hover {
+.tabela tbody tr:hover {
   background: var(--cor-fundo);
 }
 
@@ -281,11 +281,11 @@ th[aria-sort] .ordenar {
   text-align: center;
 }
 
-.medico__nome {
+.tabela__nome {
   font-weight: 700;
 }
 
-.medico__email {
+.tabela__email {
   color: var(--cor-texto-suave);
   font-size: var(--texto-sm);
   overflow-wrap: anywhere;
@@ -332,41 +332,41 @@ th[aria-sort] .ordenar {
 }
 
 @media (max-width: 640px) {
-  .tabela-medicos,
-  .tabela-medicos tbody,
-  .tabela-medicos tr,
-  .tabela-medicos td {
+  .tabela,
+  .tabela tbody,
+  .tabela tr,
+  .tabela td {
     display: block;
   }
 
-  .tabela-medicos {
+  .tabela {
     background: none;
     border: 0;
   }
 
-  .tabela-medicos thead {
+  .tabela thead {
     display: flex;
     flex-wrap: wrap;
     gap: var(--espaco-2);
     margin-bottom: var(--espaco-3);
   }
 
-  .tabela-medicos thead tr {
+  .tabela thead tr {
     display: contents;
   }
 
-  .tabela-medicos thead th {
+  .tabela thead th {
     border: 1px solid var(--cor-linha);
     border-radius: 999px;
     padding: var(--espaco-1) var(--espaco-3);
     background: var(--cor-superficie);
   }
 
-  .tabela-medicos thead th:last-child {
+  .tabela thead th:last-child {
     display: none;
   }
 
-  .tabela-medicos tbody tr {
+  .tabela tbody tr {
     display: grid;
     grid-template-columns: 1fr auto;
     gap: var(--espaco-1) var(--espaco-3);
@@ -376,24 +376,24 @@ th[aria-sort] .ordenar {
     border-radius: var(--raio);
   }
 
-  .tabela-medicos tbody tr + tr {
+  .tabela tbody tr + tr {
     margin-top: var(--espaco-3);
   }
 
-  .tabela-medicos tbody tr + tr td {
+  .tabela tbody tr + tr td {
     border-top: 0;
   }
 
-  .tabela-medicos td {
+  .tabela td {
     padding: 0;
   }
 
-  .tabela-medicos td.coluna-nome,
-  .tabela-medicos td.coluna-email {
+  .tabela td.coluna-nome,
+  .tabela td.coluna-email {
     grid-column: 1 / -1;
   }
 
-  .tabela-medicos td.coluna-acoes {
+  .tabela td.coluna-acoes {
     grid-column: 1 / -1;
     margin-top: var(--espaco-2);
     padding-top: var(--espaco-2);

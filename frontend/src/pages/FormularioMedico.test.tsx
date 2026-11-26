@@ -12,10 +12,10 @@ function ListaFalsa() {
 
 function renderizarCadastro() {
   return render(
-    <MemoryRouter initialEntries={['/cadastro']}>
+    <MemoryRouter initialEntries={['/app/medicos/cadastro']}>
       <Routes>
-        <Route path="/" element={<ListaFalsa />} />
-        <Route path="/cadastro" element={<FormularioMedico modo="cadastro" />} />
+        <Route path="/app/medicos" element={<ListaFalsa />} />
+        <Route path="/app/medicos/cadastro" element={<FormularioMedico modo="cadastro" />} />
       </Routes>
     </MemoryRouter>,
   )
@@ -44,10 +44,10 @@ const detalhe = {
 
 function renderizarEdicao(id = 7) {
   return render(
-    <MemoryRouter initialEntries={[`/editar/${id}`]}>
+    <MemoryRouter initialEntries={[`/app/medicos/editar/${id}`]}>
       <Routes>
-        <Route path="/" element={<ListaFalsa />} />
-        <Route path="/editar/:id" element={<FormularioMedico modo="edicao" />} />
+        <Route path="/app/medicos" element={<ListaFalsa />} />
+        <Route path="/app/medicos/editar/:id" element={<FormularioMedico modo="edicao" />} />
       </Routes>
     </MemoryRouter>,
   )
@@ -98,15 +98,15 @@ describe('FormularioMedico (edição)', () => {
     renderizarEdicao(99999)
 
     expect(await screen.findByRole('heading', { name: 'Médico não encontrado' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Ver médicos ativos' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'Ver médicos ativos' })).toHaveAttribute('href', '/app/medicos')
   })
 
   it('deveMostrarNaoEncontradoSemChamarApiQuandoIdNaoForNumero', async () => {
     const fetchFalso = simularFetch(() => json(detalhe))
     render(
-      <MemoryRouter initialEntries={['/editar/abc']}>
+      <MemoryRouter initialEntries={['/app/medicos/editar/abc']}>
         <Routes>
-          <Route path="/editar/:id" element={<FormularioMedico modo="edicao" />} />
+          <Route path="/app/medicos/editar/:id" element={<FormularioMedico modo="edicao" />} />
         </Routes>
       </MemoryRouter>,
     )

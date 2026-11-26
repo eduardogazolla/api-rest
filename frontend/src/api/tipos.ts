@@ -35,7 +35,7 @@ export interface MedicoCadastro {
   endereco: Endereco
 }
 
-export interface MedicoAtualizacao {
+export interface CadastroAtualizacao {
   id: number
   nome?: string
   telefone?: string

@@ -40,24 +40,24 @@ Front em `frontend/src/...`, com os testes ao lado (`*.test.ts(x)`). Back em `sr
 
 **⚠️ Ao fim desta fase, as telas de médico funcionam como antes, em `/app/medicos/...`, e nada de cliente existe ainda.**
 
-- [ ] T005 Criar `frontend/src/api/recurso.ts` com `criarApiDeCadastro<L, D, C>(base)`. Ela devolve `listarAtivos`, `listarInativos`, `detalhar`, `cadastrar`, `atualizar`, `excluir` e `reativar`.
+- [X] T005 Criar `frontend/src/api/recurso.ts` com `criarApiDeCadastro<L, D, C>(base)`. Ela devolve `listarAtivos`, `listarInativos`, `detalhar`, `cadastrar`, `atualizar`, `excluir` e `reativar`.
   - Migrar `frontend/src/api/medicos.test.ts` para testar `criarApiDeCadastro('/medicos')`, com as mesmas URLs e métodos de hoje.
   - `frontend/src/api/medicos.ts` passa a exportar `apiMedicos`.
   - Os testes devem passar.
-- [ ] T006 Criar `frontend/src/dominio/alteracoes.ts` com o `calcularAlteracoes` genérico (data-model.md "Alterações para o PUT"), movendo os testes de `calcularAlteracoes` para `alteracoes.test.ts`. Em `frontend/src/dominio/validacao.ts`:
+- [X] T006 Criar `frontend/src/dominio/alteracoes.ts` com o `calcularAlteracoes` genérico (data-model.md "Alterações para o PUT"), movendo os testes de `calcularAlteracoes` para `alteracoes.test.ts`. Em `frontend/src/dominio/validacao.ts`:
   - extrair `validarEndereco(endereco, modo)`;
   - renomear o tipo para `DadosFormularioMedico`;
   - exportar `EnderecoFormulario`.
   - Os testes de validação devem continuar verdes.
-- [ ] T007 Criar `frontend/src/components/Tabela.tsx` e `Tabela.test.tsx`, migrando os 4 testes de `TabelaMedicos.test.tsx` para colunas de médico (research.md R2). Definir as colunas de médico em `frontend/src/dominio/recursos.ts`. Apagar `TabelaMedicos.tsx` e o teste dele
-- [ ] T008 Em `frontend/src/api/cliente.ts`, mudar o 404 para "Não encontrado." e ajustar o `cliente.test.ts` (research.md R7)
-- [ ] T009 Criar `frontend/src/pages/ListaCadastros.tsx` (research.md R1), com a área `MEDICOS` em `dominio/recursos.ts`:
+- [X] T007 Criar `frontend/src/components/Tabela.tsx` e `Tabela.test.tsx`, migrando os 4 testes de `TabelaMedicos.test.tsx` para colunas de médico (research.md R2). Definir as colunas de médico em `frontend/src/dominio/recursos.ts`. Apagar `TabelaMedicos.tsx` e o teste dele
+- [X] T008 Em `frontend/src/api/cliente.ts`, mudar o 404 para "Não encontrado." e ajustar o `cliente.test.ts` (research.md R7)
+- [X] T009 Criar `frontend/src/pages/ListaCadastros.tsx` (research.md R1), com a área `MEDICOS` em `dominio/recursos.ts`:
   - migrar `ListaMedicos.test.tsx` para `ListaCadastros.test.tsx`, usando `MEDICOS` e as rotas `/app/medicos/...`;
   - um erro `nao-encontrado` numa ação mostra "Médico não encontrado.";
   - apagar `ListaMedicos.tsx`.
   - Todos os cenários atuais devem continuar verdes.
-- [ ] T010 Criar `frontend/src/hooks/useFormularioCadastro.ts` (research.md R3) e `frontend/src/components/CamposEndereco.tsx`. Reescrever `FormularioMedico.tsx` usando os dois, com as rotas `/app/medicos`. Ajustar `FormularioMedico.test.tsx` só nas rotas. Todos os cenários devem continuar verdes
-- [ ] T011 Em `frontend/src/App.tsx`, trocar as rotas para `/app/medicos`, `/app/medicos/inativos`, `/app/medicos/cadastro` e `/app/medicos/editar/:id`, e fazer `/` e `/app` redirecionarem para `/app/medicos` (contracts/rotas-de-tela.md). Conferir com `npm test` e `npm run build`
+- [X] T010 Criar `frontend/src/hooks/useFormularioCadastro.ts` (research.md R3) e `frontend/src/components/CamposEndereco.tsx`. Reescrever `FormularioMedico.tsx` usando os dois, com as rotas `/app/medicos`. Ajustar `FormularioMedico.test.tsx` só nas rotas. Todos os cenários devem continuar verdes
+- [X] T011 Em `frontend/src/App.tsx`, trocar as rotas para `/app/medicos`, `/app/medicos/inativos`, `/app/medicos/cadastro` e `/app/medicos/editar/:id`, e fazer `/` e `/app` redirecionarem para `/app/medicos` (contracts/rotas-de-tela.md). Conferir com `npm test` e `npm run build`
 
 **Checkpoint**: médicos completos em `/app/medicos`, e o comportamento de antes está garantido pelos testes.
 

@@ -1,18 +1,25 @@
-import { Link, Route, Routes } from 'react-router'
+import { Link, Navigate, Route, Routes } from 'react-router'
 import Cabecalho from './components/Cabecalho'
+import { MEDICOS } from './dominio/recursos'
 import FormularioMedico from './pages/FormularioMedico'
-import ListaMedicos from './pages/ListaMedicos'
+import ListaCadastros from './pages/ListaCadastros'
 
+// Regra das rotas: tudo que é tela fica sob /app; /medicos e /clientes são da API (constituição V)
 export default function App() {
   return (
     <>
       <Cabecalho />
       <main className="pagina">
         <Routes>
-          <Route path="/" element={<ListaMedicos key="ativos" modo="ativos" />} />
-          <Route path="/inativos" element={<ListaMedicos key="inativos" modo="inativos" />} />
-          <Route path="/cadastro" element={<FormularioMedico modo="cadastro" />} />
-          <Route path="/editar/:id" element={<FormularioMedico modo="edicao" />} />
+          <Route path="/" element={<Navigate replace to="/app/medicos" />} />
+          <Route path="/app" element={<Navigate replace to="/app/medicos" />} />
+          <Route path="/app/medicos" element={<ListaCadastros key="medicos-ativos" area={MEDICOS} modo="ativos" />} />
+          <Route
+            path="/app/medicos/inativos"
+            element={<ListaCadastros key="medicos-inativos" area={MEDICOS} modo="inativos" />}
+          />
+          <Route path="/app/medicos/cadastro" element={<FormularioMedico modo="cadastro" />} />
+          <Route path="/app/medicos/editar/:id" element={<FormularioMedico modo="edicao" />} />
           <Route path="*" element={<PaginaNaoEncontrada />} />
         </Routes>
       </main>
@@ -25,7 +32,7 @@ function PaginaNaoEncontrada() {
     <div className="estado">
       <h1 className="estado__titulo">Página não encontrada</h1>
       <p className="estado__texto">O endereço digitado não existe no sistema.</p>
-      <Link to="/" className="botao botao--primario">
+      <Link to="/app/medicos" className="botao botao--primario">
         Ver médicos ativos
       </Link>
     </div>

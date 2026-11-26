@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { formularioVazio, validarMedico, type DadosFormulario } from './validacao'
+import { medicoVazio, validarMedico, type DadosFormularioMedico } from './validacao'
 
-function cadastroValido(): DadosFormulario {
+function cadastroValido(): DadosFormularioMedico {
   return {
     nome: 'Ana Souza', email: 'ana@voll.med', telefone: '44999990000', crm: '123456',
     especialidade: 'CARDIOLOGIA',
@@ -11,7 +11,7 @@ function cadastroValido(): DadosFormulario {
 
 describe('validarMedico (cadastro)', () => {
   it('deveExigirTodosOsObrigatoriosQuandoCadastroVazio', () => {
-    const erros = validarMedico(formularioVazio(), 'cadastro')
+    const erros = validarMedico(medicoVazio(), 'cadastro')
     expect(Object.keys(erros).sort()).toEqual([
       'crm', 'email', 'endereco.bairro', 'endereco.cep', 'endereco.cidade', 'endereco.logradouro',
       'endereco.uf', 'especialidade', 'nome', 'telefone',

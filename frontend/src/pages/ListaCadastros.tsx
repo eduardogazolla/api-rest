@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router'
 import { ErroApi } from '../api/cliente'
-import { excluirMedico, listarAtivos, listarInativos, reativarMedico } from '../api/medicos'
-import type { MedicoListagem, Pagina } from '../api/tipos'
+import type { Pagina } from '../api/tipos'
 import Aviso from '../components/Aviso'
 import ModalConfirmacao from '../components/ModalConfirmacao'
 import Paginacao from '../components/Paginacao'
-import TabelaMedicos from '../components/TabelaMedicos'
+import Tabela from '../components/Tabela'
+import { maiuscula, type AreaDeCadastro } from '../dominio/recursos'
 
-interface Props {
+interface Props<L extends { id: number; nome: string }> {
+  area: AreaDeCadastro<L>
   modo: 'ativos' | 'inativos'
 }
 
@@ -24,14 +25,16 @@ function comoErroApi(erro: unknown): ErroApi {
   return erro instanceof ErroApi ? erro : new ErroApi('servidor', String(erro))
 }
 
-export default function ListaMedicos({ modo }: Props) {
+/** Lista paginada de uma área (médicos ou clientes): o comportamento é um só, os textos e colunas vêm da área. */
+export default function ListaCadastros<L extends { id: number; nome: string }>({ area, modo }: Props<L>) {
   const { pathname, search, state } = useLocation()
   const navigate = useNavigate()
   const [parametros, setParametros] = useSearchParams()
   const page = paginaDaUrl(parametros.get('page'))
   const sort = parametros.get('sort') ?? SORT_PADRAO
+  const { singular, plural, api, base } = area
 
-  const [pagina, setPagina] = useState<Pagina<MedicoListagem> | null>(null)
+  const [pagina, setPagina] = useState<Pagina<L> | null>(null)
   const [erro, setErro] = useState<ErroApi | null>(null)
   const [tentativa, setTentativa] = useState(0)
   // O id faz cada aviso remontar o componente, reiniciando os 5 s mesmo com o mesmo texto
@@ -39,7 +42,7 @@ export default function ListaMedicos({ modo }: Props) {
     const texto = (state as { aviso?: string } | null)?.aviso
     return texto ? { texto, id: 0 } : null
   })
-  const [paraExcluir, setParaExcluir] = useState<MedicoListagem | null>(null)
+  const [paraExcluir, setParaExcluir] = useState<L | null>(null)
   const [erroDaAcao, setErroDaAcao] = useState<string | null>(null)
   const [ocupado, setOcupado] = useState(false)
   const fecharAviso = useCallback(() => setAviso(null), [])
@@ -53,14 +56,14 @@ export default function ListaMedicos({ modo }: Props) {
     let ativo = true
     setPagina(null)
     setErro(null)
-    const listar = modo === 'ativos' ? listarAtivos : listarInativos
+    const listar = modo === 'ativos' ? api.listarAtivos : api.listarInativos
     listar({ page, sort })
       .then((resultado) => ativo && setPagina(resultado))
       .catch((e: unknown) => ativo && setErro(comoErroApi(e)))
     return () => {
       ativo = false
     }
-  }, [modo, page, sort, tentativa])
+  }, [api, modo, page, sort, tentativa])
 
   function irParaPagina(novaPagina: number) {
     const novos = new URLSearchParams(parametros)
@@ -84,14 +87,16 @@ export default function ListaMedicos({ modo }: Props) {
       if (eraOUltimoDaPagina) irParaPagina(page - 1)
       else setTentativa((t) => t + 1)
     } catch (e) {
-      setErroDaAcao(comoErroApi(e).message)
+      const erroApi = comoErroApi(e)
+      // O cliente HTTP é neutro ("Não encontrado."); aqui sabemos de qual entidade se trata
+      setErroDaAcao(erroApi.tipo === 'nao-encontrado' ? `${maiuscula(singular)} não encontrado.` : erroApi.message)
     } finally {
       setOcupado(false)
       setParaExcluir(null)
     }
   }
 
-  const titulo = modo === 'ativos' ? 'Médicos ativos' : 'Médicos inativos'
+  const titulo = `${maiuscula(plural)} ${modo}`
 
   return (
     <>
@@ -100,13 +105,13 @@ export default function ListaMedicos({ modo }: Props) {
           <h1 className="pagina__titulo">{titulo}</h1>
           {pagina && (
             <p className="pagina__resumo">
-              {pagina.totalElements === 1 ? '1 médico' : `${pagina.totalElements} médicos`}
+              {pagina.totalElements === 1 ? `1 ${singular}` : `${pagina.totalElements} ${plural}`}
             </p>
           )}
         </div>
         {modo === 'ativos' && (
-          <Link to="/cadastro" className="botao botao--primario">
-            Novo médico
+          <Link to={`${base}/cadastro`} className="botao botao--primario">
+            Novo {singular}
           </Link>
         )}
       </div>
@@ -136,20 +141,22 @@ export default function ListaMedicos({ modo }: Props) {
         </div>
       )}
 
-      {!erro && !pagina && <p className="carregando">Carregando médicos…</p>}
+      {!erro && !pagina && <p className="carregando">Carregando {plural}…</p>}
 
       {pagina && pagina.totalElements === 0 && (
         <div className="estado">
-          <p className="estado__titulo">{modo === 'ativos' ? 'Nenhum médico ativo' : 'Nenhum médico inativo'}</p>
+          <p className="estado__titulo">
+            Nenhum {singular} {modo === 'ativos' ? 'ativo' : 'inativo'}
+          </p>
           {modo === 'ativos' ? (
             <>
-              <p className="estado__texto">Cadastre um médico para ele aparecer aqui.</p>
-              <Link to="/cadastro" className="botao botao--primario">
-                Cadastrar o primeiro médico
+              <p className="estado__texto">Cadastre um {singular} para ele aparecer aqui.</p>
+              <Link to={`${base}/cadastro`} className="botao botao--primario">
+                Cadastrar o primeiro {singular}
               </Link>
             </>
           ) : (
-            <p className="estado__texto">Médicos excluídos aparecem aqui e podem ser reativados.</p>
+            <p className="estado__texto">{maiuscula(plural)} excluídos aparecem aqui e podem ser reativados.</p>
           )}
         </div>
       )}
@@ -165,21 +172,22 @@ export default function ListaMedicos({ modo }: Props) {
 
       {pagina && pagina.content.length > 0 && (
         <>
-          <TabelaMedicos
-            medicos={pagina.content}
+          <Tabela
+            itens={pagina.content}
+            colunas={area.colunas}
             sort={sort}
             onOrdenar={ordenar}
-            acoes={(medico) =>
+            acoes={(item) =>
               modo === 'ativos' ? (
                 <>
-                  <Link to={`/editar/${medico.id}`} className="botao botao--texto" aria-label={`Editar ${medico.nome}`}>
+                  <Link to={`${base}/editar/${item.id}`} className="botao botao--texto" aria-label={`Editar ${item.nome}`}>
                     Editar
                   </Link>
                   <button
                     type="button"
                     className="botao botao--texto botao--perigo"
-                    aria-label={`Excluir ${medico.nome}`}
-                    onClick={() => setParaExcluir(medico)}
+                    aria-label={`Excluir ${item.nome}`}
+                    onClick={() => setParaExcluir(item)}
                   >
                     Excluir
                   </button>
@@ -188,9 +196,9 @@ export default function ListaMedicos({ modo }: Props) {
                 <button
                   type="button"
                   className="botao botao--texto"
-                  aria-label={`Reativar ${medico.nome}`}
+                  aria-label={`Reativar ${item.nome}`}
                   disabled={ocupado}
-                  onClick={() => executar(() => reativarMedico(medico.id), 'Médico reativado')}
+                  onClick={() => executar(() => api.reativar(item.id), `${maiuscula(singular)} reativado`)}
                 >
                   Reativar
                 </button>
@@ -205,11 +213,11 @@ export default function ListaMedicos({ modo }: Props) {
 
       <ModalConfirmacao
         aberto={paraExcluir !== null}
-        titulo="Excluir médico?"
+        titulo={`Excluir ${singular}?`}
         mensagem={`${paraExcluir?.nome ?? ''} sai da lista de ativos. Dá para reativar depois, em Inativos.`}
         rotuloConfirmar="Excluir"
         ocupado={ocupado}
-        onConfirmar={() => paraExcluir && executar(() => excluirMedico(paraExcluir.id), 'Médico excluído')}
+        onConfirmar={() => paraExcluir && executar(() => api.excluir(paraExcluir.id), `${maiuscula(singular)} excluído`)}
         onCancelar={() => setParaExcluir(null)}
       />
 

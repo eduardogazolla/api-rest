@@ -18,7 +18,7 @@ describe('Cabecalho', () => {
   })
 
   it('deveMarcarNavegacaoAtual', () => {
-    renderizar('/inativos')
+    renderizar('/app/medicos/inativos')
     expect(screen.getByRole('link', { name: 'Inativos' })).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('link', { name: 'Médicos ativos' })).not.toHaveAttribute('aria-current')
   })
