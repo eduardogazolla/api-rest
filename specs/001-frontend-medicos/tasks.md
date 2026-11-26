@@ -60,15 +60,15 @@ todas as histórias usam.
 
 ### Testes primeiro
 
-- [ ] T006 [P] Criar `src/test/java/med/voll/api/medico/MedicoControllerValidacaoTest.java` (`@SpringBootTest`, `@AutoConfigureMockMvc`, `@ActiveProfiles("test")`, no mesmo estilo de `MedicoControllerOrdenacaoTest`) com:
+- [X] T006 [P] Criar `src/test/java/med/voll/api/medico/MedicoControllerValidacaoTest.java` (`@SpringBootTest`, `@AutoConfigureMockMvc`, `@ActiveProfiles("test")`, no mesmo estilo de `MedicoControllerOrdenacaoTest`) com:
   - `deveRetornar400ComErrosPorCampoQuandoCadastroForInvalido`: POST com CRM `"12"` e CEP `"abc"` espera `status 400`, `$[?(@.campo=='crm')].mensagem` igual a "deve ter de 4 a 6 dígitos" e `$[?(@.campo=='endereco.cep')]` presente;
   - `deveRetornarMensagensEmPortuguesQuandoCampoObrigatorioFaltar`: POST com `nome` vazio espera `campo=nome` e mensagem "é obrigatório".
   - Rodar `./mvnw test -Dtest=MedicoControllerValidacaoTest` e confirmar que FALHA.
-- [ ] T007 [P] Atualizar `src/test/java/med/voll/api/infra/HomeControllerTest.java`. Criar `src/test/java/med/voll/api/infra/RotasDaTelaTest.java` (MockMvc) com:
+- [X] T007 [P] Atualizar `src/test/java/med/voll/api/infra/HomeControllerTest.java`. Criar `src/test/java/med/voll/api/infra/RotasDaTelaTest.java` (MockMvc) com:
   - `deveEncaminharParaIndexQuandoRotaForDeTela`, parametrizado com `/`, `/inativos`, `/cadastro` e `/editar/7`, que espera `forwardedUrl("/index.html")`;
   - `deveContinuarServindoHealthQuandoRotasDeTelaExistirem`, com `GET /health` 200.
   - Confirmar que FALHA.
-- [ ] T008 [P] Criar `frontend/src/api/cliente.test.ts` cobrindo `requisitar`, com `fetch` simulado:
+- [X] T008 [P] Criar `frontend/src/api/cliente.test.ts` cobrindo `requisitar`, com `fetch` simulado:
   - `deveDevolverJsonQuandoRespostaForOk`;
   - `deveDevolverUndefinedQuandoRespostaOkVierSemCorpo`;
   - `deveLancarValidacaoComCamposQuando400ForLista`;
@@ -82,22 +82,22 @@ todas as histórias usam.
 
 ### Implementação
 
-- [ ] T009 Em `src/main/java/med/voll/api/medico/DadosCadastroMedico.java` e `src/main/java/med/voll/api/endereco/DadosEndereco.java`, colocar `message` em português em cada anotação, conforme data-model.md "Mensagens explícitas" (`DadosCadastroMedico.nome`, `.email`, `.telefone`, `.crm`, `.especialidade`, `.endereco`; `DadosEndereco.logradouro`, `.bairro`, `.cep`, `.cidade`, `.uf`)
-- [ ] T010 Em `src/main/java/med/voll/api/infra/TratadorDeErros.java`:
+- [X] T009 Em `src/main/java/med/voll/api/medico/DadosCadastroMedico.java` e `src/main/java/med/voll/api/endereco/DadosEndereco.java`, colocar `message` em português em cada anotação, conforme data-model.md "Mensagens explícitas" (`DadosCadastroMedico.nome`, `.email`, `.telefone`, `.crm`, `.especialidade`, `.endereco`; `DadosEndereco.logradouro`, `.bairro`, `.cep`, `.cidade`, `.uf`)
+- [X] T010 Em `src/main/java/med/voll/api/infra/TratadorDeErros.java`:
   - adicionar o record `DadosErroCampo(String campo, String mensagem)` com construtor a partir de `FieldError` (data-model.md `TratadorDeErros.DadosErroCampo`);
   - adicionar o handler de `MethodArgumentNotValidException`, que responde 400 com `List<DadosErroCampo>`;
   - manter o handler de sort intacto.
   - O T006 deve passar.
-- [ ] T011 Reescrever `src/main/java/med/voll/api/infra/HomeController.java` para mapear `GET /`, `/inativos`, `/cadastro` e `/editar/{id:\\d+}` para `"forward:/index.html"` (research.md R2), mantendo o `@Hidden`. O T007 deve passar, e o `./mvnw test` completo também
-- [ ] T012 [P] Criar `frontend/src/api/tipos.ts` exatamente com os tipos de data-model.md "Front-end", e `ErroApi` em `frontend/src/api/cliente.ts`
-- [ ] T013 Implementar `requisitar<T>(caminho: string, opcoes?: RequestInit): Promise<T>` em `frontend/src/api/cliente.ts`:
+- [X] T011 Reescrever `src/main/java/med/voll/api/infra/HomeController.java` para mapear `GET /`, `/inativos`, `/cadastro` e `/editar/{id:\\d+}` para `"forward:/index.html"` (research.md R2), mantendo o `@Hidden`. O T007 deve passar, e o `./mvnw test` completo também
+- [X] T012 [P] Criar `frontend/src/api/tipos.ts` exatamente com os tipos de data-model.md "Front-end", e `ErroApi` em `frontend/src/api/cliente.ts`
+- [X] T013 Implementar `requisitar<T>(caminho: string, opcoes?: RequestInit): Promise<T>` em `frontend/src/api/cliente.ts`:
   - envia `Accept: application/json`, e `Content-Type: application/json` quando houver corpo;
   - lê o corpo só quando houver conteúdo.
   - O T008 deve passar.
-- [ ] T014 [P] Criar `frontend/src/dominio/constantes.ts` com:
+- [X] T014 [P] Criar `frontend/src/dominio/constantes.ts` com:
   - `ESPECIALIDADES`, uma lista de `{valor: Especialidade, rotulo}` para data-model.md `Especialidade` (rótulos "Ortopedia", "Cardiologia", "Ginecologia", "Dermatologia");
   - `UFS` com as 27 siglas.
-- [ ] T015 Criar `frontend/src/main.tsx` e `frontend/src/App.tsx`:
+- [X] T015 Criar `frontend/src/main.tsx` e `frontend/src/App.tsx`:
   - `BrowserRouter` com as rotas `/`, `/inativos`, `/cadastro`, `/editar/:id` e um fallback "Página não encontrada";
   - as rotas ainda vazias renderizam placeholders;
   - layout com `<main>` e importação dos estilos.

@@ -1,3 +1,31 @@
+import { Link, Route, Routes } from 'react-router'
+import Cabecalho from './components/Cabecalho'
+
 export default function App() {
-  return <main className="pagina">Voll.med</main>
+  return (
+    <>
+      <Cabecalho />
+      <main className="pagina">
+        <Routes>
+          <Route path="/" element={<p>Médicos ativos</p>} />
+          <Route path="/inativos" element={<p>Médicos inativos</p>} />
+          <Route path="/cadastro" element={<p>Cadastro</p>} />
+          <Route path="/editar/:id" element={<p>Edição</p>} />
+          <Route path="*" element={<PaginaNaoEncontrada />} />
+        </Routes>
+      </main>
+    </>
+  )
+}
+
+function PaginaNaoEncontrada() {
+  return (
+    <div className="estado">
+      <h1 className="estado__titulo">Página não encontrada</h1>
+      <p className="estado__texto">O endereço digitado não existe no sistema.</p>
+      <Link to="/" className="botao botao--primario">
+        Ver médicos ativos
+      </Link>
+    </div>
+  )
 }

@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
 
-    @GetMapping("/")
+    // As rotas de tela são resolvidas pelo React Router no navegador. Sem este forward,
+    // um F5 ou link direto em /cadastro chegaria ao Spring e daria 404
+    @GetMapping({"/", "/inativos", "/cadastro", "/editar/{id:\\d+}"})
     public String home() {
-        return "redirect:/swagger-ui/index.html";
+        return "forward:/index.html";
     }
 }

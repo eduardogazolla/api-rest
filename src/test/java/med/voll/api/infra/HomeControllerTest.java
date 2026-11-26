@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class HomeControllerTest {
 
     @Test
-    @DisplayName("Deve redirecionar a página inicial para o Swagger UI")
-    void deveRedirecionarParaSwagger() {
-        assertEquals("redirect:/swagger-ui/index.html", new HomeController().home());
+    @DisplayName("Deve encaminhar as rotas de tela para o index.html do front-end")
+    void deveEncaminharParaIndexDoFrontEnd() {
+        assertEquals("forward:/index.html", new HomeController().home());
     }
 }

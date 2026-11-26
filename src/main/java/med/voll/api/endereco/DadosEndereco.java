@@ -6,20 +6,20 @@ import jakarta.validation.constraints.Pattern;
 
 public record DadosEndereco(
 		@Schema(example = "Rua das Flores")
-		@NotBlank
+		@NotBlank(message = "é obrigatório")
 		String logradouro,
 		@Schema(example = "Centro")
-		@NotBlank
+		@NotBlank(message = "é obrigatório")
 		String bairro,
 		@Schema(description = "8 dígitos, sem traço", example = "87000000")
-		@NotBlank
-		@Pattern(regexp = "\\d{8}")
+		@NotBlank(message = "é obrigatório")
+		@Pattern(regexp = "\\d{8}", message = "deve ter 8 dígitos, sem traço")
 		String cep,
 		@Schema(example = "Maringá")
-		@NotBlank
+		@NotBlank(message = "é obrigatório")
 		String cidade,
 		@Schema(example = "PR")
-		@NotBlank
+		@NotBlank(message = "é obrigatório")
 		String uf,
 		@Schema(example = "Sala 10")
 		String complemento,

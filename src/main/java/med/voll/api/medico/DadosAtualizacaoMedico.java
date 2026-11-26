@@ -7,7 +7,7 @@ import med.voll.api.endereco.DadosEndereco;
 
 public record DadosAtualizacaoMedico(
         @Schema(description = "ID do médico a atualizar", example = "1")
-        @NotNull
+        @NotNull(message = "é obrigatório")
         Long id,
         @Schema(description = "Novo nome. Ausente ou null: não altera. Em branco: recusado", example = "Ana Lima")
         @Pattern(regexp = ".*\\S.*", message = "não pode ficar em branco")
