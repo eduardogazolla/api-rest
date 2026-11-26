@@ -41,16 +41,20 @@ public class TratadorDeErros {
         return ResponseEntity.badRequest().body(List.of(new DadosErroCampo(campo, mensagem)));
     }
 
-    // Junta o caminho do Jackson no mesmo formato dos erros de validação, ex.: "endereco.cep"
+    // Junta o caminho do Jackson no mesmo formato dos erros de validação, ex.: "endereco.cep".
+    // Percorre as causas porque a mais profunda nem sempre é do Jackson: numa data inválida
+    // ela é a DateTimeParseException, e o caminho fica na exceção do Jackson logo acima
     private String campoDoErroDeLeitura(HttpMessageNotReadableException excecao) {
-        if (!(excecao.getMostSpecificCause() instanceof JacksonException jackson) || jackson.getPath().isEmpty()) {
-            return null;
+        for (Throwable causa = excecao.getCause(); causa != null; causa = causa.getCause()) {
+            if (causa instanceof JacksonException jackson && !jackson.getPath().isEmpty()) {
+                var caminho = jackson.getPath().stream()
+                        .map(JacksonException.Reference::getPropertyName)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.joining("."));
+                return caminho.isEmpty() ? null : caminho;
+            }
         }
-        var caminho = jackson.getPath().stream()
-                .map(JacksonException.Reference::getPropertyName)
-                .filter(Objects::nonNull)
-                .collect(Collectors.joining("."));
-        return caminho.isEmpty() ? null : caminho;
+        return null;
     }
 
     @ExceptionHandler(CadastroDuplicadoException.class)

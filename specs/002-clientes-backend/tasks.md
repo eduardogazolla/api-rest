@@ -62,20 +62,20 @@ Os testes MockMvc compartilham o H2: cada teste usa CPF e e-mail próprios, todo
 
 ### Tests for User Story 1
 
-- [ ] T008 [P] [US1] Criar `src/test/java/med/voll/api/cliente/DadosCadastroClienteTest.java` (com `Validator`):
+- [X] T008 [P] [US1] Criar `src/test/java/med/voll/api/cliente/DadosCadastroClienteTest.java` (com `Validator`):
   - `deveAceitarCadastroValido`;
   - `deveRecusarCpfComDezDigitos`;
   - `deveRecusarCpfComPontuacao`, que espera "deve ter 11 dígitos, sem pontuação";
   - `deveRecusarCpfComDigitoVerificadorInvalido`, com o CPF `52998224724`, que espera "CPF inválido";
   - `deveRecusarDataDeNascimentoNoFuturo` e `deveRecusarDataDeNascimentoHoje`;
   - `deveRecusarNomeComMaisDeCemCaracteres`.
-- [ ] T009 [P] [US1] Criar `src/test/java/med/voll/api/cliente/ClienteTest.java` com `deveCriarClienteAtivoAoCadastrar`, `deveInativarClienteAoExcluir` e `deveReativarClienteInativo`
-- [ ] T010 [P] [US1] Criar `src/test/java/med/voll/api/cliente/ClienteServiceTest.java` (Mockito):
+- [X] T009 [P] [US1] Criar `src/test/java/med/voll/api/cliente/ClienteTest.java` com `deveCriarClienteAtivoAoCadastrar`, `deveInativarClienteAoExcluir` e `deveReativarClienteInativo`
+- [X] T010 [P] [US1] Criar `src/test/java/med/voll/api/cliente/ClienteServiceTest.java` (Mockito):
   - `deveLancarCadastroDuplicadoQuandoCpfJaExistir` (`campo == "cpf"`, `save` nunca chamado);
   - `deveLancarCadastroDuplicadoQuandoEmailJaExistir`;
   - `deveChecarCpfAntesDoEmailQuandoAmbosExistirem`;
   - `deveSalvarClienteAtivoQuandoCpfEEmailForemIneditos`.
-- [ ] T011 [P] [US1] Criar `src/test/java/med/voll/api/cliente/ClienteControllerCadastroTest.java` (MockMvc e H2):
+- [X] T011 [P] [US1] Criar `src/test/java/med/voll/api/cliente/ClienteControllerCadastroTest.java` (MockMvc e H2):
   - `deveRetornar200QuandoCadastroForValido`;
   - `deveRetornar400ComCampoCpfQuandoCpfForInvalido`;
   - `deveRetornar400ComCampoDataNascimentoQuandoDataForIlegivel` (`"31/02/1990"`);
@@ -85,11 +85,11 @@ Os testes MockMvc compartilham o H2: cada teste usa CPF e e-mail próprios, todo
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Criar `src/main/java/med/voll/api/cliente/DadosCadastroCliente.java` com as regras de data-model.md `DadosCadastroCliente.nome`, `.email`, `.telefone`, `.cpf`, `.dataNascimento` e `.endereco`, e `@Schema` com exemplos. O T008 deve passar
-- [ ] T013 [US1] Criar `src/main/java/med/voll/api/cliente/Cliente.java` (entidade `clientes`, `@Embedded Endereco`, construtor a partir do cadastro, `excluir()` e `ativar()`), conforme data-model.md `Cliente`. O T009 deve passar
-- [ ] T014 [US1] Criar `src/main/java/med/voll/api/cliente/ClienteRepository.java` com `existsByCpf` e `existsByEmail` (data-model.md `ClienteRepository`)
-- [ ] T015 [US1] Criar `src/main/java/med/voll/api/cliente/ClienteService.java` com `cadastrar` e `validarDuplicidade` (research.md R6). As mensagens são as de contracts/api-clientes.md. O T010 deve passar
-- [ ] T016 [US1] Criar `src/main/java/med/voll/api/cliente/ClienteController.java` (`@RequestMapping("clientes")`, `@Tag(name = "Clientes")`) com `POST`, documentando 200, 400 e 409 como em `MedicoController`. O T011 deve passar
+- [X] T012 [US1] Criar `src/main/java/med/voll/api/cliente/DadosCadastroCliente.java` com as regras de data-model.md `DadosCadastroCliente.nome`, `.email`, `.telefone`, `.cpf`, `.dataNascimento` e `.endereco`, e `@Schema` com exemplos. O T008 deve passar
+- [X] T013 [US1] Criar `src/main/java/med/voll/api/cliente/Cliente.java` (entidade `clientes`, `@Embedded Endereco`, construtor a partir do cadastro, `excluir()` e `ativar()`), conforme data-model.md `Cliente`. O T009 deve passar
+- [X] T014 [US1] Criar `src/main/java/med/voll/api/cliente/ClienteRepository.java` com `existsByCpf` e `existsByEmail` (data-model.md `ClienteRepository`)
+- [X] T015 [US1] Criar `src/main/java/med/voll/api/cliente/ClienteService.java` com `cadastrar` e `validarDuplicidade` (research.md R6). As mensagens são as de contracts/api-clientes.md. O T010 deve passar
+- [X] T016 [US1] Criar `src/main/java/med/voll/api/cliente/ClienteController.java` (`@RequestMapping("clientes")`, `@Tag(name = "Clientes")`) com `POST`, documentando 200, 400 e 409 como em `MedicoController`. O T011 deve passar
 
 **Checkpoint**: cadastro de cliente funcionando de ponta a ponta.
 
