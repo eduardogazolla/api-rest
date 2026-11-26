@@ -8,6 +8,8 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
     Page<Cliente> findAllByAtivoTrue(Pageable paginacao);
 
+    Page<Cliente> findAllByAtivoFalse(Pageable paginacao);
+
     boolean existsByCpf(String cpf);
 
     boolean existsByEmail(String email);

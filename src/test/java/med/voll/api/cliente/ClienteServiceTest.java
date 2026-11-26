@@ -145,6 +145,59 @@ class ClienteServiceTest {
     }
 
     @Test
+    @DisplayName("Deve inativar o cliente ao excluir")
+    void deveInativarClienteAoExcluir() {
+        var cliente = new Cliente(ClientesDeTeste.cadastroValido());
+        when(repository.findById(1L)).thenReturn(Optional.of(cliente));
+
+        service.excluir(1L);
+
+        assertFalse(cliente.getAtivo());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao excluir cliente inexistente")
+    void deveLancarExcecaoAoExcluirClienteInexistente() {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> service.excluir(999L));
+    }
+
+    @Test
+    @DisplayName("Deve reativar um cliente inativo")
+    void deveReativarClienteInativo() {
+        var cliente = new Cliente(ClientesDeTeste.cadastroValido());
+        cliente.excluir();
+        when(repository.findById(1L)).thenReturn(Optional.of(cliente));
+
+        service.ativar(1L);
+
+        assertTrue(cliente.getAtivo());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao ativar cliente inexistente")
+    void deveLancarExcecaoAoAtivarClienteInexistente() {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> service.ativar(999L));
+    }
+
+    @Test
+    @DisplayName("Deve listar somente os inativos, sem consultar os ativos")
+    void deveListarSomenteInativosQuandoListarInativos() {
+        var cliente = new Cliente(ClientesDeTeste.cadastroValido());
+        cliente.excluir();
+        Pageable paginacao = PageRequest.of(0, 10);
+        when(repository.findAllByAtivoFalse(paginacao)).thenReturn(new PageImpl<>(List.of(cliente)));
+
+        var resultado = service.listarInativos(paginacao);
+
+        assertEquals(cliente.getCpf(), resultado.getContent().get(0).cpf());
+        verify(repository, never()).findAllByAtivoTrue(any());
+    }
+
+    @Test
     @DisplayName("Deve salvar um cliente ativo quando CPF e e-mail forem inéditos")
     void deveSalvarClienteAtivoQuandoCpfEEmailForemIneditos() {
         var dados = ClientesDeTeste.cadastroValido();

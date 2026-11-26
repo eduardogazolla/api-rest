@@ -13,7 +13,9 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -56,6 +58,17 @@ public class ClienteController {
 		return service.listar(paginacao);
 	}
 
+	@GetMapping("/inativos")
+	@Operation(summary = "Listar clientes inativos",
+			description = "Lista paginada só com os clientes excluídos (inativos), que podem ser reativados. "
+					+ "Mesmos parâmetros de paginação e ordenação de GET /clientes.")
+	@ApiResponse(responseCode = "200", description = "Página de clientes inativos")
+	@ApiResponse(responseCode = "400", description = "Parâmetro sort inválido: propriedade inexistente ou em formato errado",
+			content = @Content(schema = @Schema(implementation = TratadorDeErros.DadosErro.class)))
+	public Page<DadosListagemCliente> listarInativos(@ParameterObject @PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao) {
+		return service.listarInativos(paginacao);
+	}
+
 	@GetMapping("/{id}")
 	@Operation(summary = "Detalhar cliente",
 			description = "Todos os dados do cliente, inclusive telefone, data de nascimento, endereço e situação. Também encontra clientes inativos.")
@@ -76,5 +89,21 @@ public class ClienteController {
 	@ApiResponse(responseCode = "404", description = "Cliente não encontrado", content = @Content)
 	public void atualizar(@RequestBody @Valid DadosAtualizacaoCliente dados) {
 		service.atualizar(dados);
+	}
+
+	@PatchMapping("/{id}/ativar")
+	@Operation(summary = "Reativar cliente", description = "Volta a marcar como ativo um cliente excluído. Ele reaparece na listagem.")
+	@ApiResponse(responseCode = "200", description = "Cliente reativado")
+	@ApiResponse(responseCode = "404", description = "Cliente não encontrado", content = @Content)
+	public void ativar(@Parameter(description = "ID do cliente", example = "1") @PathVariable Long id) {
+		service.ativar(id);
+	}
+
+	@DeleteMapping("/{id}")
+	@Operation(summary = "Excluir cliente", description = "Exclusão lógica: o registro continua no banco, marcado como inativo, e some da listagem.")
+	@ApiResponse(responseCode = "200", description = "Cliente excluído (inativado)")
+	@ApiResponse(responseCode = "404", description = "Cliente não encontrado", content = @Content)
+	public void excluir(@Parameter(description = "ID do cliente", example = "1") @PathVariable Long id) {
+		service.excluir(id);
 	}
 }

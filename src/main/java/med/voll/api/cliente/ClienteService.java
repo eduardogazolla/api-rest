@@ -26,6 +26,10 @@ public class ClienteService {
         return repository.findAllByAtivoTrue(paginacao).map(DadosListagemCliente::new);
     }
 
+    public Page<DadosListagemCliente> listarInativos(Pageable paginacao) {
+        return repository.findAllByAtivoFalse(paginacao).map(DadosListagemCliente::new);
+    }
+
     public DadosDetalhamentoCliente detalhar(Long id) {
         return new DadosDetalhamentoCliente(buscarClientePorId(id));
     }
@@ -33,6 +37,16 @@ public class ClienteService {
     @Transactional
     public void atualizar(DadosAtualizacaoCliente dados) {
         buscarClientePorId(dados.id()).atualizarInformacoes(dados);
+    }
+
+    @Transactional
+    public void excluir(Long id) {
+        buscarClientePorId(id).excluir();
+    }
+
+    @Transactional
+    public void ativar(Long id) {
+        buscarClientePorId(id).ativar();
     }
 
     private Cliente buscarClientePorId(Long id) {

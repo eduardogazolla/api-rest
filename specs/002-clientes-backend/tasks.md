@@ -154,19 +154,19 @@ Os testes MockMvc compartilham o H2: cada teste usa CPF e e-mail próprios, todo
 
 **Independent Test**: o cenário 7 do quickstart.md.
 
-- [ ] T028 [P] [US5] Em `ClienteServiceTest.java`, adicionar:
+- [X] T028 [P] [US5] Em `ClienteServiceTest.java`, adicionar:
   - `deveInativarClienteAoExcluir`;
   - `deveLancarExcecaoAoExcluirClienteInexistente`;
   - `deveReativarClienteInativo`;
   - `deveLancarExcecaoAoAtivarClienteInexistente`;
   - `deveListarSomenteInativosQuandoListarInativos`.
-- [ ] T029 [P] [US5] Criar `src/test/java/med/voll/api/cliente/ClienteControllerInativosTest.java`:
+- [X] T029 [P] [US5] Criar `src/test/java/med/voll/api/cliente/ClienteControllerInativosTest.java`:
   - `deveMoverParaInativosQuandoExcluir`;
   - `deveVoltarParaAtivosQuandoReativar`;
   - `deveRetornar404QuandoExcluirOuReativarInexistente`;
   - `naoDeveConfundirInativosComIdQuandoChamarRotaLiteral`;
   - `deveRetornar400QuandoSortDeInativosForInvalido`.
-- [ ] T030 [US5] Implementar `findAllByAtivoFalse`, `ClienteService.excluir`, `ativar` e `listarInativos`, e no controller `@DeleteMapping("/{id}")`, `@PatchMapping("/{id}/ativar")` e `@GetMapping("/inativos")`, cada um com `@Operation` e `@ApiResponse`. T028 e T029 devem passar
+- [X] T030 [US5] Implementar `findAllByAtivoFalse`, `ClienteService.excluir`, `ativar` e `listarInativos`, e no controller `@DeleteMapping("/{id}")`, `@PatchMapping("/{id}/ativar")` e `@GetMapping("/inativos")`, cada um com `@Operation` e `@ApiResponse`. T028 e T029 devem passar
 
 **Checkpoint**: as 7 operações de clientes funcionando (SC-001).
 
