@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
-import { Link, useLocation, useSearchParams } from 'react-router'
+import { useCallback, useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router'
 import { ErroApi } from '../api/cliente'
 import { listarAtivos } from '../api/medicos'
 import type { MedicoListagem, Pagina } from '../api/tipos'
+import Aviso from '../components/Aviso'
 import Paginacao from '../components/Paginacao'
 import TabelaMedicos from '../components/TabelaMedicos'
 
@@ -13,8 +14,16 @@ interface Props {
 const SORT_PADRAO = 'nome,asc'
 
 export default function ListaMedicos({ modo }: Props) {
-  const { pathname } = useLocation()
+  const { pathname, search, state } = useLocation()
+  const navigate = useNavigate()
   const [parametros, setParametros] = useSearchParams()
+  const [aviso, setAviso] = useState<string | null>((state as { aviso?: string } | null)?.aviso ?? null)
+  const fecharAviso = useCallback(() => setAviso(null), [])
+
+  // O aviso chega uma vez pela navegação; limpamos o state para ele não reaparecer num F5
+  useEffect(() => {
+    if ((state as { aviso?: string } | null)?.aviso) navigate(pathname + search, { replace: true, state: null })
+  }, [state, pathname, search, navigate])
   const page = Number(parametros.get('page') ?? 0)
   const sort = parametros.get('sort') ?? SORT_PADRAO
 
@@ -121,6 +130,8 @@ export default function ListaMedicos({ modo }: Props) {
           )}
         </>
       )}
+
+      {aviso && <Aviso mensagem={aviso} onFechar={fecharAviso} />}
     </>
   )
 }

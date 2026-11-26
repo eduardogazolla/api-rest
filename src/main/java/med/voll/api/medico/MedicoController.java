@@ -2,6 +2,7 @@ package med.voll.api.medico;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,7 +29,11 @@ public class MedicoController {
 	@PostMapping
 	@Operation(summary = "Cadastrar médico", description = "Cadastra um novo médico. Todo médico cadastrado nasce ativo.")
 	@ApiResponse(responseCode = "200", description = "Médico cadastrado")
-	@ApiResponse(responseCode = "400", description = "Dados inválidos: campo obrigatório vazio, e-mail inválido, CRM fora do padrão (4 a 6 dígitos) ou CEP fora do padrão (8 dígitos)")
+	@ApiResponse(responseCode = "400", description = "Dados inválidos: campo obrigatório vazio, e-mail inválido, CRM fora do padrão (4 a 6 dígitos) ou CEP fora do padrão (8 dígitos). "
+			+ "Corpo: lista de {campo, mensagem}",
+			content = @Content(array = @ArraySchema(schema = @Schema(implementation = TratadorDeErros.DadosErroCampo.class))))
+	@ApiResponse(responseCode = "409", description = "CRM ou e-mail já usado por outro médico, mesmo inativo. Corpo: lista de {campo, mensagem}",
+			content = @Content(array = @ArraySchema(schema = @Schema(implementation = TratadorDeErros.DadosErroCampo.class))))
 	public void cadastrar(@RequestBody @Valid DadosCadastroMedico dados) {
 		service.cadastrar(dados);
 	}

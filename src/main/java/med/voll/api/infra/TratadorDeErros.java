@@ -1,7 +1,10 @@
 package med.voll.api.infra;
 
 import jakarta.persistence.EntityNotFoundException;
+import med.voll.api.medico.CadastroDuplicadoException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.http.HttpStatus;
 import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -23,6 +26,20 @@ public class TratadorDeErros {
     public ResponseEntity<List<DadosErroCampo>> tratarErroDeValidacao(MethodArgumentNotValidException excecao) {
         var erros = excecao.getFieldErrors().stream().map(DadosErroCampo::new).toList();
         return ResponseEntity.badRequest().body(erros);
+    }
+
+    @ExceptionHandler(CadastroDuplicadoException.class)
+    public ResponseEntity<List<DadosErroCampo>> tratarCadastroDuplicado(CadastroDuplicadoException excecao) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(List.of(new DadosErroCampo(excecao.getCampo(), excecao.getMessage())));
+    }
+
+    // Rede de segurança: dois cadastros simultâneos podem passar pela checagem do Service
+    // e só esbarrar na constraint unique do banco
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<List<DadosErroCampo>> tratarViolacaoDeIntegridade(DataIntegrityViolationException excecao) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(List.of(new DadosErroCampo(null, "Já existe um médico com estes dados.")));
     }
 
     @ExceptionHandler({PropertyReferenceException.class, InvalidDataAccessApiUsageException.class})

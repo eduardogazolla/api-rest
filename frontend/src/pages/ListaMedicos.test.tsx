@@ -8,7 +8,7 @@ import ListaMedicos from './ListaMedicos'
 
 function UrlAtual() {
   const local = useLocation()
-  return <output data-testid="url">{local.pathname + local.search}</output>
+  return <span data-testid="url">{local.pathname + local.search}</span>
 }
 
 function renderizar(url = '/', modo: 'ativos' | 'inativos' = 'ativos', state?: unknown) {
@@ -80,6 +80,13 @@ describe('ListaMedicos (ativos)', () => {
 
     expect(await screen.findByText('Não foi possível falar com o servidor. Tente novamente.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Tentar de novo' })).toBeInTheDocument()
+  })
+
+  it('deveMostrarAvisoRecebidoNaNavegacao', async () => {
+    simularFetch(() => json(pagina([ana])))
+    renderizar('/', 'ativos', { aviso: 'Médico cadastrado' })
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Médico cadastrado')
   })
 
   it('deveMostrarSessaoExpiradaQuandoErroForSessao', async () => {

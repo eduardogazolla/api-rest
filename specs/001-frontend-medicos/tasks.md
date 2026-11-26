@@ -165,46 +165,46 @@ erro local. CRM repetido dá erro 409 embaixo do campo (spec US2).
 
 ### Tests for User Story 2
 
-- [ ] T024 [P] [US2] Em `src/test/java/med/voll/api/medico/MedicoServiceTest.java`, adicionar:
+- [X] T024 [P] [US2] Em `src/test/java/med/voll/api/medico/MedicoServiceTest.java`, adicionar:
   - `deveLancarCadastroDuplicadoQuandoCrmJaExistir`, que verifica `campo == "crm"` e `save` nunca chamado;
   - `deveLancarCadastroDuplicadoQuandoEmailJaExistir`, com `campo == "email"`;
   - `deveChecarCrmAntesDoEmailQuandoAmbosExistirem`;
   - `deveSalvarQuandoCrmEEmailForemInéditos`.
   - Confirmar que FALHA.
-- [ ] T025 [P] [US2] Criar `src/test/java/med/voll/api/medico/MedicoControllerDuplicidadeTest.java` (MockMvc e H2) com:
+- [X] T025 [P] [US2] Criar `src/test/java/med/voll/api/medico/MedicoControllerDuplicidadeTest.java` (MockMvc e H2) com:
   - `deveRetornar409ComCampoCrmQuandoCadastrarCrmRepetido`: cadastra, cadastra de novo com outro e-mail, e espera `$[0].campo == "crm"` e a mensagem de research.md R4;
   - `deveRetornar409QuandoCrmPertencerAMedicoInativo`: cadastra, `DELETE`, cadastra de novo, e espera 409.
   - Criar também `src/test/java/med/voll/api/infra/TratadorDeErrosTest.java` com `deveRetornar409SemCampoQuandoHouverViolacaoDeIntegridade`, chamando o handler direto.
-- [ ] T026 [P] [US2] Criar `frontend/src/dominio/validacao.test.ts`, para `validarMedico(dados, "cadastro")`:
+- [X] T026 [P] [US2] Criar `frontend/src/dominio/validacao.test.ts`, para `validarMedico(dados, "cadastro")`:
   - `deveExigirTodosOsObrigatoriosQuandoCadastroVazio`, com os campos obrigatórios de data-model.md "Regras de validação no navegador";
   - `deveRecusarCrmForaDoPadrao` (`"12"` e `"1234567"`);
   - `deveRecusarCepComTraco` (`"87000-000"`);
   - `deveRecusarEmailInvalido`;
   - `deveAceitarCadastroValidoSemNumeroEComplemento`.
-- [ ] T027 [P] [US2] Criar `frontend/src/components/Campo.test.tsx` com `deveLigarErroAoInputPorAriaDescribedby` e `deveMarcarAriaInvalidQuandoHouverErro`
-- [ ] T028 [US2] Criar `frontend/src/pages/FormularioMedico.test.tsx` (modo `cadastro`) com:
+- [X] T027 [P] [US2] Criar `frontend/src/components/Campo.test.tsx` com `deveLigarErroAoInputPorAriaDescribedby` e `deveMarcarAriaInvalidQuandoHouverErro`
+- [X] T028 [US2] Criar `frontend/src/pages/FormularioMedico.test.tsx` (modo `cadastro`) com:
   - `naoDeveEnviarQuandoValidacaoLocalFalhar`;
   - `deveMostrarErroDoServidorNoCampoCrmEManterDadosQuandoReceber409`;
   - `deveNavegarParaListaComAvisoQuandoCadastrarComSucesso`, com o aviso "Médico cadastrado";
   - `deveDesabilitarSalvarDuranteEnvio`, garantindo que dois cliques geram 1 `fetch`;
   - `deveMostrarErroGeralQuandoConflitoNaoTiverCampo`.
-- [ ] T029 [P] [US2] Em `frontend/src/pages/ListaMedicos.test.tsx`, adicionar `deveMostrarAvisoRecebidoNaNavegacao`, que procura `role="status"` com o texto do aviso
+- [X] T029 [P] [US2] Em `frontend/src/pages/ListaMedicos.test.tsx`, adicionar `deveMostrarAvisoRecebidoNaNavegacao`, que procura `role="status"` com o texto do aviso
 
 ### Implementation for User Story 2
 
-- [ ] T030 [US2] Adicionar `existsByEmail` e `existsByCrm` em `src/main/java/med/voll/api/medico/MedicoRepository.java` (data-model.md `MedicoRepository`). Criar `src/main/java/med/voll/api/medico/CadastroDuplicadoException.java` (data-model.md `CadastroDuplicadoException.campo`). Fazer a checagem em `MedicoService.cadastrar`, conforme research.md R4. O T024 deve passar
-- [ ] T031 [US2] Em `src/main/java/med/voll/api/infra/TratadorDeErros.java`, adicionar os handlers:
+- [X] T030 [US2] Adicionar `existsByEmail` e `existsByCrm` em `src/main/java/med/voll/api/medico/MedicoRepository.java` (data-model.md `MedicoRepository`). Criar `src/main/java/med/voll/api/medico/CadastroDuplicadoException.java` (data-model.md `CadastroDuplicadoException.campo`). Fazer a checagem em `MedicoService.cadastrar`, conforme research.md R4. O T024 deve passar
+- [X] T031 [US2] Em `src/main/java/med/voll/api/infra/TratadorDeErros.java`, adicionar os handlers:
   - `CadastroDuplicadoException`, que responde 409 com `[DadosErroCampo(campo, mensagem)]`;
   - `DataIntegrityViolationException`, que responde 409 com `[DadosErroCampo(null, "Já existe um médico com estes dados.")]`.
   - Documentar o 409 no `@ApiResponse` do `POST` em `MedicoController`. O T025 deve passar.
-- [ ] T032 [P] [US2] Implementar `validarMedico(dados, modo): Record<string, string>` em `frontend/src/dominio/validacao.ts`, usando as regras de data-model.md (`MedicoCadastro.crm`, `.email`, `Endereco.cep`, `Endereco.uf`) e as mesmas mensagens do servidor. O T026 deve passar
-- [ ] T033 [P] [US2] Implementar `frontend/src/components/Campo.tsx`:
+- [X] T032 [P] [US2] Implementar `validarMedico(dados, modo): Record<string, string>` em `frontend/src/dominio/validacao.ts`, usando as regras de data-model.md (`MedicoCadastro.crm`, `.email`, `Endereco.cep`, `Endereco.uf`) e as mesmas mensagens do servidor. O T026 deve passar
+- [X] T033 [P] [US2] Implementar `frontend/src/components/Campo.tsx`:
   - rótulo, input ou select (via `children` ou a prop `tipo`), dica e erro;
   - `id` gerado com `useId`;
   - `aria-describedby` e `aria-invalid`.
   - O T027 deve passar.
-- [ ] T034 [US2] Implementar `cadastrarMedico(dados: MedicoCadastro): Promise<void>` em `frontend/src/api/medicos.ts`, mais um teste em `medicos.test.ts` que verifica o método POST e o corpo JSON
-- [ ] T035 [US2] Implementar `frontend/src/pages/FormularioMedico.tsx` no modo `cadastro`:
+- [X] T034 [US2] Implementar `cadastrarMedico(dados: MedicoCadastro): Promise<void>` em `frontend/src/api/medicos.ts`, mais um teste em `medicos.test.ts` que verifica o método POST e o corpo JSON
+- [X] T035 [US2] Implementar `frontend/src/pages/FormularioMedico.tsx` no modo `cadastro`:
   - seções "Dados do médico" e "Endereço";
   - selects de especialidade e UF vindos de `constantes.ts`;
   - validação local antes de enviar;
@@ -212,7 +212,7 @@ erro local. CRM repetido dá erro 409 embaixo do campo (spec US2).
   - botão desabilitado durante o envio;
   - em caso de sucesso, chama `navigate("/", {state: {aviso: "Médico cadastrado"}})`.
   - Ligar a rota `/cadastro`. O T028 deve passar.
-- [ ] T036 [US2] Criar `frontend/src/components/Aviso.tsx` (`role="status"`, some sozinho após 5 s). Fazer a `ListaMedicos` ler `location.state.aviso` uma vez e limpar o `state` com `replace`. O T029 deve passar
+- [X] T036 [US2] Criar `frontend/src/components/Aviso.tsx` (`role="status"`, some sozinho após 5 s). Fazer a `ListaMedicos` ler `location.state.aviso` uma vez e limpar o `state` com `replace`. O T029 deve passar
 
 **Checkpoint**: US1 e US2 completas, que é o MVP de cadastro mais a consulta.
 

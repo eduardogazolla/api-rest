@@ -507,6 +507,7 @@ th[aria-sort] .ordenar {
   .grade > .campo--metade { grid-column: span 3; }
   .grade > .campo--terco { grid-column: span 2; }
   .grade > .campo--dois-tercos { grid-column: span 4; }
+  .grade > .campo--sexto { grid-column: span 1; }
 }
 
 .campo {

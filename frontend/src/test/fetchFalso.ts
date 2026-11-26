@@ -13,7 +13,7 @@ export function vazio(status = 200): Response {
 
 /** Substitui o fetch global; cada chamada é respondida pelo tratador. */
 export function simularFetch(tratador: Tratador) {
-  const fetchFalso = vi.fn((url: string, init: RequestInit = {}) => Promise.resolve(tratador(url, init)))
+  const fetchFalso = vi.fn((url: string, init: RequestInit) => Promise.resolve(tratador(url, init)))
   vi.stubGlobal('fetch', fetchFalso)
   return fetchFalso
 }

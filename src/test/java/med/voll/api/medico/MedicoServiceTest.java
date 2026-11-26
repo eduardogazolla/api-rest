@@ -1,6 +1,7 @@
 package med.voll.api.medico;
 
 import med.voll.api.endereco.DadosEndereco;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -62,6 +63,52 @@ class MedicoServiceTest {
         assertTrue(medicoSalvo.getAtivo());
         assertEquals("Ana Souza", medicoSalvo.getNome());
         assertEquals("ana@voll.med", medicoSalvo.getEmail());
+    }
+
+    @Test
+    @DisplayName("Deve recusar o cadastro quando o CRM já existir, sem salvar")
+    void deveLancarCadastroDuplicadoQuandoCrmJaExistir() {
+        when(repository.existsByCrm("123456")).thenReturn(true);
+
+        var excecao = assertThrows(CadastroDuplicadoException.class,
+                () -> service.cadastrar(cadastroValido()));
+
+        assertEquals("crm", excecao.getCampo());
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve recusar o cadastro quando o e-mail já existir, sem salvar")
+    void deveLancarCadastroDuplicadoQuandoEmailJaExistir() {
+        when(repository.existsByEmail("ana@voll.med")).thenReturn(true);
+
+        var excecao = assertThrows(CadastroDuplicadoException.class,
+                () -> service.cadastrar(cadastroValido()));
+
+        assertEquals("email", excecao.getCampo());
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve apontar o CRM quando CRM e e-mail já existirem")
+    void deveChecarCrmAntesDoEmailQuandoAmbosExistirem() {
+        when(repository.existsByCrm("123456")).thenReturn(true);
+
+        var excecao = assertThrows(CadastroDuplicadoException.class,
+                () -> service.cadastrar(cadastroValido()));
+
+        assertEquals("crm", excecao.getCampo());
+        verify(repository, never()).existsByEmail(any());
+    }
+
+    @Test
+    @DisplayName("Deve salvar quando CRM e e-mail forem inéditos")
+    void deveSalvarQuandoCrmEEmailForemIneditos() {
+        service.cadastrar(cadastroValido());
+
+        verify(repository).existsByCrm("123456");
+        verify(repository).existsByEmail("ana@voll.med");
+        verify(repository).save(any(Medico.class));
     }
 
     @Test
