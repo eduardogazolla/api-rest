@@ -165,8 +165,12 @@ Front em `frontend/src/...`, com os testes ao lado (`*.test.ts(x)`). Back em `sr
     - em 375px não há rolagem horizontal em nenhuma tela;
     - Lighthouse 100 (acessibilidade, boas práticas e SEO) em `/app/clientes` (desktop) e `/app/clientes/cadastro` (mobile);
     - o visual não precisou de ajuste.
-- [ ] T030 Fazer a revisão de código da branch (`/code-review high`) e aplicar o que for procedente
-- [ ] T031 Fazer push e abrir o PR para a `main`, **sem atribuição do Claude**
+- [X] T030 Fazer a revisão de código da branch (`/code-review high`) e aplicar o que for procedente
+  - Revisão (26/11/2026): 3 achados menores, todos corrigidos com teste:
+    - o Backspace logo depois de "." ou "-" no CPF agora apaga o dígito anterior;
+    - um 404 ao salvar o formulário nomeia a entidade ("Cliente não encontrado.");
+    - uma data com ano de 6 dígitos é recusada como futura.
+- [X] T031 Fazer push e abrir o PR para a `main`, **sem atribuição do Claude**
 
 ---
 

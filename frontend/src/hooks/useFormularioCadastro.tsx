@@ -105,7 +105,8 @@ export function useFormularioCadastro<F extends DadosDeFormulario, D>(opcoes: Op
       focarPrimeiroErro(porCampo)
       return
     }
-    setErroGeral(erro.message)
+    // O cliente HTTP é neutro ("Não encontrado."); aqui sabemos de qual entidade se trata
+    setErroGeral(erro.tipo === 'nao-encontrado' ? `${maiuscula(singular)} não encontrado.` : erro.message)
   }
 
   async function salvar() {

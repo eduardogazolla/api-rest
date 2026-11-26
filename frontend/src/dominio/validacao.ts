@@ -118,9 +118,12 @@ export function validarCliente(dados: DadosFormularioCliente, modo: ModoFormular
     else if (!/^\d{11}$/.test(dados.cpf)) erros.cpf = 'deve ter 11 dígitos, sem pontuação'
     else if (!cpfValido(dados.cpf)) erros.cpf = 'CPF inválido'
 
-    // Datas AAAA-MM-DD comparam certo como texto
+    // Datas AAAA-MM-DD comparam certo como texto. O Chrome aceita anos de até 6 dígitos no seletor
+    // ("202512-01-01"), que como texto ficariam "antes" de hoje: ano fora de 4 dígitos é futuro
     if (vazio(dados.dataNascimento)) erros.dataNascimento = OBRIGATORIO
-    else if (dados.dataNascimento >= hojeNoFormatoIso()) erros.dataNascimento = 'deve ser uma data no passado'
+    else if (!/^\d{4}-\d{2}-\d{2}$/.test(dados.dataNascimento) || dados.dataNascimento >= hojeNoFormatoIso()) {
+      erros.dataNascimento = 'deve ser uma data no passado'
+    }
   }
   return erros
 }

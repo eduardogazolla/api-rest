@@ -85,3 +85,11 @@ describe('validarCliente (cadastro)', () => {
     expect(validarCliente(dados, 'edicao')).toEqual({})
   })
 })
+
+describe('validarCliente (ano com mais de 4 dígitos)', () => {
+  it('deveRecusarAnoComSeisDigitosComoDataFutura', () => {
+    // O <input type="date"> do Chrome aceita anos de até 6 dígitos; comparar como texto deixaria passar
+    expect(validarCliente({ ...clienteValido(), dataNascimento: '202512-01-01' }, 'cadastro').dataNascimento)
+      .toBe('deve ser uma data no passado')
+  })
+})

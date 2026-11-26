@@ -186,3 +186,30 @@ describe('FormularioCliente (edição)', () => {
     expect(fetchFalso).not.toHaveBeenCalled()
   })
 })
+
+describe('FormularioCliente (erros ao salvar)', () => {
+  it('deveNomearAEntidadeQuandoSalvarDer404', async () => {
+    simularFetch((_url, init) => (init.method === 'PUT' ? vazio(404) : json(detalhe)))
+    renderizarEdicao()
+    const usuario = userEvent.setup()
+    await usuario.clear(await screen.findByDisplayValue('44999998888'))
+    await usuario.type(screen.getByLabelText('Telefone'), '44911112222')
+
+    await usuario.click(screen.getByRole('button', { name: 'Salvar alterações' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Cliente não encontrado.')
+  })
+
+  it('deveApagarDigitoQuandoBackspaceCairDepoisDoTraco', async () => {
+    simularFetch(() => vazio())
+    renderizarCadastro()
+    const usuario = userEvent.setup()
+    const cpf = screen.getByLabelText('CPF')
+    await usuario.click(cpf)
+    await usuario.paste('52998224725')
+
+    await usuario.type(cpf, '{Backspace}', { initialSelectionStart: 12, initialSelectionEnd: 12 })
+
+    expect(cpf).toHaveValue('529.982.242-5')
+  })
+})

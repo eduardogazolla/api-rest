@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { apenasDigitos, cpfValido, formatarCpf } from './cpf'
+import { apenasDigitos, cpfValido, digitosAposEdicao, formatarCpf } from './cpf'
 
 describe('cpf', () => {
   it('deveFormatarCpfCompleto', () => {
@@ -32,5 +32,20 @@ describe('cpf', () => {
   it('deveRecusarOnzeDigitosIguais', () => {
     // 111.111.111-11 passa no cálculo, mas não é um CPF real; o @CPF do servidor também recusa
     expect(cpfValido('11111111111')).toBe(false)
+  })
+})
+
+describe('digitosAposEdicao', () => {
+  it('deveApagarODigitoAntesDoSeparadorQuandoBackspaceCairNele', () => {
+    // "529.982.247-25" com o cursor depois do "-": o Backspace tira o "-" e o cursor fica na posição 11
+    expect(digitosAposEdicao('52998224725', '529.982.24725', 11)).toBe('5299822425')
+  })
+
+  it('deveManterEdicaoComumQuandoUmDigitoForApagado', () => {
+    expect(digitosAposEdicao('52998224725', '529.982.247-2', 13)).toBe('5299822472')
+  })
+
+  it('deveAceitarColagemENovaDigitacao', () => {
+    expect(digitosAposEdicao('', '529.982.247-25', 14)).toBe('52998224725')
   })
 })

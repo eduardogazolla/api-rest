@@ -28,3 +28,18 @@ export function cpfValido(digitos: string): boolean {
   }
   return digitoVerificador(9) === numeros[9] && digitoVerificador(10) === numeros[10]
 }
+
+/**
+ * Os dígitos depois de uma edição no campo mascarado. Se o Backspace apagou só um separador
+ * ("." ou "-"), os dígitos não mudariam e a máscara voltaria igual, travando o campo; nesse caso
+ * apagamos o dígito que vinha antes do separador, que é o que a pessoa quis.
+ */
+export function digitosAposEdicao(anteriores: string, textoNovo: string, cursor: number | null): string {
+  const novos = apenasDigitos(textoNovo)
+  const apagouSoSeparador = novos === anteriores && textoNovo.length < formatarCpf(anteriores).length
+  if (!apagouSoSeparador || cursor === null) return novos
+
+  const digitosAntesDoCursor = apenasDigitos(textoNovo.slice(0, cursor)).length
+  if (digitosAntesDoCursor === 0) return novos
+  return novos.slice(0, digitosAntesDoCursor - 1) + novos.slice(digitosAntesDoCursor)
+}

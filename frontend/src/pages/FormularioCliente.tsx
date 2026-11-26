@@ -4,7 +4,7 @@ import Campo from '../components/Campo'
 import CamposEndereco from '../components/CamposEndereco'
 import FormularioCadastro from '../components/FormularioCadastro'
 import { calcularAlteracoes } from '../dominio/alteracoes'
-import { apenasDigitos, formatarCpf } from '../dominio/cpf'
+import { digitosAposEdicao, formatarCpf } from '../dominio/cpf'
 import { CLIENTES } from '../dominio/recursos'
 import {
   clienteVazio, hojeNoFormatoIso, validarCliente, type DadosFormularioCliente, type ModoFormulario,
@@ -54,7 +54,9 @@ export default function FormularioCliente({ modo }: { modo: ModoFormulario }) {
                 inputMode="numeric"
                 autoComplete="off"
                 value={formatarCpf(valorDe('cpf'))}
-                onChange={(e) => atualizar('cpf', apenasDigitos(e.target.value))}
+                onChange={(e) =>
+                  atualizar('cpf', digitosAposEdicao(valorDe('cpf'), e.target.value, e.target.selectionStart))
+                }
               />
             )}
           </Campo>
