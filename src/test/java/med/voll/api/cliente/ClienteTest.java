@@ -23,6 +23,14 @@ class ClienteTest {
     }
 
     @Test
+    @DisplayName("Deve guardar o e-mail em minúsculas")
+    void deveNormalizarEmailAoCadastrar() {
+        var cliente = new Cliente(ClientesDeTeste.cadastro(ClientesDeTeste.novoCpf(), "Beatriz.Rocha@Exemplo.COM"));
+
+        assertEquals("beatriz.rocha@exemplo.com", cliente.getEmail());
+    }
+
+    @Test
     @DisplayName("Excluir não apaga, só marca como inativo (exclusão lógica)")
     void deveInativarClienteAoExcluir() {
         var cliente = new Cliente(ClientesDeTeste.cadastroValido());

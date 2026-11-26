@@ -46,6 +46,6 @@ class MedicoControllerOrdenacaoTest {
     void deveExplicarOrdenacaoComCampoGenericoQuandoSortForInvalido() throws Exception {
         mockMvc.perform(get("/medicos").param("sort", "xyz"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.mensagem").value("Parâmetro sort inválido. Use um campo da listagem, por exemplo: nome ou nome,desc"));
+                .andExpect(jsonPath("$.mensagem").value("Parâmetro sort inválido. Use uma propriedade do cadastro, por exemplo: nome ou nome,desc"));
     }
 }

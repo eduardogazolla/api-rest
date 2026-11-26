@@ -8,7 +8,7 @@ Tem os mesmos formatos de `/medicos` (ver `specs/001-frontend-medicos/contracts/
 |---|---|---|
 | 400 | validação | `[{"campo":"cpf","mensagem":"CPF inválido"}]` |
 | 400 | JSON ilegível | `[{"campo":"dataNascimento","mensagem":"formato inválido"}]`, ou `campo: null` quando não dá para identificar |
-| 400 | sort inválido | `{"mensagem":"Parâmetro sort inválido. Use um campo da listagem, por exemplo: nome ou nome,desc"}` |
+| 400 | sort inválido | `{"mensagem":"Parâmetro sort inválido. Use uma propriedade do cadastro, por exemplo: nome ou nome,desc"}` |
 | 404 | id inexistente | vazio |
 | 409 | CPF ou e-mail repetido (mesmo de inativo) | `[{"campo":"cpf","mensagem":"Já existe um cliente com este CPF (ele pode estar inativo)."}]` |
 

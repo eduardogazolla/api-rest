@@ -8,8 +8,6 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -38,10 +36,11 @@ class ClienteControllerInativosTest {
 
         mockMvc.perform(delete("/clientes/" + cliente.getId())).andExpect(status().isOk());
 
-        mockMvc.perform(get("/clientes/inativos").param("size", "200"))
-                .andExpect(jsonPath("$.content[*].cpf", hasItem(cliente.getCpf())));
-        mockMvc.perform(get("/clientes").param("size", "200"))
-                .andExpect(jsonPath("$.content[*].cpf", not(hasItem(cliente.getCpf()))));
+        // Ordenar por id decrescente põe o cliente recém-criado em primeiro, seja qual for o tamanho do banco
+        mockMvc.perform(get("/clientes/inativos").param("sort", "id,desc"))
+                .andExpect(jsonPath("$.content[0].cpf").value(cliente.getCpf()));
+        mockMvc.perform(get("/clientes").param("sort", "id,desc"))
+                .andExpect(jsonPath("$.content[?(@.id == %d)]", cliente.getId()).isEmpty());
         mockMvc.perform(get("/clientes/" + cliente.getId()))
                 .andExpect(jsonPath("$.ativo").value(false));
     }
@@ -54,8 +53,10 @@ class ClienteControllerInativosTest {
 
         mockMvc.perform(patch("/clientes/" + cliente.getId() + "/ativar")).andExpect(status().isOk());
 
-        mockMvc.perform(get("/clientes").param("size", "200"))
-                .andExpect(jsonPath("$.content[*].cpf", hasItem(cliente.getCpf())));
+        mockMvc.perform(get("/clientes").param("sort", "id,desc"))
+                .andExpect(jsonPath("$.content[0].cpf").value(cliente.getCpf()));
+        mockMvc.perform(get("/clientes/" + cliente.getId()))
+                .andExpect(jsonPath("$.ativo").value(true));
     }
 
     @Test

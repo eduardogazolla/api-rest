@@ -59,7 +59,7 @@ public class ClienteService {
         if (repository.existsByCpf(dados.cpf())) {
             throw new CadastroDuplicadoException("cpf", "Já existe um cliente com este CPF (ele pode estar inativo).");
         }
-        if (repository.existsByEmail(dados.email())) {
+        if (repository.existsByEmail(Cliente.normalizarEmail(dados.email()))) {
             throw new CadastroDuplicadoException("email", "Já existe um cliente com este e-mail (ele pode estar inativo).");
         }
     }

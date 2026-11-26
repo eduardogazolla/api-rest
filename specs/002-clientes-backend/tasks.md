@@ -43,7 +43,7 @@ Os testes MockMvc compartilham o H2: cada teste usa CPF e e-mail próprios, todo
 **Purpose**: deixar a infra de erros servindo aos dois domínios (research.md R3, R4 e R5).
 
 - [X] T004 Mover `src/main/java/med/voll/api/medico/CadastroDuplicadoException.java` para `src/main/java/med/voll/api/infra/CadastroDuplicadoException.java` e ajustar os imports de `MedicoService`, `TratadorDeErros` e `MedicoServiceTest`. Todos os testes continuam verdes
-- [X] T005 Em `src/test/java/med/voll/api/infra/TratadorDeErrosTest.java`, mudar o texto esperado para "Já existe um cadastro com estes dados.". Em `src/test/java/med/voll/api/medico/MedicoControllerOrdenacaoTest.java`, adicionar `deveExplicarOrdenacaoComCampoGenericoQuandoSortForInvalido`, com `$.mensagem` igual a "Parâmetro sort inválido. Use um campo da listagem, por exemplo: nome ou nome,desc". Confirmar que FALHA
+- [X] T005 Em `src/test/java/med/voll/api/infra/TratadorDeErrosTest.java`, mudar o texto esperado para "Já existe um cadastro com estes dados.". Em `src/test/java/med/voll/api/medico/MedicoControllerOrdenacaoTest.java`, adicionar `deveExplicarOrdenacaoComCampoGenericoQuandoSortForInvalido`, com `$.mensagem` igual a "Parâmetro sort inválido. Use uma propriedade do cadastro, por exemplo: nome ou nome,desc". Confirmar que FALHA
 - [X] T006 Criar `deveRetornar400ApontandoCampoQuandoJsonTiverValorIlegivel` em `src/test/java/med/voll/api/medico/MedicoControllerValidacaoTest.java`: POST `/medicos` com `"especialidade":"PEDIATRIA"` deve dar 400 com `$[0].campo == "especialidade"` e `$[0].mensagem == "formato inválido"`. Confirmar que FALHA
 - [X] T007 Implementar em `src/main/java/med/voll/api/infra/TratadorDeErros.java`:
   - as mensagens genéricas de research.md R5;
@@ -179,7 +179,16 @@ Os testes MockMvc compartilham o H2: cada teste usa CPF e e-mail próprios, todo
 - [X] T033 Rodar `./mvnw test` (todos verdes) e `cd frontend && npm test` (continua verde). Conferir que não sobrou código morto
 - [X] T034 Rodar o roteiro de quickstart.md contra `vollmed_e2e` (nunca `vollmed_api`) e registrar o resultado
   - Resultado (26/11/2026): a V4 foi aplicada no MySQL real (`vollmed_e2e`) e os 14 de 14 passos do roteiro passaram, inclusive `/medicos` intacto e a tag "Clientes" no Swagger.
-- [ ] T035 Fazer a revisão de código da branch (`/code-review high`) e aplicar o que for procedente
+- [X] T035 Fazer a revisão de código da branch (`/code-review high`) e aplicar o que for procedente
+  - Corrigidos:
+    - e-mail repetido com outra caixa passava no PostgreSQL. Agora é normalizado para minúsculas antes da checagem e do save;
+    - o `@Past` usava o fuso UTC do container. O Dockerfile fixa `America/Sao_Paulo`;
+    - os testes de inativos dependiam do tamanho do banco. Agora usam `sort=id,desc`;
+    - a mensagem de sort e a descrição do Swagger foram atualizadas.
+  - Mantidos e registrados como pendências:
+    - o médico tem a mesma brecha de e-mail com outra caixa, que já existia antes desta branch;
+    - um cadastro inativo ainda pode ser editado no `PUT` (regra igual à do médico, decisão de produto);
+    - na corrida entre dois cadastros simultâneos, o 409 sai com `campo: null` (research.md R4).
 - [ ] T036 Fazer push da `pdi/clientes-backend` e abrir o PR para a `main`, **sem atribuição do Claude**
 
 ---

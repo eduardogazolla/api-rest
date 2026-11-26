@@ -86,6 +86,17 @@ class ClienteControllerCadastroTest {
     }
 
     @Test
+    @DisplayName("Deve retornar 409 quando o e-mail repetir com outra caixa (no PostgreSQL o unique diferencia maiúsculas)")
+    void deveRetornar409QuandoEmailRepetirComOutraCaixa() throws Exception {
+        var email = novoEmail();
+        cadastrar(json(novoCpf(), email, "1990-05-20")).andExpect(status().isOk());
+
+        cadastrar(json(novoCpf(), email.toUpperCase(), "1990-05-20"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$[0].campo").value("email"));
+    }
+
+    @Test
     @DisplayName("Deve retornar 409 quando o CPF pertencer a um cliente inativo")
     void deveRetornar409QuandoCpfPertencerAClienteInativo() throws Exception {
         var inativo = new Cliente(ClientesDeTeste.cadastroValido());

@@ -47,7 +47,7 @@ class ClienteControllerListagemTest {
     void deveRetornar400QuandoSortForInvalido() throws Exception {
         mockMvc.perform(get("/clientes").param("sort", "xyz"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.mensagem").value("Parâmetro sort inválido. Use um campo da listagem, por exemplo: nome ou nome,desc"));
+                .andExpect(jsonPath("$.mensagem").value("Parâmetro sort inválido. Use uma propriedade do cadastro, por exemplo: nome ou nome,desc"));
     }
 
     @Test

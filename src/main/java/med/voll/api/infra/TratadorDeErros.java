@@ -85,7 +85,7 @@ public class TratadorDeErros {
     @ExceptionHandler({PropertyReferenceException.class, InvalidDataAccessApiUsageException.class})
     public ResponseEntity<DadosErro> tratarErroOrdenacao() {
         return ResponseEntity.badRequest()
-                .body(new DadosErro("Parâmetro sort inválido. Use um campo da listagem, por exemplo: nome ou nome,desc"));
+                .body(new DadosErro("Parâmetro sort inválido. Use uma propriedade do cadastro, por exemplo: nome ou nome,desc"));
     }
 
     public record DadosErro(String mensagem) {

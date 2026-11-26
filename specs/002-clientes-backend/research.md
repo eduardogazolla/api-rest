@@ -48,7 +48,7 @@ Cada item segue o formato Decisão / Motivo / Alternativas.
   - violação de unicidade sem campo: "Já existe um médico com estes dados." passa a
     "Já existe um cadastro com estes dados.";
   - sort inválido: "Use uma propriedade do médico, por exemplo: nome ou crm,desc" passa a
-    "Use um campo da listagem, por exemplo: nome ou nome,desc".
+    "Use uma propriedade do cadastro, por exemplo: nome ou nome,desc".
 - **Motivo**: o tratador é um só para os dois domínios. Só o texto muda, e o formato e o status ficam iguais. O
   `TratadorDeErrosTest` e o README são ajustados.
 
