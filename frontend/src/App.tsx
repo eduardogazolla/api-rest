@@ -1,5 +1,6 @@
 import { Link, Route, Routes } from 'react-router'
 import Cabecalho from './components/Cabecalho'
+import ListaMedicos from './pages/ListaMedicos'
 
 export default function App() {
   return (
@@ -7,7 +8,7 @@ export default function App() {
       <Cabecalho />
       <main className="pagina">
         <Routes>
-          <Route path="/" element={<p>Médicos ativos</p>} />
+          <Route path="/" element={<ListaMedicos modo="ativos" />} />
           <Route path="/inativos" element={<p>Médicos inativos</p>} />
           <Route path="/cadastro" element={<p>Cadastro</p>} />
           <Route path="/editar/:id" element={<p>Edição</p>} />

@@ -116,17 +116,17 @@ recarregar: o estado se mantém. Sem médicos, aparece a lista vazia (spec US1).
 
 ### Tests for User Story 1
 
-- [ ] T016 [P] [US1] Criar `frontend/src/api/medicos.test.ts`, com `deveMontarQueryDePaginaEOrdenacaoQuandoListarAtivos`: `listarAtivos({page: 1, sort: "crm,desc"})` chama `/medicos?page=1&size=10&sort=crm%2Cdesc`
-- [ ] T017 [P] [US1] Criar `frontend/src/components/Paginacao.test.tsx` com:
+- [X] T016 [P] [US1] Criar `frontend/src/api/medicos.test.ts`, com `deveMontarQueryDePaginaEOrdenacaoQuandoListarAtivos`: `listarAtivos({page: 1, sort: "crm,desc"})` chama `/medicos?page=1&size=10&sort=crm%2Cdesc`
+- [X] T017 [P] [US1] Criar `frontend/src/components/Paginacao.test.tsx` com:
   - `deveDesabilitarAnteriorQuandoNaPrimeiraPagina`;
   - `deveChamarOnMudarComProximaPaginaQuandoClicarProxima`;
   - `deveMostrarPaginaAtualDeTotal`, que exibe o texto "Página 2 de 3".
-- [ ] T018 [P] [US1] Criar `frontend/src/components/TabelaMedicos.test.tsx` com:
+- [X] T018 [P] [US1] Criar `frontend/src/components/TabelaMedicos.test.tsx` com:
   - `deveRenderizarUmaLinhaPorMedico`;
   - `deveMarcarAriaSortNaColunaOrdenada`;
   - `deveInverterDirecaoQuandoClicarNaColunaJaOrdenada` (`nome,asc` passa a `nome,desc`);
   - `deveRenderizarAcoesRecebidasPorLinha`.
-- [ ] T019 [US1] Criar `frontend/src/pages/ListaMedicos.test.tsx` (modo `ativos`), com `MemoryRouter` e `fetch` simulado:
+- [X] T019 [US1] Criar `frontend/src/pages/ListaMedicos.test.tsx` (modo `ativos`), com `MemoryRouter` e `fetch` simulado:
   - `deveListarMedicosOrdenadosPorNomeQuandoAbrirSemParametros`;
   - `deveAtualizarUrlQuandoOrdenarPorCrm`;
   - `deveMostrarEstadoVazioComAtalhoParaCadastroQuandoNaoHouverMedicos`;
@@ -137,15 +137,15 @@ recarregar: o estado se mantém. Sem médicos, aparece a lista vazia (spec US1).
 
 ### Implementation for User Story 1
 
-- [ ] T020 [US1] Implementar `listarAtivos(params: {page?: number; sort?: string}): Promise<Pagina<MedicoListagem>>` em `frontend/src/api/medicos.ts`. O T016 deve passar
-- [ ] T021 [P] [US1] Implementar `frontend/src/components/Paginacao.tsx`, com as props `{pagina: number; totalPaginas: number; onMudar(p: number): void}`. O T017 deve passar
-- [ ] T022 [P] [US1] Implementar `frontend/src/components/TabelaMedicos.tsx`:
+- [X] T020 [US1] Implementar `listarAtivos(params: {page?: number; sort?: string}): Promise<Pagina<MedicoListagem>>` em `frontend/src/api/medicos.ts`. O T016 deve passar
+- [X] T021 [P] [US1] Implementar `frontend/src/components/Paginacao.tsx`, com as props `{pagina: number; totalPaginas: number; onMudar(p: number): void}`. O T017 deve passar
+- [X] T022 [P] [US1] Implementar `frontend/src/components/TabelaMedicos.tsx`:
   - props `{medicos: MedicoListagem[]; sort: string; onOrdenar(sort: string): void; acoes?(m: MedicoListagem): ReactNode}`;
   - colunas Nome, E-mail, CRM e Especialidade, com o rótulo vindo de `ESPECIALIDADES`;
   - cabeçalhos como `<button>` dentro de `<th aria-sort>`;
   - abaixo de 640px, vira cartões via CSS.
   - O T018 deve passar.
-- [ ] T023 [US1] Implementar `frontend/src/pages/ListaMedicos.tsx`:
+- [X] T023 [US1] Implementar `frontend/src/pages/ListaMedicos.tsx`:
   - prop `modo: "ativos" | "inativos"`, com só `ativos` ligado nesta fase;
   - `page` e `sort` via `useSearchParams`, com padrão `nome,asc`;
   - estados de carregando, vazio, erro e lista;
