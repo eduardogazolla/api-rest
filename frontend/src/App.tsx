@@ -1,6 +1,7 @@
 import { Link, Navigate, Route, Routes } from 'react-router'
 import Cabecalho from './components/Cabecalho'
 import { CLIENTES, MEDICOS } from './dominio/recursos'
+import FormularioCliente from './pages/FormularioCliente'
 import FormularioMedico from './pages/FormularioMedico'
 import ListaCadastros from './pages/ListaCadastros'
 
@@ -25,6 +26,7 @@ export default function App() {
             path="/app/clientes/inativos"
             element={<ListaCadastros key="clientes-inativos" area={CLIENTES} modo="inativos" />}
           />
+          <Route path="/app/clientes/cadastro" element={<FormularioCliente modo="cadastro" />} />
           <Route path="*" element={<PaginaNaoEncontrada />} />
         </Routes>
       </main>

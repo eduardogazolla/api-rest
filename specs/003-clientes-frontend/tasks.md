@@ -111,21 +111,21 @@ Front em `frontend/src/...`, com os testes ao lado (`*.test.ts(x)`). Back em `sr
 
 **Independent Test**: os cenários US3 da spec.
 
-- [ ] T020 [P] [US3] Em `frontend/src/dominio/validacao.test.ts`, adicionar para `validarCliente(dados, "cadastro")`:
+- [X] T020 [P] [US3] Em `frontend/src/dominio/validacao.test.ts`, adicionar para `validarCliente(dados, "cadastro")`:
   - `deveExigirCpfEDataDeNascimento`;
   - `deveRecusarCpfIncompleto`;
   - `deveRecusarCpfComDigitoErrado` ("CPF inválido");
   - `deveRecusarDataDeNascimentoHojeOuFutura`;
   - `deveAceitarClienteValido`.
   - Os campos estão em data-model.md (`DadosFormularioCliente.cpf` e `DadosFormularioCliente.dataNascimento`).
-- [ ] T021 [P] [US3] Criar `frontend/src/pages/FormularioCliente.test.tsx` (modo cadastro):
+- [X] T021 [P] [US3] Criar `frontend/src/pages/FormularioCliente.test.tsx` (modo cadastro):
   - `deveMostrarCpfComMascaraQuandoColar` (colar `529.982.247-25` e ver o mesmo valor);
   - `naoDeveEnviarQuandoCpfForInvalido`;
   - `deveRecusarDataFutura`;
   - `deveMostrarErroDoServidorNoCampoCpfQuandoReceber409`;
   - `deveEnviarSoDigitosDoCpfENavegarComAviso` (corpo com `cpf: "52998224725"`, depois "Cliente cadastrado" em `/app/clientes`);
   - `deveDesabilitarSalvarDuranteEnvio`.
-- [ ] T022 [US3] Implementar `validarCliente` em `dominio/validacao.ts` e `frontend/src/pages/FormularioCliente.tsx`, com "Dados do cliente" (o CPF com máscara e `<input type="date" max={ontem}>`) e `CamposEndereco`. Ligar a rota `/app/clientes/cadastro`. T020 e T021 devem passar
+- [X] T022 [US3] Implementar `validarCliente` em `dominio/validacao.ts` e `frontend/src/pages/FormularioCliente.tsx`, com "Dados do cliente" (o CPF com máscara e `<input type="date" max={ontem}>`) e `CamposEndereco`. Ligar a rota `/app/clientes/cadastro`. T020 e T021 devem passar
 
 ---
 

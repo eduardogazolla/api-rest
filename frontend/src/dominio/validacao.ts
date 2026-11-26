@@ -1,5 +1,6 @@
 import type { Endereco, Especialidade } from '../api/tipos'
 import { UFS } from './constantes'
+import { cpfValido } from './cpf'
 
 export type ModoFormulario = 'cadastro' | 'edicao'
 
@@ -83,6 +84,43 @@ export function validarMedico(dados: DadosFormularioMedico, modo: ModoFormulario
     else if (!/^\d{4,6}$/.test(dados.crm)) erros.crm = 'deve ter de 4 a 6 dígitos'
 
     if (dados.especialidade === '') erros.especialidade = OBRIGATORIO
+  }
+  return erros
+}
+
+export interface DadosFormularioCliente {
+  nome: string
+  email: string
+  telefone: string
+  /** Só os dígitos; a máscara é só de exibição. */
+  cpf: string
+  /** AAAA-MM-DD, como o <input type="date"> entrega; vazio enquanto não escolhida. */
+  dataNascimento: string
+  endereco: EnderecoFormulario
+}
+
+export function clienteVazio(): DadosFormularioCliente {
+  return { nome: '', email: '', telefone: '', cpf: '', dataNascimento: '', endereco: enderecoVazio() }
+}
+
+/** A data de hoje no fuso do navegador, no mesmo formato do <input type="date">. */
+export function hojeNoFormatoIso(): string {
+  const agora = new Date()
+  const doisDigitos = (n: number) => String(n).padStart(2, '0')
+  return `${agora.getFullYear()}-${doisDigitos(agora.getMonth() + 1)}-${doisDigitos(agora.getDate())}`
+}
+
+/** Na edição, e-mail, CPF e data de nascimento estão bloqueados e não são validados. */
+export function validarCliente(dados: DadosFormularioCliente, modo: ModoFormulario): ErrosDoFormulario {
+  const erros = validarDadosComuns(dados, modo)
+  if (modo === 'cadastro') {
+    if (vazio(dados.cpf)) erros.cpf = OBRIGATORIO
+    else if (!/^\d{11}$/.test(dados.cpf)) erros.cpf = 'deve ter 11 dígitos, sem pontuação'
+    else if (!cpfValido(dados.cpf)) erros.cpf = 'CPF inválido'
+
+    // Datas AAAA-MM-DD comparam certo como texto
+    if (vazio(dados.dataNascimento)) erros.dataNascimento = OBRIGATORIO
+    else if (dados.dataNascimento >= hojeNoFormatoIso()) erros.dataNascimento = 'deve ser uma data no passado'
   }
   return erros
 }

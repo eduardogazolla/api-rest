@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { medicoVazio, validarMedico, type DadosFormularioMedico } from './validacao'
+import { clienteVazio, hojeNoFormatoIso, medicoVazio, validarCliente, validarMedico, type DadosFormularioCliente, type DadosFormularioMedico } from './validacao'
 
 function cadastroValido(): DadosFormularioMedico {
   return {
@@ -42,5 +42,46 @@ describe('validarMedico (cadastro)', () => {
 
   it('deveAceitarCadastroValidoSemNumeroEComplemento', () => {
     expect(validarMedico(cadastroValido(), 'cadastro')).toEqual({})
+  })
+})
+
+function clienteValido(): DadosFormularioCliente {
+  return {
+    nome: 'Beatriz Rocha', email: 'beatriz@exemplo.com', telefone: '44999998888', cpf: '52998224725',
+    dataNascimento: '1990-05-20',
+    endereco: { logradouro: 'Av. Brasil', bairro: 'Centro', cep: '87013000', cidade: 'Maringá', uf: 'PR', numero: '', complemento: '' },
+  }
+}
+
+describe('validarCliente (cadastro)', () => {
+  it('deveExigirCpfEDataDeNascimento', () => {
+    const erros = validarCliente(clienteVazio(), 'cadastro')
+    expect(erros.cpf).toBe('é obrigatório')
+    expect(erros.dataNascimento).toBe('é obrigatório')
+    expect(erros.nome).toBe('é obrigatório')
+  })
+
+  it('deveRecusarCpfIncompleto', () => {
+    expect(validarCliente({ ...clienteValido(), cpf: '5299822472' }, 'cadastro').cpf).toBe('deve ter 11 dígitos, sem pontuação')
+  })
+
+  it('deveRecusarCpfComDigitoErrado', () => {
+    expect(validarCliente({ ...clienteValido(), cpf: '52998224724' }, 'cadastro').cpf).toBe('CPF inválido')
+  })
+
+  it('deveRecusarDataDeNascimentoHojeOuFutura', () => {
+    expect(validarCliente({ ...clienteValido(), dataNascimento: hojeNoFormatoIso() }, 'cadastro').dataNascimento)
+      .toBe('deve ser uma data no passado')
+    expect(validarCliente({ ...clienteValido(), dataNascimento: '2999-01-01' }, 'cadastro').dataNascimento)
+      .toBe('deve ser uma data no passado')
+  })
+
+  it('deveAceitarClienteValido', () => {
+    expect(validarCliente(clienteValido(), 'cadastro')).toEqual({})
+  })
+
+  it('naoDeveValidarCamposBloqueadosNaEdicao', () => {
+    const dados = { ...clienteValido(), cpf: '', dataNascimento: '', email: '' }
+    expect(validarCliente(dados, 'edicao')).toEqual({})
   })
 })
