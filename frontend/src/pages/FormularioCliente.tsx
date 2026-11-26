@@ -11,6 +11,8 @@ import {
 } from '../dominio/validacao'
 import { useFormularioCadastro } from '../hooks/useFormularioCadastro'
 
+const BLOQUEADO = 'Não pode ser alterado'
+
 export default function FormularioCliente({ modo }: { modo: ModoFormulario }) {
   const form = useFormularioCadastro<DadosFormularioCliente, ClienteDetalhe>({
     modo,
@@ -24,7 +26,9 @@ export default function FormularioCliente({ modo }: { modo: ModoFormulario }) {
     cadastrar: (dados) => apiClientes.cadastrar(paraCadastro(dados)),
     atualizar: (original, dados) => apiClientes.atualizar(calcularAlteracoes(original, dados)),
   })
-  const { erros, texto, valorDe, atualizar } = form
+  const { edicao, erros, texto, valorDe, atualizar } = form
+  // E-mail, CPF e data de nascimento identificam o cliente: a API não deixa mudar, a tela mostra bloqueado
+  const bloqueado = edicao ? BLOQUEADO : undefined
 
   return (
     <FormularioCadastro form={form}>
@@ -34,18 +38,19 @@ export default function FormularioCliente({ modo }: { modo: ModoFormulario }) {
           <Campo rotulo="Nome" erro={erros.nome}>
             {texto('nome', { autoComplete: 'name', maxLength: 100 })}
           </Campo>
-          <Campo rotulo="E-mail" erro={erros.email} className="campo--metade">
-            {texto('email', { type: 'email', autoComplete: 'email', maxLength: 100 })}
+          <Campo rotulo="E-mail" erro={erros.email} dica={bloqueado} className="campo--metade">
+            {texto('email', { type: 'email', autoComplete: 'email', maxLength: 100, readOnly: edicao })}
           </Campo>
           <Campo rotulo="Telefone" erro={erros.telefone} dica="Com DDD, só números" className="campo--metade">
             {texto('telefone', { type: 'tel', inputMode: 'tel', autoComplete: 'tel', maxLength: 20 })}
           </Campo>
-          <Campo rotulo="CPF" erro={erros.cpf} dica="Pode colar com ou sem pontuação" className="campo--metade">
+          <Campo rotulo="CPF" erro={erros.cpf} dica={bloqueado ?? 'Pode colar com ou sem pontuação'} className="campo--metade">
             {(props) => (
               // O estado guarda só os dígitos; o campo mostra a máscara 000.000.000-00
               <input
                 {...props}
                 name="cpf"
+                readOnly={edicao}
                 inputMode="numeric"
                 autoComplete="off"
                 value={formatarCpf(valorDe('cpf'))}
@@ -53,12 +58,13 @@ export default function FormularioCliente({ modo }: { modo: ModoFormulario }) {
               />
             )}
           </Campo>
-          <Campo rotulo="Data de nascimento" erro={erros.dataNascimento} className="campo--metade">
+          <Campo rotulo="Data de nascimento" erro={erros.dataNascimento} dica={bloqueado} className="campo--metade">
             {(props) => (
               <input
                 {...props}
                 type="date"
                 name="dataNascimento"
+                readOnly={edicao}
                 max={ontem()}
                 value={valorDe('dataNascimento')}
                 onChange={(e) => atualizar('dataNascimento', e.target.value)}

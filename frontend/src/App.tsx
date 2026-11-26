@@ -27,6 +27,7 @@ export default function App() {
             element={<ListaCadastros key="clientes-inativos" area={CLIENTES} modo="inativos" />}
           />
           <Route path="/app/clientes/cadastro" element={<FormularioCliente modo="cadastro" />} />
+          <Route path="/app/clientes/editar/:id" element={<FormularioCliente modo="edicao" />} />
           <Route path="*" element={<PaginaNaoEncontrada />} />
         </Routes>
       </main>

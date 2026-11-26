@@ -131,14 +131,14 @@ Front em `frontend/src/...`, com os testes ao lado (`*.test.ts(x)`). Back em `sr
 
 ## Phase 6: User Story 4 - Editar cliente (P2)
 
-- [ ] T023 [US4] Em `FormularioCliente.test.tsx`, adicionar para o modo edição:
+- [X] T023 [US4] Em `FormularioCliente.test.tsx`, adicionar para o modo edição:
   - `devePreencherComCpfFormatadoEDataDeNascimento`;
   - `deveBloquearEmailCpfENascimentoComExplicacao`;
   - `deveEnviarSoOQueMudouQuandoSalvar` (`{id, telefone}`);
   - `deveMostrarClienteNaoEncontradoQuando404`;
   - `deveMostrarNaoEncontradoSemChamarApiQuandoIdNaoForNumero`.
   - Confirmar que FALHA.
-- [ ] T024 [US4] Completar a edição em `FormularioCliente.tsx` (readOnly/disabled nos três campos, com a dica "Não pode ser alterado"), ligar a rota `/app/clientes/editar/:id` e o botão Editar da área `CLIENTES`. O T023 deve passar
+- [X] T024 [US4] Completar a edição em `FormularioCliente.tsx` (readOnly/disabled nos três campos, com a dica "Não pode ser alterado"), ligar a rota `/app/clientes/editar/:id` e o botão Editar da área `CLIENTES`. O T023 deve passar
 
 ---
 

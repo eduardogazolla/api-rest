@@ -113,3 +113,76 @@ describe('FormularioCliente (cadastro)', () => {
     expect(fetchFalso).toHaveBeenCalledTimes(1)
   })
 })
+
+const detalhe = {
+  id: 11, nome: 'Beatriz Rocha', email: 'beatriz@exemplo.com', telefone: '44999998888', cpf: '52998224725',
+  dataNascimento: '1990-05-20', ativo: true,
+  endereco: { logradouro: 'Av. Brasil', bairro: 'Centro', cep: '87013000', cidade: 'Maringá', uf: 'PR', numero: '100', complemento: null },
+}
+
+function renderizarEdicao(id: number | string = 11) {
+  return render(
+    <MemoryRouter initialEntries={[`/app/clientes/editar/${id}`]}>
+      <Routes>
+        <Route path="/app/clientes" element={<ListaFalsa />} />
+        <Route path="/app/clientes/editar/:id" element={<FormularioCliente modo="edicao" />} />
+      </Routes>
+    </MemoryRouter>,
+  )
+}
+
+describe('FormularioCliente (edição)', () => {
+  it('devePreencherComCpfFormatadoEDataDeNascimento', async () => {
+    simularFetch(() => json(detalhe))
+    renderizarEdicao()
+
+    expect(await screen.findByRole('heading', { name: 'Editar cliente' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Nome')).toHaveValue('Beatriz Rocha')
+    expect(screen.getByLabelText('CPF')).toHaveValue('529.982.247-25')
+    expect(screen.getByLabelText('Data de nascimento')).toHaveValue('1990-05-20')
+    expect(screen.getByLabelText(/Número/)).toHaveValue('100')
+  })
+
+  it('deveBloquearEmailCpfENascimentoComExplicacao', async () => {
+    simularFetch(() => json(detalhe))
+    renderizarEdicao()
+    await screen.findByDisplayValue('Beatriz Rocha')
+
+    for (const rotulo of ['E-mail', 'CPF', 'Data de nascimento']) {
+      expect(screen.getByLabelText(rotulo)).toHaveAttribute('readonly')
+      expect(screen.getByLabelText(rotulo)).toHaveAccessibleDescription('Não pode ser alterado')
+    }
+  })
+
+  it('deveEnviarSoOQueMudouQuandoSalvar', async () => {
+    const fetchFalso = simularFetch((_url, init) => (init.method === 'PUT' ? vazio() : json(detalhe)))
+    renderizarEdicao()
+    const usuario = userEvent.setup()
+    const telefone = await screen.findByDisplayValue('44999998888')
+
+    await usuario.clear(telefone)
+    await usuario.type(telefone, '44911112222')
+    await usuario.click(screen.getByRole('button', { name: 'Salvar alterações' }))
+
+    expect(await screen.findByText('Lista: Cliente atualizado')).toBeInTheDocument()
+    const put = fetchFalso.mock.calls.find(([, init]) => init.method === 'PUT')!
+    expect(put[0]).toBe('/clientes')
+    expect(JSON.parse(String(put[1].body))).toEqual({ id: 11, telefone: '44911112222' })
+  })
+
+  it('deveMostrarClienteNaoEncontradoQuando404', async () => {
+    simularFetch(() => vazio(404))
+    renderizarEdicao(99999)
+
+    expect(await screen.findByRole('heading', { name: 'Cliente não encontrado' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Ver clientes ativos' })).toHaveAttribute('href', '/app/clientes')
+  })
+
+  it('deveMostrarNaoEncontradoSemChamarApiQuandoIdNaoForNumero', async () => {
+    const fetchFalso = simularFetch(() => json(detalhe))
+    renderizarEdicao('abc')
+
+    expect(await screen.findByRole('heading', { name: 'Cliente não encontrado' })).toBeInTheDocument()
+    expect(fetchFalso).not.toHaveBeenCalled()
+  })
+})
