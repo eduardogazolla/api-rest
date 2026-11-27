@@ -179,6 +179,8 @@ export default function ListaCadastros<L extends { id: number; nome: string }>({
             colunas={area.colunas}
             sort={sort}
             onOrdenar={ordenar}
+            // Com mais de uma página, toda página tem a altura de uma cheia (size vem da API, hoje 10)
+            linhasMinimas={pagina.totalPages > 1 ? pagina.size : 0}
             acoes={(item) =>
               modo === 'ativos' ? (
                 <>

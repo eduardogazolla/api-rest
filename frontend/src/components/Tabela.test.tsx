@@ -34,6 +34,26 @@ describe('Tabela (com as colunas de médico)', () => {
     expect(onOrdenar).toHaveBeenLastCalledWith('email,asc')
   })
 
+  it('deveReservarAlturaDoMinimoDeLinhasSemAlongarATabelaReal', () => {
+    const { container } = render(
+      <Tabela itens={[ana, bruno]} colunas={colunas} sort="nome,asc" onOrdenar={() => {}} linhasMinimas={5} />,
+    )
+    // A tabela real termina na última linha de verdade
+    const real = container.querySelector('table:not([aria-hidden])')!
+    expect(real.querySelectorAll('tbody tr')).toHaveLength(2)
+    // Uma cópia invisível com o mínimo de linhas reserva a altura, fora do alcance de leitores de tela
+    const reserva = container.querySelector('table[aria-hidden="true"]')!
+    expect(reserva.querySelectorAll('tbody tr')).toHaveLength(5)
+    expect(reserva.querySelector('tbody tr')!.children).toHaveLength(colunas.length)
+    expect(screen.getAllByRole('table')).toHaveLength(1)
+    expect(screen.getAllByRole('row').slice(1)).toHaveLength(2)
+  })
+
+  it('naoDeveReservarAlturaQuandoNaoHouverMinimo', () => {
+    const { container } = render(<Tabela itens={[ana]} colunas={colunas} sort="nome,asc" onOrdenar={() => {}} />)
+    expect(container.querySelectorAll('table')).toHaveLength(1)
+  })
+
   it('deveRenderizarAcoesRecebidasPorLinha', () => {
     render(
       <Tabela

@@ -15,9 +15,14 @@ interface Props<T extends { id: number }> {
   sort: string
   onOrdenar(sort: string): void
   acoes?(item: T): ReactNode
+  /**
+   * Reserva a altura deste número de linhas, para o que vem abaixo (a paginação) não mudar de lugar
+   * na última página. A tabela em si termina na última linha de verdade.
+   */
+  linhasMinimas?: number
 }
 
-export default function Tabela<T extends { id: number }>({ itens, colunas, sort, onOrdenar, acoes }: Props<T>) {
+export default function Tabela<T extends { id: number }>({ itens, colunas, sort, onOrdenar, acoes, linhasMinimas = 0 }: Props<T>) {
   const [campoOrdenado, direcao = 'asc'] = sort.split(',')
 
   function ordenarPor(campo: string) {
@@ -25,7 +30,7 @@ export default function Tabela<T extends { id: number }>({ itens, colunas, sort,
     onOrdenar(`${campo},${novaDirecao}`)
   }
 
-  return (
+  const tabela = (
     <table className="tabela">
       <thead>
         <tr>
@@ -70,5 +75,44 @@ export default function Tabela<T extends { id: number }>({ itens, colunas, sort,
         ))}
       </tbody>
     </table>
+  )
+
+  if (itens.length >= linhasMinimas) return tabela
+
+  // Uma cópia invisível com linhas vazias, no mesmo lugar da tabela: a moldura fica com a altura de uma
+  // página cheia, mas o que aparece é a tabela de verdade, terminando normalmente
+  return (
+    <div className="tabela-moldura">
+      {tabela}
+      <table className="tabela tabela--reserva" aria-hidden="true">
+        <thead>
+          <tr>
+            {colunas.map(({ campo, rotulo }) => (
+              <th key={campo}>
+                <span className="ordenar">{rotulo}</span>
+              </th>
+            ))}
+            {acoes && <th />}
+          </tr>
+        </thead>
+        <tbody>
+          {Array.from({ length: linhasMinimas }, (_, i) => (
+            // Mesmas células de uma linha real, com um "botão" nas ações para ter a mesma altura
+            <tr key={i}>
+              {colunas.map((coluna) => (
+                <td key={coluna.campo}>&nbsp;</td>
+              ))}
+              {acoes && (
+                <td className="coluna-acoes">
+                  <div className="acoes">
+                    <span className="botao botao--texto">&nbsp;</span>
+                  </div>
+                </td>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
