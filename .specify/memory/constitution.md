@@ -56,7 +56,7 @@ Por quê: o objetivo é aprender. Uma biblioteca "mágica" esconde justamente o 
 
 - O front-end é compilado e empacotado no mesmo `.jar` da API. A tela e a API ficam na mesma
   origem, sem CORS.
-- As rotas de tela MUST NOT começar com `/medicos`, prefixo reservado à API.
+- As rotas de tela MUST ficar sob `/app`; `/medicos` e `/clientes` são reservados à API.
 - Endpoints existentes MUST NOT mudar de contrato. O que for novo é adicionado ao lado.
 - O Swagger (`/swagger-ui/index.html`) e o health check (`/health`) MUST continuar funcionando.
 
@@ -93,4 +93,4 @@ Por quê: o objetivo é aprender. Uma biblioteca "mágica" esconde justamente o 
   verificar a conformidade.
 - Uma violação só é aceita se estiver justificada na seção de complexidade do plano.
 
-**Version**: 1.0.0 | **Ratified**: 2026-11-26 | **Last Amended**: 2026-11-26
+**Version**: 1.0.1 | **Ratified**: 2026-11-26 | **Last Amended**: 2026-11-26

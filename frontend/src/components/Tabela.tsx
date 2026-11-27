@@ -1,22 +1,23 @@
 import type { ReactNode } from 'react'
-import type { MedicoListagem } from '../api/tipos'
-import { rotuloDaEspecialidade } from '../dominio/constantes'
 
-interface Props {
-  medicos: MedicoListagem[]
-  sort: string
-  onOrdenar(sort: string): void
-  acoes?(medico: MedicoListagem): ReactNode
+export interface Coluna<T> {
+  /** Propriedade enviada no sort da API (ex.: "crm" vira sort=crm,asc). */
+  campo: string
+  rotulo: string
+  celula(item: T): ReactNode
+  /** Classes da célula; coluna-nome e coluna-email ocupam a linha inteira no cartão do celular. */
+  className?: string
 }
 
-const COLUNAS = [
-  { campo: 'nome', rotulo: 'Nome' },
-  { campo: 'email', rotulo: 'E-mail' },
-  { campo: 'crm', rotulo: 'CRM' },
-  { campo: 'especialidade', rotulo: 'Especialidade' },
-]
+interface Props<T extends { id: number }> {
+  itens: T[]
+  colunas: Coluna<T>[]
+  sort: string
+  onOrdenar(sort: string): void
+  acoes?(item: T): ReactNode
+}
 
-export default function TabelaMedicos({ medicos, sort, onOrdenar, acoes }: Props) {
+export default function Tabela<T extends { id: number }>({ itens, colunas, sort, onOrdenar, acoes }: Props<T>) {
   const [campoOrdenado, direcao = 'asc'] = sort.split(',')
 
   function ordenarPor(campo: string) {
@@ -25,10 +26,10 @@ export default function TabelaMedicos({ medicos, sort, onOrdenar, acoes }: Props
   }
 
   return (
-    <table className="tabela-medicos">
+    <table className="tabela">
       <thead>
         <tr>
-          {COLUNAS.map(({ campo, rotulo }) => {
+          {colunas.map(({ campo, rotulo }) => {
             const ordenada = campo === campoOrdenado
             return (
               <th
@@ -53,21 +54,16 @@ export default function TabelaMedicos({ medicos, sort, onOrdenar, acoes }: Props
         </tr>
       </thead>
       <tbody>
-        {medicos.map((medico) => (
-          <tr key={medico.id}>
-            <td className="coluna-nome medico__nome">{medico.nome}</td>
-            <td className="coluna-email medico__email">{medico.email}</td>
-            <td>
-              <span className="carimbo">CRM {medico.crm}</span>
-            </td>
-            <td>
-              <span className="especialidade" data-especialidade={medico.especialidade}>
-                {rotuloDaEspecialidade(medico.especialidade)}
-              </span>
-            </td>
+        {itens.map((item) => (
+          <tr key={item.id}>
+            {colunas.map((coluna) => (
+              <td key={coluna.campo} className={coluna.className}>
+                {coluna.celula(item)}
+              </td>
+            ))}
             {acoes && (
               <td className="coluna-acoes">
-                <div className="acoes">{acoes(medico)}</div>
+                <div className="acoes">{acoes(item)}</div>
               </td>
             )}
           </tr>

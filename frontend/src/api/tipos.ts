@@ -35,7 +35,35 @@ export interface MedicoCadastro {
   endereco: Endereco
 }
 
-export interface MedicoAtualizacao {
+// Espelho de med.voll.api.cliente (DadosListagemCliente, DadosDetalhamentoCliente, DadosCadastroCliente)
+
+export interface ClienteListagem {
+  id: number
+  nome: string
+  email: string
+  /** Só os 11 dígitos; a tela formata. */
+  cpf: string
+}
+
+export interface ClienteDetalhe extends ClienteListagem {
+  telefone: string
+  /** AAAA-MM-DD */
+  dataNascimento: string
+  endereco: Endereco
+  ativo: boolean
+}
+
+export interface ClienteCadastro {
+  nome: string
+  email: string
+  telefone: string
+  cpf: string
+  dataNascimento: string
+  endereco: Endereco
+}
+
+/** Médicos e clientes atualizam os mesmos campos: nome, telefone e endereço (parcial). */
+export interface CadastroAtualizacao {
   id: number
   nome?: string
   telefone?: string

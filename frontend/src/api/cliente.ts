@@ -63,7 +63,7 @@ function criarErro(status: number, corpo: unknown): ErroApi {
         ? new ErroApi('validacao', 'Revise os campos destacados.', campos)
         : new ErroApi('requisicao', mensagemDoCorpo ?? 'Requisição inválida.')
     case 404:
-      return new ErroApi('nao-encontrado', 'Médico não encontrado.')
+      return new ErroApi('nao-encontrado', 'Não encontrado.')
     case 409:
       return new ErroApi('conflito', campos[0]?.mensagem ?? 'Os dados já estão em uso.', campos)
     default:

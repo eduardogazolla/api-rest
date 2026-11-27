@@ -11,6 +11,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/medicos': api,
+      '/clientes': api,
       '/swagger-ui': api,
       '/v3': api,
     },

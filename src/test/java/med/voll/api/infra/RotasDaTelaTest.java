@@ -24,11 +24,18 @@ class RotasDaTelaTest {
     private MockMvc mockMvc;
 
     @ParameterizedTest
-    @ValueSource(strings = {"/", "/inativos", "/cadastro", "/editar/7"})
-    @DisplayName("Deve encaminhar as rotas de tela para o index.html, para F5 e links diretos funcionarem")
+    @ValueSource(strings = {"/", "/app", "/app/medicos", "/app/medicos/inativos", "/app/clientes/cadastro", "/app/clientes/editar/7"})
+    @DisplayName("Deve encaminhar as rotas de tela (/app) para o index.html, para F5 e links diretos funcionarem")
     void deveEncaminharParaIndexQuandoRotaForDeTela(String rota) throws Exception {
         mockMvc.perform(get(rota))
                 .andExpect(forwardedUrl("/index.html"));
+    }
+
+    @Test
+    @DisplayName("Não deve encaminhar os endereços antigos de tela, que saíram com a mudança para /app")
+    void naoDeveEncaminharRotasAntigasDeTela() throws Exception {
+        mockMvc.perform(get("/inativos"))
+                .andExpect(status().isNotFound());
     }
 
     @Test

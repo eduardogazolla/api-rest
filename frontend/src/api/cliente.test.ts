@@ -59,9 +59,12 @@ describe('requisitar', () => {
     expect(erro.campos[0].campo).toBe('crm')
   })
 
-  it('deveLancarNaoEncontradoQuando404', async () => {
+  it('deveLancarNaoEncontradoComMensagemNeutraQuando404', async () => {
     responder(404)
-    expect((await erroDe(requisitar('/medicos/99'))).tipo).toBe('nao-encontrado')
+    const erro = await erroDe(requisitar('/clientes/99'))
+    expect(erro.tipo).toBe('nao-encontrado')
+    // O cliente HTTP serve a médicos e clientes; o nome da entidade é colocado pela tela
+    expect(erro.message).toBe('Não encontrado.')
   })
 
   it('deveLancarRedeQuandoFetchFalhar', async () => {

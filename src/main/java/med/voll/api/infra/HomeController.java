@@ -18,9 +18,9 @@ public class HomeController {
         this.frontEndCompilado = indexDoFrontEnd.exists();
     }
 
-    // As rotas de tela são resolvidas pelo React Router no navegador. Sem este forward,
-    // um F5 ou link direto em /cadastro chegaria ao Spring e daria 404
-    @GetMapping({"/", "/inativos", "/cadastro", "/editar/{id:\\d+}"})
+    // As telas ficam todas sob /app (o resto é API) e são resolvidas pelo React Router no navegador.
+    // Sem este forward, um F5 ou link direto em /app/clientes/cadastro chegaria ao Spring e daria 404
+    @GetMapping({"/", "/app", "/app/**"})
     public String home() {
         return frontEndCompilado ? "forward:/index.html" : "redirect:/swagger-ui/index.html";
     }

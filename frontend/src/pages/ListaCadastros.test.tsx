@@ -3,31 +3,33 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router'
 import { describe, expect, it } from 'vitest'
 import { ErroApi } from '../api/cliente'
-import { ana, bruno, json, pagina, simularFetch, vazio } from '../test/fetchFalso'
-import ListaMedicos from './ListaMedicos'
+import { ana, beatriz, bruno, caio, json, pagina, paginaDeClientes, simularFetch, vazio } from '../test/fetchFalso'
+import { CLIENTES, MEDICOS } from '../dominio/recursos'
+import ListaCadastros from './ListaCadastros'
 
 function UrlAtual() {
   const local = useLocation()
   return <span data-testid="url">{local.pathname + local.search}</span>
 }
 
-function renderizar(url = '/', modo: 'ativos' | 'inativos' = 'ativos', state?: unknown) {
+function renderizar(url = '/app/medicos', modo: 'ativos' | 'inativos' = 'ativos', state?: unknown) {
   return render(
     <MemoryRouter initialEntries={[{ pathname: url.split('?')[0], search: url.includes('?') ? `?${url.split('?')[1]}` : '', state }]}>
       <Routes>
-        <Route path="*" element={<><ListaMedicos modo={modo} /><UrlAtual /></>} />
+        <Route path="*" element={<><ListaCadastros area={MEDICOS} modo={modo} /><UrlAtual /></>} />
       </Routes>
     </MemoryRouter>,
   )
 }
 
-describe('ListaMedicos (ativos)', () => {
+describe('ListaCadastros: médicos ativos', () => {
   it('deveListarMedicosOrdenadosPorNomeQuandoAbrirSemParametros', async () => {
     const fetchFalso = simularFetch(() => json(pagina([ana, bruno])))
     renderizar()
 
     expect(await screen.findByText('Ana Souza')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Médicos ativos' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Médicos' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Ativos' })).toHaveAttribute('aria-current', 'page')
     expect(screen.getByText('2 médicos')).toBeInTheDocument()
     expect(fetchFalso.mock.calls[0][0]).toBe('/medicos?page=0&size=10&sort=nome%2Casc')
   })
@@ -39,7 +41,7 @@ describe('ListaMedicos (ativos)', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /CRM/ }))
 
-    expect(screen.getByTestId('url')).toHaveTextContent('/?sort=crm%2Casc')
+    expect(screen.getByTestId('url')).toHaveTextContent('/app/medicos?sort=crm%2Casc')
     await screen.findByText('Ana Souza')
     expect(fetchFalso.mock.calls.at(-1)?.[0]).toBe('/medicos?page=0&size=10&sort=crm%2Casc')
   })
@@ -49,16 +51,16 @@ describe('ListaMedicos (ativos)', () => {
     renderizar()
 
     expect(await screen.findByText('Nenhum médico ativo')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Cadastrar o primeiro médico' })).toHaveAttribute('href', '/cadastro')
+    expect(screen.getByRole('link', { name: 'Cadastrar o primeiro médico' })).toHaveAttribute('href', '/app/medicos/cadastro')
   })
 
   it('deveMostrarLinkParaPrimeiraPaginaQuandoPaginaPassarDoFim', async () => {
     simularFetch(() => json({ content: [], number: 99, totalPages: 2, totalElements: 15, size: 10 }))
-    renderizar('/?page=99')
+    renderizar('/app/medicos?page=99')
 
     expect(await screen.findByText('Esta página não existe')).toBeInTheDocument()
     await userEvent.click(screen.getByRole('link', { name: 'Ir para a primeira página' }))
-    expect(screen.getByTestId('url')).toHaveTextContent(/^\/$/)
+    expect(screen.getByTestId('url')).toHaveTextContent(/^\/app\/medicos$/)
   })
 
   it('deveMostrarMensagemDaApiEVoltarAoPadraoQuandoSortForInvalido', async () => {
@@ -67,7 +69,7 @@ describe('ListaMedicos (ativos)', () => {
         ? json({ mensagem: 'Parâmetro sort inválido. Use uma propriedade do médico, por exemplo: nome ou crm,desc' }, 400)
         : json(pagina([ana])),
     )
-    renderizar('/?sort=xyz')
+    renderizar('/app/medicos?sort=xyz')
 
     expect(await screen.findByText(/Parâmetro sort inválido/)).toBeInTheDocument()
     await userEvent.click(screen.getByRole('link', { name: 'Voltar à ordenação padrão' }))
@@ -84,7 +86,7 @@ describe('ListaMedicos (ativos)', () => {
 
   it('deveTratarPaginaInvalidaNaUrlComoPrimeiraPagina', async () => {
     const fetchFalso = simularFetch(() => json(pagina([ana], 0, 2)))
-    renderizar('/?page=abc')
+    renderizar('/app/medicos?page=abc')
 
     expect(await screen.findByText('Página 1 de 2')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Anterior' })).toBeDisabled()
@@ -93,7 +95,7 @@ describe('ListaMedicos (ativos)', () => {
 
   it('deveMostrarAvisoRecebidoNaNavegacao', async () => {
     simularFetch(() => json(pagina([ana])))
-    renderizar('/', 'ativos', { aviso: 'Médico cadastrado' })
+    renderizar('/app/medicos', 'ativos', { aviso: 'Médico cadastrado' })
 
     expect(await screen.findByRole('status')).toHaveTextContent('Médico cadastrado')
   })
@@ -106,7 +108,7 @@ describe('ListaMedicos (ativos)', () => {
   })
 })
 
-describe('ListaMedicos (exclusão e reativação)', () => {
+describe('ListaCadastros: exclusão e reativação de médicos', () => {
   it('deveExcluirSomenteAposConfirmacao', async () => {
     const fetchFalso = simularFetch(() => json(pagina([ana, bruno])))
     renderizar()
@@ -144,22 +146,23 @@ describe('ListaMedicos (exclusão e reativação)', () => {
       if (init.method === 'DELETE') return vazio()
       return url.includes('page=1') ? json(pagina([bruno], 1, 2)) : json(pagina([ana], 0, 1))
     })
-    renderizar('/?page=1')
+    renderizar('/app/medicos?page=1')
     const usuario = userEvent.setup()
 
     await usuario.click(await screen.findByRole('button', { name: 'Excluir Bruno Lima' }))
     await usuario.click(screen.getByRole('button', { name: 'Excluir' }))
 
     expect(await screen.findByText('Ana Souza')).toBeInTheDocument()
-    expect(screen.getByTestId('url')).toHaveTextContent(/^\/$/)
+    expect(screen.getByTestId('url')).toHaveTextContent(/^\/app\/medicos$/)
     expect(fetchFalso.mock.calls.at(-1)?.[0]).toContain('page=0')
   })
 
   it('deveListarInativosComBotaoReativar', async () => {
     const fetchFalso = simularFetch(() => json(pagina([bruno])))
-    renderizar('/inativos', 'inativos')
+    renderizar('/app/medicos/inativos', 'inativos')
 
-    expect(await screen.findByRole('heading', { name: 'Médicos inativos' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Médicos' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Inativos' })).toHaveAttribute('aria-current', 'page')
     expect(await screen.findByRole('button', { name: 'Reativar Bruno Lima' })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Novo médico' })).not.toBeInTheDocument()
     expect(fetchFalso.mock.calls[0][0]).toMatch(/^\/medicos\/inativos\?/)
@@ -174,12 +177,124 @@ describe('ListaMedicos (exclusão e reativação)', () => {
       }
       return json(pagina(reativado ? [] : [bruno]))
     })
-    renderizar('/inativos', 'inativos')
+    renderizar('/app/medicos/inativos', 'inativos')
 
     await userEvent.click(await screen.findByRole('button', { name: 'Reativar Bruno Lima' }))
 
     expect(await screen.findByRole('status')).toHaveTextContent('Médico reativado')
     expect(await screen.findByText('Nenhum médico inativo')).toBeInTheDocument()
     expect(fetchFalso.mock.calls.find(([, init]) => init.method === 'PATCH')?.[0]).toBe('/medicos/2/ativar')
+  })
+})
+
+describe('ListaCadastros: mensagens da entidade', () => {
+  it('deveMostrarMedicoNaoEncontradoQuandoAcaoDer404', async () => {
+    simularFetch((_url, init) => (init.method === 'PATCH' ? vazio(404) : json(pagina([bruno]))))
+    renderizar('/app/medicos/inativos', 'inativos')
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Reativar Bruno Lima' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Médico não encontrado.')
+  })
+})
+
+function renderizarClientes(url = '/app/clientes', modo: 'ativos' | 'inativos' = 'ativos') {
+  return render(
+    <MemoryRouter initialEntries={[url]}>
+      <Routes>
+        <Route path="*" element={<><ListaCadastros area={CLIENTES} modo={modo} /><UrlAtual /></>} />
+      </Routes>
+    </MemoryRouter>,
+  )
+}
+
+describe('ListaCadastros: clientes', () => {
+  it('deveListarClientesComCpfFormatado', async () => {
+    const fetchFalso = simularFetch(() => json(paginaDeClientes([beatriz, caio])))
+    renderizarClientes()
+
+    expect(await screen.findByText('529.982.247-25')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Clientes' })).toBeInTheDocument()
+    expect(screen.getByText('2 clientes')).toBeInTheDocument()
+    expect(screen.queryByText('52998224725')).not.toBeInTheDocument()
+    expect(fetchFalso.mock.calls[0][0]).toBe('/clientes?page=0&size=10&sort=nome%2Casc')
+  })
+
+  it('deveMostrarEstadoVazioDeClientesComAtalho', async () => {
+    simularFetch(() => json(paginaDeClientes([])))
+    renderizarClientes()
+
+    expect(await screen.findByText('Nenhum cliente ativo')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Cadastrar o primeiro cliente' })).toHaveAttribute('href', '/app/clientes/cadastro')
+    expect(screen.getByRole('link', { name: 'Novo cliente' })).toHaveAttribute('href', '/app/clientes/cadastro')
+  })
+
+  it('deveOrdenarClientesPorCpf', async () => {
+    const fetchFalso = simularFetch(() => json(paginaDeClientes([beatriz])))
+    renderizarClientes()
+    await screen.findByText('Beatriz Rocha')
+
+    await userEvent.click(screen.getByRole('button', { name: /CPF/ }))
+
+    expect(screen.getByTestId('url')).toHaveTextContent('/app/clientes?sort=cpf%2Casc')
+    await screen.findByText('Beatriz Rocha')
+    expect(fetchFalso.mock.calls.at(-1)?.[0]).toBe('/clientes?page=0&size=10&sort=cpf%2Casc')
+  })
+
+  it('deveApontarEdicaoParaAAreaDeClientes', async () => {
+    simularFetch(() => json(paginaDeClientes([beatriz])))
+    renderizarClientes()
+
+    expect(await screen.findByRole('link', { name: 'Editar Beatriz Rocha' })).toHaveAttribute('href', '/app/clientes/editar/11')
+  })
+})
+
+describe('ListaCadastros: exclusão e reativação de clientes', () => {
+  it('deveExcluirClienteAposConfirmacaoComAviso', async () => {
+    let excluido = false
+    const fetchFalso = simularFetch((_url, init) => {
+      if (init.method === 'DELETE') {
+        excluido = true
+        return vazio()
+      }
+      return json(paginaDeClientes(excluido ? [caio] : [beatriz, caio]))
+    })
+    renderizarClientes()
+    const usuario = userEvent.setup()
+
+    await usuario.click(await screen.findByRole('button', { name: 'Excluir Beatriz Rocha' }))
+    expect(screen.getByRole('dialog', { name: 'Excluir cliente?' })).toHaveTextContent('Beatriz Rocha')
+    await usuario.click(screen.getByRole('button', { name: 'Excluir' }))
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Cliente excluído')
+    expect(screen.queryByText('Beatriz Rocha')).not.toBeInTheDocument()
+    expect(fetchFalso.mock.calls.find(([, init]) => init.method === 'DELETE')?.[0]).toBe('/clientes/11')
+  })
+
+  it('deveReativarClienteNosInativos', async () => {
+    let reativado = false
+    const fetchFalso = simularFetch((_url, init) => {
+      if (init.method === 'PATCH') {
+        reativado = true
+        return vazio()
+      }
+      return json(paginaDeClientes(reativado ? [] : [caio]))
+    })
+    renderizarClientes('/app/clientes/inativos', 'inativos')
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Reativar Caio Nunes' }))
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Cliente reativado')
+    expect(await screen.findByText('Nenhum cliente inativo')).toBeInTheDocument()
+    expect(fetchFalso.mock.calls.find(([, init]) => init.method === 'PATCH')?.[0]).toBe('/clientes/12/ativar')
+  })
+
+  it('deveMostrarClienteNaoEncontradoQuandoAcaoDer404', async () => {
+    simularFetch((_url, init) => (init.method === 'PATCH' ? vazio(404) : json(paginaDeClientes([caio]))))
+    renderizarClientes('/app/clientes/inativos', 'inativos')
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Reativar Caio Nunes' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Cliente não encontrado.')
   })
 })
