@@ -93,6 +93,24 @@ describe('ListaCadastros: médicos ativos', () => {
     expect(fetchFalso.mock.calls[0][0]).toContain('page=0')
   })
 
+  it('deveManterAlturaDaPaginaCheiaNaUltimaPaginaParaAPaginacaoNaoSubir', async () => {
+    simularFetch(() => json(pagina([bruno], 1, 2)))
+    const { container } = renderizar('/app/medicos?page=1')
+
+    expect(await screen.findByText('Página 2 de 2')).toBeInTheDocument()
+    // A tabela real tem 1 linha; a reserva invisível tem o size da página (10)
+    expect(container.querySelectorAll('table:not([aria-hidden]) tbody tr')).toHaveLength(1)
+    expect(container.querySelectorAll('table[aria-hidden="true"] tbody tr')).toHaveLength(10)
+  })
+
+  it('naoDeveReservarAlturaQuandoTudoCouberNumaPagina', async () => {
+    simularFetch(() => json(pagina([ana, bruno])))
+    const { container } = renderizar()
+
+    await screen.findByText('Ana Souza')
+    expect(container.querySelectorAll('table')).toHaveLength(1)
+  })
+
   it('deveMostrarAvisoRecebidoNaNavegacao', async () => {
     simularFetch(() => json(pagina([ana])))
     renderizar('/app/medicos', 'ativos', { aviso: 'Médico cadastrado' })
